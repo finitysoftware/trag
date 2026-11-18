@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:dialogs="using:Trag.Desktop.Dialogs" xmlns:converters="using:Avalonia.Data.Converters">
+  <!-- DialogHost: scrim, centred card, header (plate or plain icon, title, subtitle, a square ✕), content, footer. The pseudo-classes
+       :plate and :icon switch the header between the round-plate look and the plain one; the template holds the round-plate
+       values, and every style that changes them is conditional, so it wins over the template. -->
+  <ControlTheme x:Key="{x:Type dialogs:DialogHost}" TargetType="dialogs:DialogHost">
+    <Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="dialogs:DialogHost">
+        <Border Background="{DynamicResource ScrimBrush}">
+          <Border Name="Card" Width="{TemplateBinding DialogWidth}" Background="{DynamicResource DialogBrush}" CornerRadius="10" Padding="26" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <!-- Header and footer keep their height; the content takes what the window leaves between them, so a dialog
+                 that scrolls its content scrolls instead of pushing its buttons out of the window. -->
+            <Grid RowDefinitions="Auto,*,Auto">
+              <Grid Name="Header" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                <Border Name="Plate" IsVisible="False" Width="58" Height="58" CornerRadius="29" Background="{TemplateBinding PlateBrush}"><controls:LineIcon Kind="{TemplateBinding Icon}" Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}" Foreground="{TemplateBinding IconBrush}" /></Border>
+                <controls:LineIcon Name="PlainIcon" IsVisible="False" Kind="{TemplateBinding Icon}" Width="26" Height="26" Foreground="{TemplateBinding IconBrush}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                  <TextBlock Text="{TemplateBinding Title}" FontSize="19" FontWeight="SemiBold" />
+                  <TextBlock Name="SubtitleText" Text="{TemplateBinding Subtitle}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Name="CloseButton" Grid.Column="2" VerticalAlignment="Top" Content="✕" Command="{TemplateBinding CloseCommand}" Background="Transparent" BorderThickness="0" Width="26" Height="26" Padding="0"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="14" AutomationProperties.Name="Close" />
+              </Grid>
+              <ContentPresenter Grid.Row="1" Name="PART_ContentPresenter" Margin="0,12,0,0" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <ContentPresenter Grid.Row="2" Name="FooterPresenter" Margin="0,12,0,0" Content="{TemplateBinding Footer}" IsVisible="{TemplateBinding Footer, Converter={x:Static converters:ObjectConverters.IsNotNull}}" />
+            </Grid>
+          </Border>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:plate /template/ Border#Plate"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:icon:not(:plate) /template/ controls|LineIcon#PlainIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:not(:plate) /template/ Grid#Header"><Setter Property="ColumnSpacing" Value="12" /></Style>
+    <Style Selector="^:not(:icon) /template/ Grid#Header"><Setter Property="ColumnSpacing" Value="0" /></Style>
+    <Style Selector="^:not(:plate) /template/ Button#CloseButton"><Setter Property="VerticalAlignment" Value="Center" /></Style>
+    <Style Selector="^:not(:plate) /template/ TextBlock#SubtitleText"><Setter Property="IsVisible" Value="False" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

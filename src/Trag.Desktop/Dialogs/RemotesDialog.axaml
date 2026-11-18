@@ -1,0 +1,78 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:status="using:Trag.Domain.Status"
+                    xmlns:sync="using:Trag.ViewModels.Sync"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.RemotesDialog" x:DataType="sync:RemoteSettingsViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding IsOpen}" CloseCommand="{Binding CloseCommand}" DialogWidth="580"
+                    Title="Remotes" Subtitle="Where this repository fetches from and pushes to. Changes here stay in this repository; only a fetch after adding asks the server."
+                    Icon="cloud" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}">
+  <!-- The remotes, each with a change and a remove action like the picker rows, and under them one form at a time:
+       adding a remote (fetched right after unless unticked), changing the one chosen, or asking before the chosen one is
+       removed. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="This repository has no remote yet." IsVisible="{Binding !Remotes.Count}" FontSize="12" Foreground="{DynamicResource MutedBrush}" />
+    <ItemsControl Name="RemoteList" ItemsSource="{Binding Remotes}">
+      <ItemsControl.ItemTemplate><DataTemplate x:DataType="status:RepositoryRemote">
+        <Grid ColumnDefinitions="24,*,Auto,Auto" ColumnSpacing="8" Margin="0,4">
+          <controls:LineIcon Kind="cloud" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{Binding FetchAddress}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FetchAddress}" />
+          </StackPanel>
+          <Button Grid.Column="2" Classes="rowaction" Command="{Binding $parent[ItemsControl].((sync:RemoteSettingsViewModel)DataContext).BeginEditCommand}" CommandParameter="{Binding}" ToolTip.Tip="Change the name or URL" AutomationProperties.Name="Change remote"><controls:LineIcon Kind="edit" Width="15" Height="15" /></Button>
+          <Button Grid.Column="3" Classes="trash" Command="{Binding $parent[ItemsControl].((sync:RemoteSettingsViewModel)DataContext).BeginRemoveCommand}" CommandParameter="{Binding}" ToolTip.Tip="Remove the remote" AutomationProperties.Name="Remove remote"><controls:LineIcon Kind="trash" Width="15" Height="15" /></Button>
+        </Grid>
+      </DataTemplate></ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <Separator />
+    <StackPanel Spacing="8" IsVisible="{Binding IsAdding}">
+      <TextBlock Text="Add a remote" FontSize="13" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="150,*" ColumnSpacing="8">
+        <TextBox Name="NewRemoteNameEditor" Text="{Binding NewName}" PlaceholderText="Name, e.g. upstream" FontSize="12" MaxLength="255" AutomationProperties.Name="New remote name">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding AddCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+        <TextBox Grid.Column="1" Name="NewRemoteUrlEditor" Text="{Binding NewUrl}" PlaceholderText="URL or path" FontSize="12" MaxLength="4096" AutomationProperties.Name="New remote URL">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding AddCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+      </Grid>
+      <TextBlock Text="{Binding AddError}" IsVisible="{Binding AddError, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+      <Grid ColumnDefinitions="*,Auto">
+        <CheckBox Name="FetchAfterAddingBox" Content="Fetch after adding" IsChecked="{Binding FetchAfterAdding}" FontSize="12" VerticalAlignment="Center"
+                  ToolTip.Tip="Bring the new remote's branches in right after it is added" />
+        <Button Grid.Column="1" Name="AddRemoteButton" Classes="accent" Content="Add remote" Command="{Binding AddCommand}" Padding="16,7" />
+      </Grid>
+    </StackPanel>
+    <StackPanel Spacing="8" IsVisible="{Binding IsEditing}">
+      <TextBlock Text="Change remote" FontSize="13" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="150,*" ColumnSpacing="8">
+        <TextBox Name="EditRemoteNameEditor" Text="{Binding EditName}" FontSize="12" MaxLength="255" AutomationProperties.Name="Remote name">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding SaveCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+        <TextBox Grid.Column="1" Name="EditRemoteUrlEditor" Text="{Binding EditUrl}" FontSize="12" MaxLength="4096" AutomationProperties.Name="Remote URL">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding SaveCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+      </Grid>
+      <TextBlock Text="{Binding EditError}" IsVisible="{Binding EditError, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <Button Name="CancelEditRemoteButton" Content="Cancel" Command="{Binding CancelCommand}" Padding="16,7" />
+        <Button Name="SaveRemoteButton" Classes="accent" Content="Save" Command="{Binding SaveCommand}" Padding="16,7" />
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Spacing="8" IsVisible="{Binding IsRemoving}">
+      <TextBlock Text="Remove this remote?" FontSize="13" FontWeight="SemiBold" />
+      <TextBlock Name="RemoteRemoval" Text="{Binding Removal}" FontSize="12" TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <Button Name="CancelRemoveRemoteButton" Content="Cancel" Command="{Binding CancelCommand}" Padding="16,7" />
+        <Button Name="RemoveRemoteButton" Classes="danger" Content="Remove" Command="{Binding ConfirmRemoveCommand}" Padding="16,7" />
+      </StackPanel>
+    </StackPanel>
+    <TextBlock Text="{Binding Message}" IsVisible="{Binding Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Name="CloseRemotesButton" Content="Close" Command="{Binding CloseCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

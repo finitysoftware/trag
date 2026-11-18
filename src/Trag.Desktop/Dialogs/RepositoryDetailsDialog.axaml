@@ -1,0 +1,84 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:details="using:Trag.ViewModels.Details"
+                    xmlns:text="using:Trag.Domain.Presentation.Text"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.RepositoryDetailsDialog" x:DataType="details:RepositoryDetailsViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding IsOpen}" CloseCommand="{Binding CloseCommand}" DialogWidth="620"
+                    Title="Repository details" Subtitle="Who wrote the current branch, and what this repository holds."
+                    Icon="info" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}">
+  <!-- Read each time the dialog opens: a spinner while Git answers, then the repository with its folder's actions, the
+       current branch's history, its people, each finding their commits in the search, and what the repository holds. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <!-- About the room the details take once read, so the dialog barely moves when they come. -->
+    <Panel Height="440" IsVisible="{Binding Details.IsBusy}">
+      <Arc Name="DetailsSpinner" Classes="spinner" Classes.spinning="{Binding Details.IsBusy}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Panel>
+    <TextBlock Text="{Binding Details.Message}" IsVisible="{Binding Details.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <StackPanel Spacing="24" IsVisible="{Binding Overview, Converter={x:Static converters:ObjectConverters.IsNotNull}}">
+      <!-- The repository with its folder's actions beside the folder, and the current branch's history beside it. -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+        <StackPanel Spacing="2">
+          <TextBlock Name="DetailsName" Text="{Binding Overview.Name}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+          <StackPanel Orientation="Horizontal" Spacing="2">
+            <TextBlock Name="DetailsPath" Text="{Binding Overview.Path}" MaxWidth="210" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Overview.Path}" VerticalAlignment="Center" />
+            <Button Name="RevealRepositoryButton" Classes="rowaction" Command="{Binding RevealCommand}" ToolTip.Tip="Open in File Explorer" AutomationProperties.Name="Open in File Explorer"><controls:LineIcon Kind="folder" Width="14" Height="14" /></Button>
+            <Button Name="CopyRepositoryPathButton" Classes="rowaction" Command="{Binding CopyPathCommand}" ToolTip.Tip="Copy path" AutomationProperties.Name="Copy path"><controls:LineIcon Kind="link" Width="14" Height="14" /></Button>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <controls:LineIcon Kind="branch" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+            <TextBlock Name="DetailsBranch" Text="{Binding Overview.Branch}" FontSize="12" VerticalAlignment="Center" />
+          </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="3">
+          <TextBlock Text="History" FontSize="13" FontWeight="SemiBold" />
+          <TextBlock Name="DetailsCommits" Text="{Binding Overview.Commits}" FontSize="12" TextWrapping="Wrap" />
+          <TextBlock Name="DetailsDates" Text="{Binding Overview.Dates}" IsVisible="{Binding Overview.Dates, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+      <StackPanel Spacing="4" IsVisible="{Binding !!Overview.People.Count}">
+        <TextBlock Text="People" FontSize="13" FontWeight="SemiBold" />
+        <!-- The scroll bar is drawn over the list, so the list scrolls across the dialog's right margin and keeps it free. -->
+        <ScrollViewer MaxHeight="220" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-18,0">
+          <ItemsControl Name="PeopleList" ItemsSource="{Binding Overview.People}" Margin="0,0,18,0">
+            <ItemsControl.ItemTemplate><DataTemplate x:DataType="text:ContributorRow">
+              <Button Classes="branch plain" Command="{Binding $parent[ItemsControl].((details:RepositoryDetailsViewModel)DataContext).ShowPersonCommand}" CommandParameter="{Binding}"
+                      ToolTip.Tip="Find their commits in the search" AutomationProperties.Name="{Binding Identity.Name}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                  <StackPanel Spacing="1">
+                    <TextBlock Text="{Binding Identity.Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Identity.Email}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="1" Text="{Binding Commits}" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                </Grid>
+              </Button>
+            </DataTemplate></ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </StackPanel>
+      <StackPanel Spacing="6">
+        <TextBlock Text="Repository" FontSize="13" FontWeight="SemiBold" />
+        <ItemsControl Name="FactColumns" ItemsSource="{Binding Overview.FactColumns}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate x:DataType="text:DetailColumn">
+            <ItemsControl ItemsSource="{Binding Facts}" Margin="0,0,16,0">
+              <ItemsControl.ItemTemplate><DataTemplate x:DataType="text:DetailFact">
+                <Grid ColumnDefinitions="100,*" Margin="0,2">
+                  <TextBlock Text="{Binding Label}" FontSize="12" Foreground="{DynamicResource MutedBrush}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="12" TextWrapping="Wrap" />
+                </Grid>
+              </DataTemplate></ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </StackPanel>
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Name="CloseRepositoryDetailsButton" Content="Close" Command="{Binding CloseCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

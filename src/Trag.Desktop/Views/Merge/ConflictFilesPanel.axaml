@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:merge="using:Trag.ViewModels.Merge"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Merge.ConflictFilesPanel" x:DataType="shell:ConflictsPage" x:CompileBindings="True">
+  <!-- The files of a merge or rebase stop: the conflicts still open over the files already decided, each decided file
+       tagged with how (yours, the other side, edited, auto, or markers left). -->
+  <Grid Name="ConflictFilesColumn" RowDefinitions="Auto,Auto,Auto,Auto,*" ClipToBounds="True">
+    <Border Classes="mergeheading"><StackPanel Orientation="Horizontal" Spacing="6"><controls:LineIcon Kind="warning" Width="14" Height="14" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" /><TextBlock Text="CONFLICTS ·" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" /><TextBlock Name="ConflictCount" Text="{Binding Resolution.Conflicts.Count}" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" /></StackPanel></Border>
+    <!-- The code-behind keeps this list to about half the column, so it stays virtualized and the decided files keep room. -->
+    <ListBox Grid.Row="1" Name="ConflictList" Classes="virtualized" ItemsSource="{Binding Resolution.Conflicts}" SelectedItem="{Binding Resolution.SelectedConflict}" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Unresolved conflicts">
+      <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="merge:ConflictRow"><Setter Property="AutomationProperties.Name" Value="{Binding PathText}" /></Style></ListBox.Styles>
+      <ListBox.ItemTemplate><DataTemplate x:DataType="merge:ConflictRow"><Grid ColumnDefinitions="22,*,Auto" ColumnSpacing="6" ToolTip.Tip="{Binding PathText}"><TextBlock Text="!" Foreground="{DynamicResource WarningTextBrush}" FontWeight="Bold" /><TextBlock Grid.Column="1" Text="{Binding PathText}" FontSize="12" TextTrimming="CharacterEllipsis" /><TextBlock Grid.Column="2" Text="{Binding BlocksText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" /></Grid></DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+    <TextBlock Grid.Row="2" Text="No conflicts left" IsVisible="{Binding !Resolution.HasConflicts}" FontSize="12" FontStyle="Italic" Foreground="{DynamicResource MutedBrush}" Margin="12,8" />
+    <Border Grid.Row="3" Classes="mergeheading" Margin="0,4,0,0"><StackPanel Orientation="Horizontal" Spacing="6"><controls:LineIcon Kind="check" Width="14" Height="14" Foreground="{DynamicResource DiffAddedBrush}" VerticalAlignment="Center" /><TextBlock Text="RESOLVED ·" Foreground="{DynamicResource DiffAddedBrush}" VerticalAlignment="Center" /><TextBlock Name="ResolvedCount" Text="{Binding Resolution.Resolved.Count}" Foreground="{DynamicResource DiffAddedBrush}" VerticalAlignment="Center" /></StackPanel></Border>
+    <ListBox Grid.Row="4" Name="ResolvedList" Classes="virtualized" ItemsSource="{Binding Resolution.Resolved}" SelectedItem="{Binding Resolution.SelectedResolved}" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Resolved files">
+      <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="merge:ResolvedRow"><Setter Property="AutomationProperties.Name" Value="{Binding PathText}" /></Style></ListBox.Styles>
+      <ListBox.ItemTemplate><DataTemplate x:DataType="merge:ResolvedRow">
+        <Grid ColumnDefinitions="22,*,Auto" ColumnSpacing="6" ToolTip.Tip="{Binding PathText}">
+          <controls:LineIcon Kind="check" Width="14" Height="14" Foreground="{DynamicResource DiffAddedBrush}" IsVisible="{Binding !HasMarkers}" VerticalAlignment="Center" />
+          <controls:LineIcon Kind="blocked" Width="14" Height="14" Foreground="{DynamicResource DiffRemovedBrush}" IsVisible="{Binding HasMarkers}" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding PathText}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          <Border Grid.Column="2" Classes="mergetag" Classes.theirs="{Binding IsOther}" Classes.mine="{Binding IsYours}" Classes.edited="{Binding IsEdited}" Classes.markers="{Binding HasMarkers}"><TextBlock Text="{Binding Tag}" /></Border>
+        </Grid>
+      </DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</UserControl>

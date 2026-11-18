@@ -1,0 +1,28 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:stash="using:Trag.ViewModels.Stash"
+                    xmlns:naming="using:Trag.Domain.Naming"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.StashDialog" x:DataType="stash:StashViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Draft.IsOpen}" CloseCommand="{Binding CancelStashCommand}"
+                    Title="Stash changes" Subtitle="Set the current changes aside and get a clean working tree."
+                    Icon="stash" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #StashMessageEditor}">
+  <!-- Stash: the current changes are set aside under a name and the working tree is clean afterwards. -->
+  <dialogs:DialogHost.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding CreateStashCommand}" /></dialogs:DialogHost.KeyBindings>
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="MESSAGE" Classes="caption" />
+    <TextBox Name="StashMessageEditor" Text="{Binding Draft.Message}" FontSize="12" MaxLength="{x:Static naming:GitLimits.StashMessageLength}" PlaceholderText="What is being set aside" IsEnabled="{Binding !Repository.IsWriting}" AutomationProperties.Name="Stash message" />
+    <TextBlock Text="{Binding StashDefaultHint}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <CheckBox Name="StashUntrackedBox" IsChecked="{Binding Draft.IncludeUntracked}" Content="Include untracked files" FontSize="12" IsEnabled="{Binding !Repository.IsWriting}" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Repository.IsWriting}" />
+    <TextBlock Text="{Binding Draft.Notice}" IsVisible="{Binding Draft.HasNotice}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelStashButton" Content="Cancel" Command="{Binding CancelStashCommand}" Padding="18,8" />
+      <Button Name="CreateStashButton" Classes="primary" Content="Create stash" Command="{Binding CreateStashCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

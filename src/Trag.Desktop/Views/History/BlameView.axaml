@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:history="using:Trag.ViewModels.History"
+             xmlns:blame="using:Trag.Domain.Blame"
+             xmlns:views="using:Trag.Desktop.Views.History"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Views.History.BlameView" x:DataType="history:BlameViewModel" x:CompileBindings="True"
+             IsVisible="{Binding IsOpen}" Background="{DynamicResource SurfaceBrush}"
+             behaviors:FocusOnOpen.Target="{Binding #BlameLines}">
+  <UserControl.KeyBindings><KeyBinding Gesture="Escape" Command="{Binding CloseCommand}" /></UserControl.KeyBindings>
+  <!-- A file blamed line by line over the shown section: the path and version with the way back, the lines with the
+       commit named on the first line of each block and a stripe as strong as that commit is new, and the chosen block's
+       commit with what can be done with it. -->
+  <Grid RowDefinitions="Auto,2,*,Auto">
+    <Border Name="BlameHeader" Background="{DynamicResource ChromeBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1" Padding="8,6">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Name="CloseBlameButton" Classes="scope" Command="{Binding CloseCommand}" ToolTip.Tip="Back" AutomationProperties.Name="Back"><controls:LineIcon Kind="back" Width="18" Height="18" /></Button>
+          <controls:LineIcon Kind="file" Width="16" Height="16" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Path}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Version}" FontSize="12" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" Margin="0,0,8,0">
+          <CheckBox Name="IgnoreWhitespaceBox" Content="Ignore whitespace" IsChecked="{Binding IgnoreWhitespace}" FontSize="12" ToolTip.Tip="A line that only changed its whitespace keeps the commit that wrote it" />
+          <CheckBox Name="DetectMovesBox" Content="Detect moved lines" IsChecked="{Binding DetectMoves}" FontSize="12" ToolTip.Tip="Lines moved within the file, or copied from another file changed in the same commit, keep the commit that wrote them" />
+        </StackPanel>
+      </Grid>
+    </Border>
+    <ProgressBar Classes="thin" Grid.Row="1" IsVisible="{Binding IsBusy}" />
+    <ListBox Grid.Row="2" Name="BlameLines" Classes="virtualized blame" Focusable="True" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" ScrollViewer.HorizontalScrollBarVisibility="Auto" AutomationProperties.Name="Blamed lines">
+      <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="blame:BlameRow"><Setter Property="AutomationProperties.Name" Value="{Binding Line.Text}" /></Style></ListBox.Styles>
+      <ListBox.ItemTemplate><DataTemplate x:DataType="blame:BlameRow">
+        <Border Classes="blameline" Classes.blockstart="{Binding StartsBlock}">
+          <Grid ColumnDefinitions="4,240,56,*">
+            <Border Name="AgeStripe" Background="{DynamicResource AccentBrush}" Opacity="{Binding Age, Converter={x:Static views:BlameView.AgeOpacity}}" />
+            <TextBlock Grid.Column="1" Classes="blamelabel" Text="{Binding Label}" IsVisible="{Binding StartsBlock}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Grid.Column="2" Classes="lineno" Text="{Binding Line.Number}" />
+            <controls:CodeTextBlock Grid.Column="3" Classes="codeline" Code="{Binding Line.Text}" Tokens="{Binding Tokens}" />
+          </Grid>
+        </Border>
+      </DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+    <TextBlock Grid.Row="2" Text="{Binding Message}" IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="16" Foreground="{DynamicResource MutedBrush}" />
+    <Border Grid.Row="3" Name="BlameCommitBar" IsVisible="{Binding SelectedRow, Converter={x:Static ObjectConverters.IsNotNull}}" Background="{DynamicResource ChromeBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="12,6">
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+        <TextBlock Text="{Binding Summary}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Name="ShowBlameCommitButton" Content="Show commit" Command="{Binding ShowCommitCommand}" FontSize="12" />
+        <Button Grid.Column="2" Name="BlameBeforeButton" Content="Blame before it" Command="{Binding BlameBeforeCommand}" FontSize="12" />
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

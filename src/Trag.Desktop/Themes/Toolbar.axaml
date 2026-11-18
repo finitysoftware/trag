@@ -1,0 +1,21 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Trag.Desktop.Controls">
+  <!-- Toolbar tiles, sidebar navigation and the small headings of the main window. -->
+  <Style Selector="Button.tool"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="1" /><Setter Property="BorderBrush" Value="Transparent" /><Setter Property="Padding" Value="5,5" /><Setter Property="MinWidth" Value="54" /><Setter Property="FontSize" Value="11" /></Style>
+  <Style Selector="Button.nav"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderBrush" Value="Transparent" /><Setter Property="Padding" Value="10,9" /><Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="FontSize" Value="12" /></Style>
+  <Style Selector="Button.nav.active"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="Button.tool:pointerover, Button.nav:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button.tool:focus-visible, Button.nav:focus-visible"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Style>
+  <!-- The tile grew from 32 to 40 px while the LineIcon glyphs stay 19 px, so the surface is bigger but the symbols are not. -->
+  <Style Selector="Border.iconTile"><Setter Property="CornerRadius" Value="10" /><Setter Property="Background" Value="{DynamicResource ControlBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="1" /><Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" /></Style>
+  <Style Selector="TextBlock.caption"><Setter Property="FontSize" Value="10" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Button.tool TextBlock.accent"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="TextBlock.detached"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+  <!-- Icon-only discard in the Unstaged header: pale until hovered, red on hover, like the trash on branch rows. -->
+  <Style Selector="Button.headerdiscard"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="5" /><Setter Property="CornerRadius" Value="6" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Button.headerdiscard:pointerover"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="Button.headerdiscard controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Opacity" Value="0.55" /></Style>
+  <Style Selector="Button.headerdiscard:pointerover controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+  <Style Selector="Button.headerdiscard:disabled controls|LineIcon"><Setter Property="Opacity" Value="0.25" /></Style>
+  <Style Selector="Border.iconTile.highlighted"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Style>
+</Styles>

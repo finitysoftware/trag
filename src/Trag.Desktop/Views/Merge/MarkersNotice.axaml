@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:merge="using:Trag.ViewModels.Merge"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Merge.MarkersNotice" x:DataType="merge:ResolutionViewModel" x:CompileBindings="True">
+  <!-- Over Finish or Continue: a staged file still holds conflict markers, with the way to it and back to its conflict.
+       It is hidden until that happens, so its texts are TextBlock.Text, never bound Runs. -->
+  <Border Name="MergeMarkersNotice" Classes="mergestrip danger" CornerRadius="8" IsVisible="{Binding HasMarkers}">
+    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
+      <controls:LineIcon Kind="blocked" Width="16" Height="16" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Center" />
+      <DockPanel Grid.Column="1" VerticalAlignment="Center">
+        <TextBlock DockPanel.Dock="Left" Text="{Binding Scope.MarkersLead}" FontWeight="SemiBold" FontSize="12" Margin="0,0,4,0" />
+        <TextBlock Text="{Binding MarkersText}" TextWrapping="Wrap" FontSize="12" />
+      </DockPanel>
+      <Button Grid.Column="2" Classes="link" Content="Show file" Command="{Binding ShowResolvedCommand}" CommandParameter="{Binding MarkedRow}" VerticalAlignment="Center" />
+      <TextBlock Grid.Column="3" Text="·" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+      <Button Grid.Column="4" Classes="link" Content="Mark as unresolved" Command="{Binding RequestReopenCommand}" CommandParameter="{Binding MarkedRow}" VerticalAlignment="Center" />
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Trag.Desktop/Trag.Desktop.csproj" />
+    <ProjectReference Include="../../src/Trag.ViewModels/Trag.ViewModels.csproj" />
+    <ProjectReference Include="../Trag.TestSupport/Trag.TestSupport.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,75 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:platform="using:Trag.Desktop.Platform" xmlns:controls="using:Trag.Desktop.Controls">
+  <!-- The look of the stock controls throughout the app. -->
+  <!-- Every window carries the app icon: the grey plate for the taskbar and Alt+Tab (Icon), the bare mark for a native title bar (TitleBarIcon); the exe itself gets the plate through ApplicationIcon in the project file. -->
+  <Style Selector="Window"><Setter Property="FontFamily" Value="Segoe UI,Inter,DejaVu Sans,sans-serif" /><Setter Property="Foreground" Value="{DynamicResource TextBrush}" /><Setter Property="Icon" Value="/Assets/trag-icon.ico" /><Setter Property="platform:TitleBarIcon.Source" Value="/Assets/trag-titlebar.ico" /><Setter Property="platform:CaptionColor.Follows" Value="True" /></Style>
+  <Style Selector="Button">
+    <Setter Property="CornerRadius" Value="8" /><Setter Property="Padding" Value="12,7" />
+    <Setter Property="Background" Value="{DynamicResource ControlBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" RecognizesAccessKey="True" /></Border></ControlTemplate></Setter>
+  </Style>
+  <Style Selector="Button:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button:pressed"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /></Style>
+  <Style Selector="Button:focus-visible"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="Button:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  <Style Selector="Button.primary"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="Button.accent"><Setter Property="Background" Value="{DynamicResource AccentStrongBrush}" /><Setter Property="Foreground" Value="White" /><Setter Property="BorderBrush" Value="{DynamicResource AccentStrongBrush}" /></Style>
+  <Style Selector="Button.accent:pointerover"><Setter Property="Background" Value="{DynamicResource AccentStrongBrush}" /><Setter Property="Opacity" Value="0.88" /></Style>
+  <Style Selector="Button.accent:pressed"><Setter Property="Background" Value="{DynamicResource AccentStrongBrush}" /><Setter Property="Opacity" Value="0.75" /></Style>
+  <Style Selector="Button.danger"><Setter Property="Background" Value="{DynamicResource DiffRemovedBrush}" /><Setter Property="Foreground" Value="White" /><Setter Property="BorderBrush" Value="{DynamicResource DiffRemovedBrush}" /></Style>
+  <Style Selector="Button.danger:pointerover"><Setter Property="Background" Value="{DynamicResource DiffRemovedBrush}" /><Setter Property="Opacity" Value="0.88" /></Style>
+  <Style Selector="Button.danger:pressed"><Setter Property="Background" Value="{DynamicResource DiffRemovedBrush}" /><Setter Property="Opacity" Value="0.75" /></Style>
+  <Style Selector="TextBox"><Setter Property="CornerRadius" Value="7" /></Style>
+  <!-- Fluent pads a drop-down 5 above its text and 7 below, which leaves the text a pixel high; even padding centres it. -->
+  <Style Selector="ComboBox"><Setter Property="CornerRadius" Value="7" /><Setter Property="Padding" Value="12,6,0,6" /></Style>
+  <Style Selector="ListBox"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /></Style>
+  <Style Selector="ListBoxItem"><Setter Property="Padding" Value="8,5" /><Setter Property="MinHeight" Value="30" /><Setter Property="CornerRadius" Value="4" /></Style>
+  <!-- The 2 px activity line under headers and above lists; visibility is bound per use. -->
+  <Style Selector="ProgressBar.thin"><Setter Property="IsIndeterminate" Value="True" /><Setter Property="Height" Value="2" /></Style>
+  <!-- A spinner where a whole area waits: three quarters of a ring in the activity line's accent, turning once a second
+       while it carries the "spinning" class, so a hidden one costs nothing. -->
+  <Style Selector="Arc.spinner">
+    <Setter Property="Width" Value="32" /><Setter Property="Height" Value="32" /><Setter Property="StartAngle" Value="0" /><Setter Property="SweepAngle" Value="270" />
+    <Setter Property="Stroke" Value="{DynamicResource SystemControlHighlightAccentBrush}" /><Setter Property="StrokeThickness" Value="3" /><Setter Property="StrokeLineCap" Value="Round" />
+  </Style>
+  <Style Selector="Arc.spinner.spinning">
+    <Style.Animations>
+      <Animation Duration="0:0:1" IterationCount="Infinite">
+        <KeyFrame Cue="0%"><Setter Property="RotateTransform.Angle" Value="0" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="RotateTransform.Angle" Value="360" /></KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+  <!-- Scroll bars keep Fluent's thin line while the pointer is away; under the pointer they expand into a faint rounded
+       track exactly as thick as the narrow accent thumb on it, without the arrow buttons of a classic scroll bar. The
+       thumb keeps its width and shape either way: collapsed it is only narrowed to a quarter, 2 px in from the edge where
+       Fluent draws its line, so expanding and collapsing are that one animation. The template sets the track's fill and
+       the thumb's size itself, which only a style with a condition (:vertical, [IsExpanded=true]) outranks. -->
+  <Style Selector="ScrollBar /template/ RepeatButton#PART_LineUpButton"><Setter Property="IsVisible" Value="False" /></Style>
+  <Style Selector="ScrollBar /template/ RepeatButton#PART_LineDownButton"><Setter Property="IsVisible" Value="False" /></Style>
+  <Style Selector="ScrollBar:vertical /template/ Rectangle#TrackRect"><Setter Property="Fill" Value="{DynamicResource HoverBrush}" /><Setter Property="RadiusX" Value="4" /><Setter Property="RadiusY" Value="4" /><Setter Property="Width" Value="8" /><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+  <Style Selector="ScrollBar:horizontal /template/ Rectangle#TrackRect"><Setter Property="Fill" Value="{DynamicResource HoverBrush}" /><Setter Property="RadiusX" Value="4" /><Setter Property="RadiusY" Value="4" /><Setter Property="Height" Value="8" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="ScrollBar:vertical /template/ Thumb"><Setter Property="Width" Value="8" /><Setter Property="CornerRadius" Value="4" /><Setter Property="RenderTransform" Value="scaleX(0.25) translateX(2px)" /></Style>
+  <Style Selector="ScrollBar:horizontal /template/ Thumb"><Setter Property="Height" Value="8" /><Setter Property="CornerRadius" Value="4" /><Setter Property="RenderTransform" Value="scaleY(0.25) translateY(2px)" /></Style>
+  <!-- Fluent animates only the thumb's shape; the colour follows it at the same pace instead of switching at once. -->
+  <Style Selector="ScrollBar /template/ Thumb"><Setter Property="Transitions"><Transitions><TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" /><BrushTransition Property="Background" Duration="0:0:0.1" /></Transitions></Setter></Style>
+  <Style Selector="ScrollBar[IsExpanded=true] /template/ Thumb"><Setter Property="Background" Value="{DynamicResource AccentBrush}" /><Setter Property="RenderTransform" Value="none" /></Style>
+  <!-- Fluent paints the thumb's own border under the pointer and while dragged. -->
+  <Style Selector="ScrollBar /template/ Thumb:pointerover /template/ Border"><Setter Property="Background" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="ScrollBar /template/ Thumb:pressed /template/ Border"><Setter Property="Background" Value="{DynamicResource AccentBrush}" /></Style>
+  <!-- The app's menus (a commit's actions, More in the toolbar): the app's surface with a hairline, rounded rows that
+       tint on hover, accent icons, and, where a menu names what it acts on, a quiet caption at the top. -->
+  <Style Selector="MenuFlyoutPresenter.actions"><Setter Property="Background" Value="{DynamicResource MenuBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="8" /><Setter Property="Padding" Value="4" /><Setter Property="MinWidth" Value="230" /></Style>
+  <Style Selector="MenuFlyoutPresenter.actions MenuItem"><Setter Property="FontSize" Value="12" /><Setter Property="Padding" Value="10,7" /><Setter Property="CornerRadius" Value="6" /><Setter Property="Foreground" Value="{DynamicResource TextBrush}" /></Style>
+  <Style Selector="MenuFlyoutPresenter.actions MenuItem:pointerover /template/ Border#PART_LayoutRoot"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="MenuFlyoutPresenter.actions MenuItem controls|LineIcon"><Setter Property="Width" Value="16" /><Setter Property="Height" Value="16" /><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="MenuFlyoutPresenter.actions MenuItem:disabled controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Opacity" Value="0.5" /></Style>
+  <Style Selector="MenuFlyoutPresenter.actions MenuItem.caption"><Setter Property="FontSize" Value="11" /><Setter Property="Padding" Value="10,6,10,4" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="MenuFlyoutPresenter.actions Separator"><Setter Property="Background" Value="{DynamicResource DividerBrush}" /><Setter Property="Margin" Value="6,3" /></Style>
+  <!-- A list heading, "Title · count": one text block each, since a bound Run changed while hidden stays empty. -->
+  <Style Selector="StackPanel.heading"><Setter Property="Orientation" Value="Horizontal" /><Setter Property="Spacing" Value="4" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="StackPanel.heading > TextBlock"><Setter Property="FontSize" Value="12" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <!-- Long lists realize only the visible rows. -->
+  <Style Selector="ListBox.virtualized"><Setter Property="ItemsPanel"><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></Setter></Style>
+</Styles>

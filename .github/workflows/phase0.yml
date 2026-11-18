@@ -1,0 +1,148 @@
+name: Build, test and NativeAOT
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Build, unit tests, NativeAOT publish and the smokes of the published app. Windows must pass; Linux reports without
+  # failing the run until Trag's tests are made to run on Linux.
+  build-test-aot:
+    continue-on-error: ${{ matrix.os == 'ubuntu-24.04' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            rid: win-x64
+            executable: Trag.exe
+          - os: ubuntu-24.04
+            rid: linux-x64
+            executable: Trag
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Linux prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang zlib1g-dev libx11-6 libice6 libsm6 libfontconfig1 libfreetype6 libxrandr2 libxi6 libxcursor1 libxrender1 libgl1 libegl1 libsecret-1-0 dbus-x11 gnome-keyring xvfb xdotool fonts-dejavu-core
+      - name: Restore locked dependencies
+        run: dotnet restore Trag.sln --locked-mode
+      - name: Build
+        run: dotnet build Trag.sln -c Release --no-restore
+      # One test project at a time (-m:1): run side by side they shared the runner's cores, and tests that wait for the
+      # watcher or a view timed out at the start of the run. The integration tests run in their own job below.
+      - name: Unit tests
+        run: dotnet test Trag.sln -c Release --no-build -m:1 --filter "FullyQualifiedName!~Trag.IntegrationTests" --logger trx --results-directory artifacts/test-results -- xUnit.MaxParallelThreads=4
+      - name: Windows NativeAOT publish
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Publish-Windows.ps1
+      - name: Linux NativeAOT publish
+        if: runner.os == 'Linux'
+        run: dotnet publish src/Trag.Desktop -c Release -r linux-x64 -p:RestoreLockedMode=true -o artifacts/publish/linux-x64
+      - name: Smoke from path containing spaces (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Copy-Item -LiteralPath artifacts/publish/win-x64 -Destination 'artifacts/Trag With Spaces' -Recurse
+          dotnet run --project tests/Trag.Benchmarks -c Release --no-build -- smoke 'artifacts/Trag With Spaces/Trag.exe'
+          if ($LASTEXITCODE -ne 0) { throw 'Windows AOT smoke failed' }
+          ./scripts/Test-AskPassIsolation.ps1 -Executable 'artifacts/Trag With Spaces/Trag.exe'
+      - name: Runtime-free Linux container smoke
+        if: runner.os == 'Linux'
+        run: |
+          docker build -f tests/runtime-linux/Dockerfile -t trag-phase0-runtime .
+          docker run --rm --network none trag-phase0-runtime
+      - name: Generate large fixture
+        run: dotnet run --project tests/Trag.Benchmarks -c Release --no-build -- generate artifacts/fixtures/large 100000 10000
+      - name: Native desktop pointer and keyboard (Windows)
+        if: runner.os == 'Windows'
+        run: dotnet run --project tests/Trag.Benchmarks -c Release --no-build -- desktop-smoke artifacts/publish/win-x64/Trag.exe artifacts/phase1/desktop-smoke
+      - name: Published application UI suites
+        shell: pwsh
+        run: |
+          $app = 'artifacts/publish/${{ matrix.rid }}/${{ matrix.executable }}'
+          $benchmark = 'tests/Trag.Benchmarks/bin/Release/net10.0/Trag.Benchmarks.dll'
+          foreach ($mode in @('open-smoke', 'live-smoke', 'write-smoke', 'history-smoke', 'diff-smoke', 'sync-smoke', 'merge-smoke', 'accounts-smoke')) {
+            $arguments = @($benchmark, $mode, $app, "artifacts/phase1/$mode")
+            if ($mode -eq 'history-smoke') { $arguments += 'artifacts/fixtures/large' }
+            if ($IsLinux) { & xvfb-run -a dotnet @arguments }
+            else { & dotnet @arguments }
+            if ($LASTEXITCODE -ne 0) { throw "$mode failed with exit code $LASTEXITCODE" }
+          }
+      - name: Large repository lifecycle and input
+        shell: pwsh
+        run: |
+          $arguments = @('tests/Trag.Benchmarks/bin/Release/net10.0/Trag.Benchmarks.dll', 'ui-open',
+            'artifacts/publish/${{ matrix.rid }}/${{ matrix.executable }}', 'artifacts/phase1/large-open.json', '3', 'artifacts/fixtures/large')
+          if ($IsLinux) { & xvfb-run -a dotnet @arguments }
+          else { & dotnet @arguments }
+          if ($LASTEXITCODE -ne 0) { throw 'Large repository lifecycle failed' }
+      - name: Preserve binaries and evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: phase0-${{ matrix.rid }}
+          if-no-files-found: error
+          path: |
+            artifacts/publish/
+            artifacts/test-results/
+            artifacts/phase1/
+
+  # The integration tests drive the real Git for over an hour and meet what a runner has that a desk does not: another Git
+  # configuration, more tools on the PATH, a slower disk. They run only when the workflow is started by hand (Run
+  # workflow), since every push would spend that hour on both runners, and report without failing the run; they are run
+  # in full on the developer's machine before a change lands.
+  integration-tests:
+    if: github.event_name == 'workflow_dispatch'
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            rid: win-x64
+          - os: ubuntu-24.04
+            rid: linux-x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Linux prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsecret-1-0 dbus-x11 gnome-keyring fonts-dejavu-core
+      - name: Restore locked dependencies
+        run: dotnet restore Trag.sln --locked-mode
+      - name: Build
+        run: dotnet build tests/Trag.IntegrationTests -c Release --no-restore
+      - name: Integration tests
+        run: dotnet test tests/Trag.IntegrationTests -c Release --no-build --logger trx --results-directory artifacts/test-results -- xUnit.MaxParallelThreads=4
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-${{ matrix.rid }}
+          if-no-files-found: warn
+          path: artifacts/test-results/
+
+# Shared CI checks functionality; absolute startup/RAM acceptance is measured
+# separately on fixed Windows and GNOME/KDE hardware with cold and warm caches.

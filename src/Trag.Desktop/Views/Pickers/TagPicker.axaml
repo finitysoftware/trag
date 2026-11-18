@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:tags="using:Trag.ViewModels.Tags"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Views.Pickers.TagPicker" x:DataType="tags:TagsViewModel" x:CompileBindings="True" Width="320"
+             behaviors:FocusOnOpen.Target="{Binding #TagSearchBox}">
+  <Grid RowDefinitions="*,Auto">
+    <StackPanel Spacing="8" Margin="16,15,16,12">
+      <TextBlock Text="Tags" FontWeight="SemiBold" FontSize="13" />
+      <TextBlock Text="Click a tag to find its commit in the history." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <TextBox Name="TagSearchBox" Text="{Binding TagSearch}" PlaceholderText="Find a tag…" FontSize="12" MaxLength="255" AutomationProperties.Name="Find a tag" />
+      <TextBlock Text="{Binding List.Message}" IsVisible="{Binding List.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <!-- The scroll bar is drawn over the content, so the list scrolls across the picker's right margin and keeps it free: the bar lies beside the rows' buttons. -->
+      <ScrollViewer MaxHeight="380" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-16,0">
+        <!-- The rows are plain records; every action is a command of the tags view model that takes the row. -->
+        <ItemsControl Name="TagList" ItemsSource="{Binding Visible}" Margin="0,0,16,0"><ItemsControl.ItemTemplate><DataTemplate x:DataType="tags:TagRow">
+          <Button Classes="stash" Command="{Binding $parent[ItemsControl].((tags:TagsViewModel)DataContext).ShowCommand}" CommandParameter="{Binding}" ToolTip.Tip="Find this tag's commit in the history">
+            <Grid ColumnDefinitions="24,*,Auto" ColumnSpacing="8">
+              <controls:LineIcon Kind="tag" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+              <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center"><TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Detail}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" /></StackPanel>
+              <StackPanel Grid.Column="2" Orientation="Horizontal"><Button Classes="rowaction" IsVisible="{Binding $parent[ItemsControl].((tags:TagsViewModel)DataContext).CanPushTags}" Command="{Binding $parent[ItemsControl].((tags:TagsViewModel)DataContext).PushCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding $parent[ItemsControl].((tags:TagsViewModel)DataContext).PushTip}" AutomationProperties.Name="Push tag"><controls:LineIcon Kind="push" Width="14" Height="14" /></Button>
+              <Button Classes="trash" Command="{Binding $parent[ItemsControl].((tags:TagsViewModel)DataContext).RequestDeleteCommand}" CommandParameter="{Binding}" ToolTip.Tip="Delete the tag" AutomationProperties.Name="Delete tag"><controls:LineIcon Kind="trash" Width="14" Height="14" /></Button></StackPanel>
+            </Grid>
+          </Button>
+        </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+      </ScrollViewer>
+    </StackPanel>
+    <Border Grid.Row="1" Name="TagBusySlot" Height="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+      <controls:BusyBar Name="TagBusyBar" IsActive="{Binding List.IsBusy}" Height="2" MinHeight="2" />
+    </Border>
+  </Grid>
+</UserControl>

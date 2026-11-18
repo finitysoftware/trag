@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Shell.WorkspaceToolBar" x:DataType="shell:ShellViewModel" x:CompileBindings="True">
+  <!-- The toolbar of an open repository: open, pull, push or publish, fetch, merge, refresh, stash, close. -->
+  <StackPanel Orientation="Horizontal" Spacing="2">
+    <controls:ToolButton Name="OpenButton" Kind="open" Text="Open" Command="{Binding OpenCommand}" ToolTip.Tip="Open (Ctrl+O)" AutomationProperties.Name="Open" />
+    <controls:ToolButton Name="PullButton" Kind="pull" Text="{Binding Sync.Panel.Counts.PullLabel}" Pending="{Binding Sync.Panel.Counts.SuggestsPull}" Command="{Binding Sync.PullCommand}" ToolTip.Tip="{Binding Sync.Panel.Counts.PullTip}" ToolTip.ShowOnDisabled="True" AutomationProperties.Name="Pull" />
+    <controls:ToolButton Name="PushButton" Kind="push" Text="{Binding Sync.Panel.Counts.PushLabel}" Pending="{Binding Sync.Panel.Counts.HasPushCount}" IsVisible="{Binding !Publish.Context.ShowPublish}" Command="{Binding Sync.PushCommand}" ToolTip.Tip="{Binding Sync.Panel.Target.PushDestination}" AutomationProperties.Name="Push" />
+    <!-- Publish takes Push's place while the branch has no remote or upstream to push to. -->
+    <controls:ToolButton Name="PublishButton" Kind="publish" Text="Publish" Accent="True" Highlighted="True" IsVisible="{Binding Publish.Context.ShowPublish}" Command="{Binding Publish.OpenPublishCommand}" ToolTip.Tip="{Binding Publish.Context.Tip}" AutomationProperties.Name="Publish" />
+    <controls:ToolButton Name="FetchButton" Kind="fetch" Text="Fetch" Command="{Binding Sync.FetchCommand}" ToolTip.Tip="{Binding AutoFetch.FetchTip}" AutomationProperties.Name="Fetch" />
+    <controls:ToolButton Name="MergeButton" Kind="merge" Text="Merge" Command="{Binding MergeDialog.OpenCommand}" ToolTip.Tip="Merge one branch into another (Ctrl+Shift+M)" AutomationProperties.Name="Merge" />
+    <controls:ToolButton Name="RefreshButton" Kind="refresh" Text="Refresh" Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh (F5)" AutomationProperties.Name="Refresh" />
+    <controls:ToolButton Name="StashButton" Kind="stash" Text="Stash" Command="{Binding Stash.OpenStashCommand}" ToolTip.Tip="Stash changes (Ctrl+Shift+K)" AutomationProperties.Name="Stash" />
+    <controls:ToolButton Name="CloseButton" Kind="close" Text="Close" Command="{Binding CloseRepositoryCommand}" ToolTip.Tip="Close (Ctrl+W)" AutomationProperties.Name="Close" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,25 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:branches="using:Trag.ViewModels.Branches"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.RenameBranchDialog" x:DataType="branches:BranchesViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Rename.IsOpen}" CloseCommand="{Binding CancelRenameCommand}"
+                    Title="Rename branch" Icon="edit" IconBrush="{DynamicResource TextBrush}" DialogWidth="480"
+                    behaviors:FocusOnOpen.Target="{Binding #RenameBranchEditor}">
+  <!-- The branch's name to change; Rename only for a new name no other branch has, and the reason a name is refused. -->
+  <StackPanel Name="RenameBranchFields" Spacing="12">
+    <TextBlock Text="{Binding Rename.Subtitle}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="New name" FontWeight="SemiBold" FontSize="13" />
+    <TextBox Name="RenameBranchEditor" Text="{Binding Rename.Name}" MaxLength="255" FontSize="12" AutomationProperties.Name="New branch name">
+      <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding RenameBranchCommand}" /></TextBox.KeyBindings>
+    </TextBox>
+    <TextBlock Name="RenameBranchError" Text="{Binding Rename.NameError}" IsVisible="{Binding Rename.HasNameError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Rename.Notice}" IsVisible="{Binding Rename.HasNotice}" FontSize="12" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelRenameBranchButton" Content="Cancel" Command="{Binding CancelRenameCommand}" Padding="18,8" />
+      <Button Name="ConfirmRenameBranchButton" Classes="accent" Content="Rename" Command="{Binding RenameBranchCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

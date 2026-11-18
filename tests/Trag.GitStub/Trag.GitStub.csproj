@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The Git that changes nothing, which the integration tests start in place of Git (SkippedGitWriteTests,
+       SkippedSyncWriteTests); with TRAG_GITSTUB_FLOOD it is the git.exe whose answer is larger than Trag reads
+       (GitLocatorChooseTests). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+</Project>

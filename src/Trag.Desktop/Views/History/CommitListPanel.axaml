@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:coreHistory="using:Trag.Domain.History"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.History.CommitListPanel" x:DataType="shell:HistoryPage" x:CompileBindings="True">
+  <!-- The upper history pane: the section header with the search box and scope, the column captions, the commit list,
+       which reads the next page as it is scrolled near its end, and the footer with the message and the count. -->
+  <Grid RowDefinitions="Auto,Auto,2,*,Auto" ClipToBounds="True">
+    <Border Background="{DynamicResource ChromeBrush}" Padding="12,8">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="10">
+        <TextBlock Text="{Binding History.Title}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+        <!-- The one file the history follows, with the way back to the whole history. -->
+        <Border Grid.Column="1" Name="FileHistoryChip" Classes="chip" HorizontalAlignment="Left" IsVisible="{Binding History.FilePath, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <controls:LineIcon Kind="file" Width="14" Height="14" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding History.FilePath}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <Button Name="ClearFileHistoryButton" Classes="chipclose" Command="{Binding History.ClearFileHistoryCommand}" ToolTip.Tip="Show the whole history" AutomationProperties.Name="Show the whole history"><controls:LineIcon Kind="close" Width="12" Height="12" /></Button>
+          </StackPanel>
+        </Border>
+        <TextBox Grid.Column="1" Name="HistorySearchEditor" Text="{Binding History.SearchQuery}" AutomationProperties.Name="Search history" IsVisible="{Binding History.IsSearch}" PlaceholderText="Search SHA, full message or author" FontSize="12" MaxLength="1024">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding History.SearchHistoryCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+        <Button Grid.Column="2" Content="Search" Command="{Binding History.SearchHistoryCommand}" IsVisible="{Binding History.IsSearch}" FontSize="12" />
+        <Button Grid.Column="3" Name="HistoryCancelButton" Classes="scope" IsVisible="{Binding History.ShowHistoryCancel}" Command="{Binding Cancel}" AutomationProperties.Name="Cancel">
+          <!-- The ✕ sits 2 px low, on the middle of the lowercase letters, without changing the button's height. -->
+          <StackPanel Orientation="Horizontal" Spacing="5"><controls:LineIcon Kind="close" Width="12" Height="12" VerticalAlignment="Center" Margin="0,2,0,-2" /><TextBlock Text="Cancel" FontSize="12" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+        <Button Grid.Column="4" Classes="scope" Classes.active="{Binding !History.HistoryAllBranches}" Name="HistoryScopeButton" Command="{Binding History.ToggleHistoryScopeCommand}" ToolTip.Tip="{Binding History.HistoryScopeTip}" AutomationProperties.Name="Show only the current branch"><controls:LineIcon Kind="branch" Width="18" Height="18" /></Button>
+      </Grid>
+    </Border>
+    <Border Grid.Row="1" Background="{DynamicResource ChromeBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1" Padding="10,6">
+      <Grid ColumnDefinitions="Auto,160,100,*,120"><TextBlock Name="GraphCaption" Text="Graph" IsVisible="{Binding History.ShowsGraph}" FontSize="11" Opacity="0.6" MinWidth="{Binding History.Page.Graph, Converter={x:Static controls:CommitGraphCell.WidthOfGraph}}" Margin="0,0,10,0" /><TextBlock Grid.Column="1" Text="Author" FontSize="11" Opacity="0.6" /><TextBlock Grid.Column="2" Text="Commit" FontSize="11" Opacity="0.6" /><TextBlock Grid.Column="3" Text="Message" FontSize="11" Opacity="0.6" /><TextBlock Grid.Column="4" Text="Date" FontSize="11" Opacity="0.6" /></Grid>
+    </Border>
+    <ProgressBar Classes="thin" Grid.Row="2" IsVisible="{Binding History.IsHistoryBusy}" />
+    <ListBox Grid.Row="3" Name="HistoryList" Classes="virtualized" Focusable="True" DoubleTapped="HistoryRowDoubleTapped" ItemsSource="{Binding History.Page.Commits}" SelectedItem="{Binding History.SelectedCommit}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Commit history">
+      <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="coreHistory:HistoryCommit"><Setter Property="AutomationProperties.Name" Value="{Binding Caption}" /></Style></ListBox.Styles>
+      <ListBox.ItemTemplate><DataTemplate x:DataType="coreHistory:HistoryCommit">
+        <Grid ColumnDefinitions="Auto,160,100,*,120" Background="Transparent" ToolTip.Tip="{Binding Subject}">
+          <!-- A right-click chooses the commit and offers what its pane offers, named and with the same icons; the
+               transparent background lets a right-click between the columns reach the menu too. -->
+          <Grid.ContextFlyout>
+            <MenuFlyout FlyoutPresenterClasses="actions">
+              <MenuItem Classes="caption" IsHitTestVisible="False" Focusable="False">
+                <MenuItem.Header><TextBlock MaxWidth="320" TextTrimming="CharacterEllipsis" Text="{Binding Caption}" /></MenuItem.Header>
+              </MenuItem>
+              <Separator />
+              <MenuItem Header="Create branch" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Branches.CreateBranchFromCommitCommand}"><MenuItem.Icon><controls:LineIcon Kind="branch" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Create tag" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Tags.OpenCreateTagCommand}"><MenuItem.Icon><controls:LineIcon Kind="tag" /></MenuItem.Icon></MenuItem>
+              <Separator />
+              <MenuItem Header="Revert" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Revert.RequestRevertCommand}"><MenuItem.Icon><controls:LineIcon Kind="discard" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Cherry-pick" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).CherryPick.RequestCherryPickCommand}"><MenuItem.Icon><controls:LineIcon Kind="cherrypick" /></MenuItem.Icon></MenuItem>
+              <Separator />
+              <MenuItem Header="Reset current branch to here" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Reset.RequestResetCommand}"><MenuItem.Icon><controls:LineIcon Kind="reset" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Edit commits from here" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Rewrite.RequestRewriteCommand}"><MenuItem.Icon><controls:LineIcon Kind="rebase" /></MenuItem.Icon></MenuItem>
+              <Separator />
+              <MenuItem Header="Copy SHA" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).History.CopyCommitIdCommand}"><MenuItem.Icon><controls:LineIcon Kind="link" /></MenuItem.Icon></MenuItem>
+            </MenuFlyout>
+          </Grid.ContextFlyout>
+          <controls:CommitGraphCell Commit="{Binding}" IsVisible="{Binding $parent[ListBox].((shell:HistoryPage)DataContext).History.ShowsGraph}" Graph="{Binding $parent[ListBox].((shell:HistoryPage)DataContext).History.Page.Graph}" Head="{Binding $parent[ListBox].((shell:HistoryPage)DataContext).GoTo.CurrentHeadId}" VerticalAlignment="Stretch" Margin="0,0,10,0" /><TextBlock Grid.Column="1" Text="{Binding Author}" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,10,0" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Text="{Binding ShortId}" FontSize="11" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><DockPanel Grid.Column="3" Margin="0,0,12,0" VerticalAlignment="Center"><ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Refs}" VerticalAlignment="Center"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate x:DataType="coreHistory:CommitRef"><Border Classes="refbadge" Classes.current="{Binding IsCurrent}" Classes.remote="{Binding IsRemote}" Classes.tag="{Binding IsTag}" Classes.head="{Binding IsHead}"><StackPanel Orientation="Horizontal" Spacing="3"><controls:LineIcon Kind="branch" Width="11" Height="11" IsVisible="{Binding IsBranch}" VerticalAlignment="Center" /><controls:LineIcon Kind="cloud" Width="11" Height="11" IsVisible="{Binding IsRemote}" VerticalAlignment="Center" /><controls:LineIcon Kind="tag" Width="11" Height="11" IsVisible="{Binding IsTag}" VerticalAlignment="Center" /><TextBlock Text="{Binding Name}" VerticalAlignment="Center" /></StackPanel></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><Border DockPanel.Dock="Left" Classes="pathbadge" IsVisible="{Binding OriginalPath, Converter={x:Static ObjectConverters.IsNotNull}}"><TextBlock Text="{Binding OriginalPathText}" /></Border><TextBlock Text="{Binding Subject}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /></DockPanel><TextBlock Grid.Column="4" Text="{Binding DateText}" FontSize="11" Opacity="0.65" VerticalAlignment="Center" /></Grid>
+      </DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+    <Border Grid.Row="4" Padding="12,6" Background="{DynamicResource ChromeBrush}">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+        <TextBlock Text="{Binding History.Page.Message}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Name="HistoryCount" Text="{Binding History.Page.CountText}" FontSize="11" VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

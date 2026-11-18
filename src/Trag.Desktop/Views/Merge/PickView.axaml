@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             xmlns:viewsMerge="using:Trag.Desktop.Views.Merge"
+             x:Class="Trag.Desktop.Views.Merge.PickView" x:DataType="shell:PickPage" x:CompileBindings="True">
+  <!-- A revert or a cherry-pick stopped at its conflicts: the banner with what is left, the conflict panels the merge and
+       rebase views share, and the pick's own Abort (behind a question) and Finish, which waits for the last conflict and,
+       like the merge view's, names a resolved file that still holds markers. -->
+  <Grid RowDefinitions="Auto,*,Auto">
+    <viewsMerge:OperationBanner Name="PickBanner" Title="{Binding Pick.Words.Title}" Remaining="{Binding Conflicts.Resolution.Scope.ViewLine}"
+                                ReviewCommand="{Binding Navigator.ShowFileStatusCommand}" />
+
+    <controls:RatioGrid Grid.Row="1" Ratio="{Binding Conflicts.Layout.DiffFilesRatio, Mode=TwoWay}">
+      <viewsMerge:ConflictFilesPanel DataContext="{Binding Conflicts}" />
+      <controls:PaneSplitter Grid.Column="1" AutomationProperties.Name="Resize conflict panels" ToolTip.Tip="Drag to resize · Double-click to restore" />
+      <viewsMerge:ConflictDetailPanel Grid.Column="2" DataContext="{Binding Conflicts}" />
+    </controls:RatioGrid>
+
+    <Border Grid.Row="2" Background="{DynamicResource ChromeBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="14,9">
+      <Grid>
+        <StackPanel Spacing="6" IsVisible="{Binding !Pick.Abort.IsOpen}">
+          <viewsMerge:MarkersNotice DataContext="{Binding Conflicts.Resolution}" />
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+            <Button Name="RequestAbortPickButton" Content="{Binding Pick.Words.AbortAction}" Command="{Binding Pick.RequestAbortPickCommand}" FontSize="11" Padding="10,5" />
+            <TextBlock Grid.Column="1" Text="{Binding Pick.Words.FinishHint}" TextWrapping="Wrap" FontSize="10" Opacity="0.65" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Name="FinishPickButton" Content="{Binding Pick.Words.FinishAction}" Command="{Binding Pick.FinishPickCommand}" FontSize="12" Padding="14,6" />
+          </Grid>
+        </StackPanel>
+        <StackPanel IsVisible="{Binding Pick.Abort.IsOpen}" Spacing="10">
+          <TextBlock Text="{Binding Pick.Words.AbortTitle}" FontWeight="SemiBold" FontSize="13" />
+          <TextBlock Text="{Binding Pick.Abort.Text}" TextWrapping="Wrap" FontSize="12" />
+          <ProgressBar Classes="thin" IsVisible="{Binding Pick.Abort.IsRunning}" />
+          <TextBlock Text="{Binding Pick.Abort.Message}" IsVisible="{Binding Pick.Abort.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Name="KeepPickButton" Content="{Binding Pick.Words.KeepAction}" Command="{Binding Pick.Abort.CancelCommand}" FontSize="12" />
+            <Button Name="ConfirmAbortPickButton" Classes="danger" Content="{Binding Pick.Words.ConfirmAbortAction}" Command="{Binding Pick.Abort.ConfirmCommand}" FontSize="12" />
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

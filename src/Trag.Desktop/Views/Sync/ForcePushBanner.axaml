@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:sync="using:Trag.ViewModels.Sync" xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Sync.ForcePushBanner" x:DataType="sync:ForcePushViewModel" x:CompileBindings="True">
+  <!-- Above the file status while the branch was rewritten after it was pushed: what that means, the way to its history,
+       and, once asked, the question before the remote branch is replaced. The file status changes these texts while it
+       is hidden, so each is a TextBlock's Text. -->
+  <Border Name="ForcePushNotice" Background="{DynamicResource NoticeTintBrush}" Padding="16,8" IsVisible="{Binding Summary.Shows}">
+    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+      <controls:LineIcon Kind="push" Width="17" Height="17" Foreground="{DynamicResource MineBrush}" VerticalAlignment="Center" />
+      <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center" IsVisible="{Binding !Replace.IsOpen}">
+        <TextBlock Name="ForcePushTitle" Text="{Binding Summary.Title}" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding Summary.Text}" FontSize="12" TextWrapping="Wrap" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center" IsVisible="{Binding Replace.IsOpen}">
+        <TextBlock Name="ForcePushQuestion" Text="{Binding Summary.ConfirmTitle}" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding Summary.ConfirmText}" FontSize="12" TextWrapping="Wrap" />
+        <ProgressBar Classes="thin" IsVisible="{Binding Replace.IsRunning}" />
+        <TextBlock Text="{Binding Replace.Message}" IsVisible="{Binding Replace.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource DiffRemovedBrush}" />
+      </StackPanel>
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" IsVisible="{Binding !Replace.IsOpen}">
+        <Button Name="ShowRewrittenHistoryButton" Classes="link" Content="Show in History" Command="{Binding ShowHistoryCommand}" VerticalAlignment="Center" />
+        <Button Name="RequestForcePushButton" Command="{Binding RequestForcePushCommand}" FontSize="12" Padding="12,5" AutomationProperties.Name="Force push with lease">
+          <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="push" Width="14" Height="14" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Force push with lease…" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+      </StackPanel>
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" IsVisible="{Binding Replace.IsOpen}">
+        <Button Name="KeepRemoteButton" Content="Keep remote" Command="{Binding Replace.CancelCommand}" FontSize="12" Padding="12,5" />
+        <Button Name="ConfirmForcePushButton" Classes="danger" Command="{Binding Replace.ConfirmCommand}" FontSize="12" Padding="12,5" AutomationProperties.Name="Force push">
+          <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="push" Width="14" Height="14" Foreground="White" VerticalAlignment="Center" /><TextBlock Text="Force push" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

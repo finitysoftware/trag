@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:stash="using:Trag.ViewModels.Stash"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Pickers.StashPicker" x:DataType="stash:StashViewModel" x:CompileBindings="True" Width="320">
+  <StackPanel Spacing="8" Margin="16,15,16,12">
+    <TextBlock Text="Stashes" FontWeight="SemiBold" FontSize="13" />
+    <TextBlock Text="Click an entry to preview it. Apply brings the changes back and keeps the entry." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding List.Message}" IsVisible="{Binding List.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <!-- The scroll bar is drawn over the content, so the list scrolls across the picker's right margin and keeps it free: the bar lies beside the rows' buttons. -->
+    <ScrollViewer MaxHeight="380" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-16,0">
+      <!-- The rows are plain records; every action is a command of the stash view model that takes the row. -->
+      <ItemsControl Name="StashList" ItemsSource="{Binding Rows}" Margin="0,0,16,0"><ItemsControl.ItemTemplate><DataTemplate x:DataType="stash:StashRow">
+        <Button Classes="stash" Command="{Binding $parent[ItemsControl].((stash:StashViewModel)DataContext).PreviewCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Tooltip}" AutomationProperties.Name="{Binding Title}">
+          <Grid ColumnDefinitions="24,*,Auto" ColumnSpacing="8">
+            <controls:LineIcon Kind="stash" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center"><TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Detail}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" /></StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal"><Button Classes="rowaction" Command="{Binding $parent[ItemsControl].((stash:StashViewModel)DataContext).ApplyCommand}" CommandParameter="{Binding}" ToolTip.Tip="Apply the stash" AutomationProperties.Name="Apply stash"><controls:LineIcon Kind="pull" Width="14" Height="14" /></Button>
+            <Button Classes="trash" Command="{Binding $parent[ItemsControl].((stash:StashViewModel)DataContext).RequestDropCommand}" CommandParameter="{Binding}" ToolTip.Tip="Drop the stash" AutomationProperties.Name="Drop stash"><controls:LineIcon Kind="trash" Width="14" Height="14" /></Button></StackPanel>
+          </Grid>
+        </Button>
+      </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+    </ScrollViewer>
+  </StackPanel>
+</UserControl>

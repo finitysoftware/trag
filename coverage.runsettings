@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Code coverage collection for scripts/Measure-Coverage.ps1 (coverlet.collector, XPlat Code Coverage). -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Only the four production assemblies are measured. -->
+          <Include>[Trag.Domain]*,[Trag.Application]*,[Trag.Infrastructure]*,[Trag.ViewModels]*,[Trag.Desktop]*</Include>
+          <Exclude>[*.UnitTests]*,[Trag.IntegrationTests]*,[Trag.ArchitectureTests]*,[Trag.TestSupport]*,[Trag.Benchmarks]*,[Trag.LibGit2Probe]*</Exclude>
+          <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+          <!-- Source generators (CommunityToolkit.Mvvm, System.Text.Json, LibraryImport) and compiled XAML emit into obj. -->
+          <ExcludeByFile>**/obj/**/*.cs,**/*.g.cs,**/*.axaml</ExcludeByFile>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+          <SkipAutoProps>true</SkipAutoProps>
+          <UseSourceLink>false</UseSourceLink>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

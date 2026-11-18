@@ -1,0 +1,30 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:tags="using:Trag.ViewModels.Tags"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.CreateTagDialog" x:DataType="tags:TagsViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Draft.IsOpen}" CloseCommand="{Binding CancelCreateTagCommand}"
+                    Title="Create tag" Icon="tag" IconBrush="{DynamicResource TextBrush}" DialogWidth="480"
+                    behaviors:FocusOnOpen.Target="{Binding #NewTagNameEditor}">
+  <!-- A tag at the commit chosen in History: Enter in the name creates it; a message makes it an annotated tag (a
+       repository that signs its tags asks for one), and with a remote the tag can go there right after. -->
+  <StackPanel Spacing="12">
+    <TextBlock Text="{Binding Draft.Subtitle}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="Tag name" FontWeight="SemiBold" FontSize="13" />
+    <TextBox Name="NewTagNameEditor" Text="{Binding Draft.Name}" PlaceholderText="e.g. v1.4.0" MaxLength="255" FontSize="12" AutomationProperties.Name="Tag name">
+      <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding CreateTagCommand}" /></TextBox.KeyBindings>
+    </TextBox>
+    <TextBlock Text="{Binding Draft.NameError}" IsVisible="{Binding Draft.HasNameError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Draft.MessageLabel}" FontWeight="SemiBold" FontSize="13" />
+    <TextBox Name="TagMessageEditor" Text="{Binding Draft.Message}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" MaxHeight="140" FontSize="12" PlaceholderText="Release notes, or what this tag marks" AutomationProperties.Name="Tag message" />
+    <TextBlock Text="{Binding Draft.MessageHint}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <CheckBox Name="PushTagBox" Content="{Binding Draft.PushLabel}" IsChecked="{Binding Draft.Push}" IsVisible="{Binding Draft.CanPush}" FontSize="12" ToolTip.Tip="Only this tag is pushed; your branches stay as they are." />
+    <TextBlock Text="{Binding Draft.Notice}" IsVisible="{Binding Draft.HasNotice}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelCreateTagButton" Content="Cancel" Command="{Binding CancelCreateTagCommand}" Padding="18,8" />
+      <Button Name="ConfirmCreateTagButton" Classes="accent" Content="Create tag" Command="{Binding CreateTagCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

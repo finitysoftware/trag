@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:coreAccounts="using:Trag.Domain.Accounts"
+             xmlns:sync="using:Trag.ViewModels.Sync"
+             xmlns:coreSync="using:Trag.Application.Sync"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             xmlns:viewsPickers="using:Trag.Desktop.Views.Pickers"
+             x:Class="Trag.Desktop.Views.Sync.SyncPanel" x:DataType="shell:ShellViewModel" x:CompileBindings="True">
+  <StackPanel Spacing="7" Margin="8,18,8,0">
+    <!-- Without a remote there is nothing to choose; the card leads to Publish instead of showing empty selectors. -->
+    <Border Name="NoRemoteCard" Classes="sidecard" IsVisible="{Binding Publish.Context.ShowNoRemoteCard}">
+      <StackPanel Spacing="9">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9"><controls:LineIcon Kind="cloud" Width="16" Height="16" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="No remote yet" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" /></Grid>
+        <Button Classes="sidelink" Name="PublishLink" Command="{Binding Publish.OpenPublishCommand}" ToolTip.Tip="{Binding Publish.Context.Tip}" AutomationProperties.Name="Publish repository">
+          <StackPanel Orientation="Horizontal" Spacing="9"><controls:LineIcon Kind="publish" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="Publish repository…" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+        <TextBlock Text="Publish this local repository to share it." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <!-- A branch without an upstream is published under its own name; choosing another remote branch here used to push into it by accident. -->
+    <Border Name="PublishBranchCard" Classes="sidecard" IsVisible="{Binding Publish.Context.ShowBranchCard}">
+      <StackPanel Spacing="9">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9"><controls:LineIcon Kind="branch" Width="16" Height="16" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Publish.Context.BranchCardText}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" /></Grid>
+        <Button Classes="sidelink" Name="PublishBranchLink" Command="{Binding Publish.OpenPublishCommand}" ToolTip.Tip="{Binding Publish.Context.Tip}" AutomationProperties.Name="Publish branch">
+          <StackPanel Orientation="Horizontal" Spacing="9"><controls:LineIcon Kind="publish" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="Publish branch…" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+        <TextBlock Text="Push it to a remote and set the upstream." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <!-- On a detached HEAD there is nothing to sync; the card names the state and leads to a branch that keeps the work. -->
+    <Border Name="DetachedCard" Classes="sidecard" IsVisible="{Binding GoTo.IsDetachedHead}">
+      <StackPanel Spacing="9">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9"><controls:LineIcon Kind="commit" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding GoTo.DetachedCardText}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" /></Grid>
+        <Button Classes="sidelink" Name="DetachedCreateBranchLink" Command="{Binding Branches.OpenCreateBranchCommand}" ToolTip.Tip="Create a branch at the current commit" AutomationProperties.Name="Create branch here">
+          <StackPanel Orientation="Horizontal" Spacing="9"><controls:LineIcon Kind="branch" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="Create branch here…" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+        <TextBlock Text="Pull, push and publish need a branch. Commits made here stay until you leave." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <!-- A push found the remote's repository missing under the user's own account on its host: the link creates it, private, and pushes again. -->
+    <Border Name="MissingRepositoryCard" Classes="sidecard" IsVisible="{Binding Sync.HasMissingRepository}">
+      <StackPanel Spacing="9">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9"><controls:LineIcon Kind="cloud" Width="16" Height="16" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Sync.MissingRepository.Text}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" /></Grid>
+        <Button Classes="sidelink" Name="CreateMissingRepositoryLink" Command="{Binding Sync.CreateMissingRepositoryCommand}" AutomationProperties.Name="Create the repository and push">
+          <StackPanel Orientation="Horizontal" Spacing="9"><controls:LineIcon Kind="publish" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="Create and push" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+        <TextBlock Text="{Binding Sync.MissingRepository.Note}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <StackPanel Spacing="7" IsVisible="{Binding Publish.Context.ShowSyncSelectors}">
+      <!-- A single remote needs no caption or selector; both appear only when there is a real choice. -->
+      <TextBlock Name="RemoteHeader" Text="REMOTE" IsVisible="{Binding Publish.Context.HasMultipleRemotes}" FontSize="10" FontWeight="SemiBold" Opacity="0.6" />
+      <Button Name="SyncRemoteSelector" behaviors:FlyoutOpen.IsOpen="{Binding Sync.IsRemotePickerOpen, Mode=TwoWay}" IsVisible="{Binding Publish.Context.HasMultipleRemotes}" IsEnabled="{Binding Sync.CanChooseSyncTarget}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,7" FontSize="12" Margin="0,0,0,5" ToolTip.Tip="Choose the remote" AutomationProperties.Name="Remote">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><controls:LineIcon Kind="cloud" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Sync.Selection.RemoteLabel}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><controls:LineIcon Grid.Column="2" Kind="chevron" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+        <Button.Flyout><Flyout Placement="BottomEdgeAlignedLeft" ShowMode="Standard" FlyoutPresenterClasses="branches"><viewsPickers:RemotePicker DataContext="{Binding Sync}" /></Flyout></Button.Flyout>
+      </Button>
+      <TextBlock Text="UPSTREAM BRANCH" FontSize="10" FontWeight="SemiBold" Opacity="0.6" />
+      <Button Name="SyncBranchSelector" behaviors:FlyoutOpen.Command="{Binding Sync.OpenUpstreamPickerCommand}" behaviors:FlyoutOpen.IsOpen="{Binding Sync.IsUpstreamPickerOpen, Mode=TwoWay}" IsEnabled="{Binding Sync.CanChooseSyncTarget}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,7" FontSize="12" ToolTip.Tip="Choose the upstream branch" AutomationProperties.Name="Upstream branch">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><controls:LineIcon Kind="branch" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Sync.Selection.BranchLabel}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><controls:LineIcon Grid.Column="2" Kind="chevron" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+        <Button.Flyout><Flyout Placement="BottomEdgeAlignedLeft" ShowMode="Standard" FlyoutPresenterClasses="branches"><viewsPickers:UpstreamPicker DataContext="{Binding Sync}" /></Flyout></Button.Flyout>
+      </Button>
+      <TextBlock Name="SyncPushWarningText" Text="{Binding Sync.Panel.Target.Warning}" IsVisible="{Binding Sync.Panel.Target.HasWarning}" FontSize="11" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+      <TextBlock Name="SyncCountsText" Text="{Binding Sync.Panel.Counts.Text}" TextWrapping="Wrap" FontSize="11" />
+      <TextBlock Text="{Binding Sync.Panel.Counts.FetchedText}" IsVisible="{Binding Sync.Panel.Counts.HasFetchedText}" TextWrapping="Wrap" FontSize="10" Opacity="0.6" />
+      <!-- Why a read gave nothing (failed, canceled); a read in flight or one that gave a state says nothing. -->
+      <TextBlock Text="{Binding Sync.Panel.Message}" TextWrapping="Wrap" FontSize="10" Foreground="{DynamicResource MutedBrush}">
+        <TextBlock.IsVisible>
+          <MultiBinding Converter="{x:Static BoolConverters.And}">
+            <Binding Path="Sync.Panel.State" Converter="{x:Static ObjectConverters.IsNull}" />
+            <Binding Path="Sync.IsSyncBusy" Converter="{x:Static BoolConverters.Not}" />
+          </MultiBinding>
+        </TextBlock.IsVisible>
+      </TextBlock>
+      <!-- Which identity Git uses for this remote: a Trag account matching the host, or Git's own credential helper. Shown when several Trag accounts match, or when the repository remembers Git's own credentials although one Trag account could serve the remote. -->
+      <StackPanel Name="SyncAccountSection" IsVisible="{Binding Sync.Panel.Accounts.HasChoices}" Spacing="6" Margin="0,8,0,0">
+        <TextBlock Text="ACCOUNT" FontSize="10" FontWeight="SemiBold" Opacity="0.6" />
+        <ComboBox Name="SyncAccountSelector" DataContext="{Binding Sync.Panel.Accounts}" x:DataType="coreSync:SyncAccountSelection" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" IsEnabled="{Binding $parent[UserControl].((shell:ShellViewModel)DataContext).Sync.CanChooseSyncTarget}" PlaceholderText="Choose account" HorizontalAlignment="Stretch" FontSize="12">
+          <ComboBox.ItemTemplate><DataTemplate x:DataType="coreAccounts:AccountChoice"><TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Name="SaveSyncAccountButton" Classes="sidelink" IsVisible="{Binding Sync.Panel.Accounts.IsUnsaved}" Command="{Binding Sync.SaveSyncAccountCommand}" AutomationProperties.Name="Use this account">
+          <TextBlock Text="Use this account" Foreground="{DynamicResource AccentBrush}" />
+        </Button>
+        <TextBlock Text="{Binding Sync.Panel.Accounts.Message}" TextWrapping="Wrap" FontSize="10" Foreground="{DynamicResource MutedBrush}" />
+      </StackPanel>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

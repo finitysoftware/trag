@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:commit="using:Trag.ViewModels.Commit" xmlns:writes="using:Trag.Domain.Writes"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Views.Pickers.CoAuthorPicker" x:DataType="commit:CoAuthorsViewModel" x:CompileBindings="True" Width="320"
+             behaviors:FocusOnOpen.Target="{Binding #CoAuthorSearchBox}">
+  <Grid RowDefinitions="*,Auto">
+    <StackPanel Spacing="8" Margin="16,15,16,12">
+      <TextBlock Text="Add co-author" FontWeight="SemiBold" FontSize="13" />
+      <TextBlock Text="A co-author goes into the message as a Co-authored-by line." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <TextBox Name="CoAuthorSearchBox" Text="{Binding Search}" PlaceholderText="Find a person, or type Name &lt;email&gt;" FontSize="12" MaxLength="512" AutomationProperties.Name="Find a co-author" />
+      <TextBlock Text="{Binding People.Message}" IsVisible="{Binding People.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <ScrollViewer MaxHeight="320" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-16,0">
+        <ItemsControl Name="CoAuthorChoices" ItemsSource="{Binding Choices}" Margin="0,0,16,0"><ItemsControl.ItemTemplate><DataTemplate x:DataType="writes:GitIdentity">
+          <Button Classes="stash" Command="{Binding $parent[ItemsControl].((commit:CoAuthorsViewModel)DataContext).ChooseCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Display}">
+            <StackPanel Spacing="1"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Email}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" /></StackPanel>
+          </Button>
+        </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+      </ScrollViewer>
+    </StackPanel>
+    <Border Grid.Row="1" Name="CoAuthorBusySlot" Height="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+      <controls:BusyBar IsActive="{Binding People.IsBusy}" Height="2" MinHeight="2" />
+    </Border>
+  </Grid>
+</UserControl>

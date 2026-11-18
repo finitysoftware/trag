@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:viewsPickers="using:Trag.Desktop.Views.Pickers" xmlns:viewsSync="using:Trag.Desktop.Views.Sync"
+             x:Class="Trag.Desktop.Views.Shell.WorkspaceSidebar" x:DataType="shell:ShellViewModel" x:CompileBindings="True">
+  <!-- The left column of an open repository: the sections, the current branch with its picker, the sync panel, the stashes and the tags. -->
+  <Border Name="Sidebar" Background="{DynamicResource ChromeBrush}">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+      <ScrollViewer Grid.RowSpan="2"><StackPanel Margin="12,18" Spacing="4">
+        <TextBlock Classes="caption" Text="WORKSPACE" Margin="8,0,0,10" />
+        <controls:NavButton Kind="file" Text="File status" Section="FileStatus" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowFileStatusCommand}" />
+        <controls:NavButton Name="HistoryButton" Kind="history" Text="History" Section="History" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowHistoryCommand}" ToolTip.Tip="History (Ctrl+2)" />
+        <controls:NavButton Name="SearchButton" Kind="search" Text="Search" Section="Search" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowSearchCommand}" ToolTip.Tip="Search (Ctrl+F or Ctrl+3)" />
+        <!-- A submodule leads back to the repository it belongs to. -->
+        <Button Name="SuperprojectButton" Command="{Binding OpenSuperprojectCommand}" IsVisible="{Binding Header.Superproject, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="10,7" FontSize="12" ToolTip.Tip="Open the repository this submodule belongs to" AutomationProperties.Name="Open the superproject">
+          <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="back" Width="14" Height="14" /><TextBlock Text="{Binding Header.Superproject}" TextTrimming="CharacterEllipsis" /></StackPanel>
+        </Button>
+        <!-- The merge section exists only during a merge; it counts the conflicts left, or shows a check once none is. -->
+        <Panel IsVisible="{Binding Repository.HasMerge}">
+          <controls:NavButton Name="MergeButton" Kind="branch" Text="{x:Static text:MergeText.InProgress}" Section="Merge" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowMergeCommand}" Foreground="{DynamicResource WarningTextBrush}" />
+          <Border Name="MergeConflictCount" Classes="conflictpill" IsVisible="{Binding Merge.Overview.IsBlocked}" ToolTip.Tip="{Binding Merge.Overview.SidebarTip}"><TextBlock Text="{Binding Merge.Overview.SidebarCount}" /></Border>
+          <controls:LineIcon Kind="check" Width="14" Height="14" Foreground="{DynamicResource DiffAddedBrush}" IsVisible="{Binding !Merge.Overview.IsBlocked}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" IsHitTestVisible="False" />
+        </Panel>
+        <!-- The rebase section exists only during a rebase; it shows the commit Git stopped at, as step of plan. -->
+        <Panel IsVisible="{Binding Repository.HasRebase}">
+          <controls:NavButton Name="RebaseButton" Kind="rebase" Text="{x:Static text:RebaseText.InProgress}" Section="Rebase" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowRebaseCommand}" Foreground="{DynamicResource WarningTextBrush}" />
+          <Border Name="RebaseStepCount" Classes="conflictpill" ToolTip.Tip="{Binding Rebase.Overview.SidebarTip}"><TextBlock Text="{Binding Rebase.Overview.SidebarCount}" /></Border>
+        </Panel>
+        <!-- A revert or a cherry-pick stopped at its conflicts exists only while it lasts; the pill counts what is left. -->
+        <Panel IsVisible="{Binding Repository.HasPick}">
+          <controls:NavButton Name="PickButton" Kind="discard" Text="{Binding Pick.Words.Title}" Section="Pick" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowPickCommand}" Foreground="{DynamicResource WarningTextBrush}" />
+          <Border Name="PickConflictCount" Classes="conflictpill" IsVisible="{Binding Resolution.HasConflicts}"><TextBlock Text="{Binding Resolution.Conflicts.Count}" /></Border>
+        </Panel>
+        <!-- The conflicts a stash left exist only while they last; the pill counts them. -->
+        <Panel IsVisible="{Binding Repository.HasStashConflicts}">
+          <controls:NavButton Name="ConflictsButton" Kind="warning" Text="Conflicts" Section="Conflicts" Current="{Binding Navigator.Section}" Command="{Binding Navigator.ShowConflictsCommand}" Foreground="{DynamicResource WarningTextBrush}" />
+          <Border Name="StashConflictCount" Classes="conflictpill"><TextBlock Text="{Binding Resolution.Conflicts.Count}" /></Border>
+        </Panel>
+        <Separator Margin="6,14" />
+        <TextBlock Classes="caption" Text="CURRENT BRANCH" Margin="8,0,0,6" />
+        <Button Name="BranchButton" behaviors:FlyoutOpen.Command="{Binding Branches.OpenBranchPickerCommand}" behaviors:FlyoutOpen.IsOpen="{Binding Branches.IsPickerOpen, Mode=TwoWay}" Margin="8,0,8,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,7" FontSize="12" IsEnabled="{Binding Repository.HasRepository}" ToolTip.Tip="Switch or create a branch" AutomationProperties.Name="Current branch">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><controls:LineIcon Kind="branch" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" IsVisible="{Binding !GoTo.IsDetachedHead}" /><TextBlock Grid.Column="1" Text="{Binding Header.BranchText}" Classes.detached="{Binding GoTo.IsDetachedHead}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><controls:LineIcon Grid.Column="2" Kind="chevron" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+          <Button.Flyout><Flyout Placement="BottomEdgeAlignedLeft" ShowMode="Standard" FlyoutPresenterClasses="branches"><viewsPickers:BranchPicker DataContext="{Binding Branches}" /></Flyout></Button.Flyout>
+        </Button>
+        <viewsSync:SyncPanel IsVisible="{Binding Repository.HasRepository}" />
+        <!-- Stashes appear only once there is one; the button opens the list, like the branch dropdown. -->
+        <TextBlock Classes="caption" Text="STASHES" Margin="8,18,0,6" IsVisible="{Binding Stash.HasStashes}" />
+        <Button Name="StashPickerButton" behaviors:FlyoutOpen.Command="{Binding Stash.OpenStashPickerCommand}" behaviors:FlyoutOpen.IsOpen="{Binding Stash.IsPickerOpen, Mode=TwoWay}" IsVisible="{Binding Stash.HasStashes}" Margin="8,0,8,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,7" FontSize="12" ToolTip.Tip="Preview, apply or drop a stash" AutomationProperties.Name="Stashes">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8"><controls:LineIcon Kind="stash" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Stash.StashButtonText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Name="StashCountLabel" Text="{Binding Stash.StashCountText}" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /><controls:LineIcon Grid.Column="3" Kind="chevron" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+          <Button.Flyout><Flyout Placement="BottomEdgeAlignedLeft" ShowMode="Standard" FlyoutPresenterClasses="branches"><viewsPickers:StashPicker DataContext="{Binding Stash}" /></Flyout></Button.Flyout>
+        </Button>
+        <!-- Tags appear only once there is one; the button names the highest and opens the list. -->
+        <TextBlock Classes="caption" Text="TAGS" Margin="8,18,0,6" IsVisible="{Binding Tags.HasTags}" />
+        <Button Name="TagPickerButton" behaviors:FlyoutOpen.Command="{Binding Tags.OpenTagPickerCommand}" behaviors:FlyoutOpen.IsOpen="{Binding Tags.IsPickerOpen, Mode=TwoWay}" IsVisible="{Binding Tags.HasTags}" Margin="8,0,8,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,7" FontSize="12" ToolTip.Tip="Find, push or delete a tag" AutomationProperties.Name="Tags">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8"><controls:LineIcon Kind="tag" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Tags.TagButtonText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Name="TagCountLabel" Text="{Binding Tags.TagCountText}" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /><controls:LineIcon Grid.Column="3" Kind="chevron" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+          <Button.Flyout><Flyout Placement="BottomEdgeAlignedLeft" ShowMode="Standard" FlyoutPresenterClasses="branches"><viewsPickers:TagPicker DataContext="{Binding Tags}" /></Flyout></Button.Flyout>
+        </Button>
+      </StackPanel></ScrollViewer>
+
+      <!-- Sync activity shows on the sidebar's bottom edge in a fixed 2 px slot, so nothing above it moves when it appears or disappears. -->
+      <Border Grid.Row="3" Name="SyncBusySlot" Height="2"><controls:BusyBar Name="SyncBusyBar" IsActive="{Binding Sync.IsSyncBusy}" Height="2" MinHeight="2" /></Border>
+    </Grid>
+  </Border>
+</UserControl>

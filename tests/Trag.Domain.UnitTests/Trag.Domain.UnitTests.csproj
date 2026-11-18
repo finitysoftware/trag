@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Trag.Domain/Trag.Domain.csproj" />
+    <ProjectReference Include="../Trag.TestSupport/Trag.TestSupport.csproj" />
+  </ItemGroup>
+</Project>

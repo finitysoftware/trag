@@ -1,0 +1,47 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The merge view and the file status during a merge: the banner (red while markers are staged), the two list
+       headings, the tags of decided files, the conflict cards with our side blue and theirs green, and the action bar. -->
+  <Style Selector="Border.mergebanner"><Setter Property="Background" Value="{DynamicResource WarningTintBrush}" /><Setter Property="Padding" Value="16,9" /></Style>
+  <Style Selector="Border.mergebanner.markers"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="ProgressBar.mergeprogress"><Setter Property="MinHeight" Value="6" /><Setter Property="Height" Value="6" /><Setter Property="CornerRadius" Value="3" /><Setter Property="Minimum" Value="0" /><Setter Property="Maximum" Value="100" /><Setter Property="Foreground" Value="{DynamicResource PreviewAddedBrush}" /><Setter Property="Background" Value="{DynamicResource DividerBrush}" /></Style>
+  <Style Selector="Border.mergeheading"><Setter Property="Background" Value="{DynamicResource ChromeBrush}" /><Setter Property="Padding" Value="12,7" /></Style>
+  <Style Selector="Border.mergeheading TextBlock"><Setter Property="FontSize" Value="11" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="Border.mergetag"><Setter Property="CornerRadius" Value="9" /><Setter Property="Padding" Value="8,1" /><Setter Property="VerticalAlignment" Value="Center" /><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Border.mergetag TextBlock"><Setter Property="FontSize" Value="10" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Border.mergetag.theirs"><Setter Property="Background" Value="{DynamicResource OkTintBrush}" /></Style>
+  <Style Selector="Border.mergetag.theirs TextBlock"><Setter Property="Foreground" Value="{DynamicResource TheirsBrush}" /></Style>
+  <Style Selector="Border.mergetag.mine"><Setter Property="Background" Value="{DynamicResource NoticeTintBrush}" /></Style>
+  <Style Selector="Border.mergetag.mine TextBlock"><Setter Property="Foreground" Value="{DynamicResource MineBrush}" /></Style>
+  <Style Selector="Border.mergetag.edited"><Setter Property="Background" Value="{DynamicResource AccentTintBrush}" /></Style>
+  <Style Selector="Border.mergetag.edited TextBlock"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="Border.mergetag.markers"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="Border.mergetag.markers TextBlock"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /></Style>
+  <Style Selector="Border.conflictcard"><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="8" /><Setter Property="ClipToBounds" Value="True" /><Setter Property="Margin" Value="12,6,16,6" /><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /></Style>
+  <Style Selector="Border.conflicthead"><Setter Property="Background" Value="{DynamicResource ChromeBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="0,0,0,1" /><Setter Property="Padding" Value="12,6" /></Style>
+  <Style Selector="Border.conflictside"><Setter Property="BorderThickness" Value="3,0,0,0" /><Setter Property="Padding" Value="9,3" /></Style>
+  <Style Selector="Border.conflictside TextBlock"><Setter Property="FontSize" Value="10.5" /><Setter Property="FontWeight" Value="Bold" /></Style>
+  <Style Selector="Border.conflictlines"><Setter Property="BorderThickness" Value="3,0,0,0" /></Style>
+  <Style Selector="Border.mine"><Setter Property="Background" Value="{DynamicResource NoticeTintBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource MineBrush}" /></Style>
+  <Style Selector="Border.mine TextBlock"><Setter Property="Foreground" Value="{DynamicResource MineBrush}" /></Style>
+  <Style Selector="Border.theirs"><Setter Property="Background" Value="{DynamicResource OkTintBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource TheirsBrush}" /></Style>
+  <Style Selector="Border.theirs TextBlock"><Setter Property="Foreground" Value="{DynamicResource TheirsBrush}" /></Style>
+  <Style Selector="Border.conflictlines TextBlock"><Setter Property="Foreground" Value="{DynamicResource TextBrush}" /></Style>
+  <Style Selector="TextBlock.codeline"><Setter Property="FontFamily" Value="Consolas,DejaVu Sans Mono,monospace" /><Setter Property="FontSize" Value="12.5" /></Style>
+  <Style Selector="TextBlock.lineno"><Setter Property="FontFamily" Value="Consolas,DejaVu Sans Mono,monospace" /><Setter Property="FontSize" Value="12" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="TextAlignment" Value="Right" /><Setter Property="Margin" Value="0,0,14,0" /><Setter Property="Opacity" Value="0.7" /></Style>
+  <Style Selector="Button.mergeaction"><Setter Property="FontSize" Value="12" /><Setter Property="Padding" Value="10,5" /></Style>
+  <Style Selector="Button.mergeaction StackPanel"><Setter Property="Orientation" Value="Horizontal" /><Setter Property="Spacing" Value="7" /></Style>
+  <Style Selector="Border.mergestrip"><Setter Property="Padding" Value="16,7" /></Style>
+  <Style Selector="Border.mergestrip.danger"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="Border.mergestrip.notice"><Setter Property="Background" Value="{DynamicResource WarningTintBrush}" /></Style>
+  <Style Selector="Border.conflictpill"><Setter Property="Background" Value="{DynamicResource WarningTintBrush}" /><Setter Property="CornerRadius" Value="9" /><Setter Property="Padding" Value="7,0" /><Setter Property="VerticalAlignment" Value="Center" /><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="Margin" Value="0,0,10,0" /><Setter Property="IsHitTestVisible" Value="False" /></Style>
+  <Style Selector="Border.conflictpill TextBlock"><Setter Property="FontSize" Value="10" /><Setter Property="FontWeight" Value="Bold" /><Setter Property="Foreground" Value="{DynamicResource WarningTextBrush}" /><Setter Property="LineHeight" Value="17" /></Style>
+  <!-- The rebase view's plan: one row per commit, the stopped one tinted, the waiting ones muted. -->
+  <Style Selector="Border.rebasestep"><Setter Property="Padding" Value="12,5" /><Setter Property="MinHeight" Value="30" /></Style>
+  <Style Selector="Border.rebasestep.current"><Setter Property="Background" Value="{DynamicResource WarningTintBrush}" /></Style>
+  <Style Selector="Border.rebasestep TextBlock"><Setter Property="FontSize" Value="12" /></Style>
+  <Style Selector="Border.rebasestep.current TextBlock.stepsubject"><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="Border.rebasestep.waiting TextBlock.stepsubject"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Border.rebasestep TextBlock.stepnumber"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="FontSize" Value="11" /></Style>
+  <Style Selector="Border.rebasestep TextBlock.stepid"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="FontFamily" Value="Consolas,DejaVu Sans Mono,monospace" /><Setter Property="FontSize" Value="11" /></Style>
+  <Style Selector="Border.rebasestep TextBlock.stepnote"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="FontSize" Value="11" /></Style>
+</Styles>

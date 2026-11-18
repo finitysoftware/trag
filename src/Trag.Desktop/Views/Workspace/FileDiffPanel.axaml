@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:diff="using:Trag.Desktop.Controls.Diff"
+             x:Class="Trag.Desktop.Views.Workspace.FileDiffPanel" x:DataType="shell:FileStatusPage" x:CompileBindings="True">
+  <!-- The diff of the selected working file: its header, the empty-state hint, the diff message with the limited preview, and the diff itself. -->
+  <Grid RowDefinitions="Auto,*,Auto" ClipToBounds="True">
+    <Border IsVisible="{Binding FileStatus.HasSelection}" Padding="14,9" Background="{DynamicResource ChromeBrush}">
+      <StackPanel Spacing="4"><TextBlock Text="{Binding FileStatus.SelectedStatus.PathText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding FileStatus.SelectedStatus.Source}" FontSize="11" Foreground="{DynamicResource AccentBrush}" /></StackPanel>
+    </Border>
+    <StackPanel Grid.Row="1" IsVisible="{Binding !FileStatus.HasSelection}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12" Margin="24" MaxWidth="320">
+      <controls:LineIcon Kind="file" Width="36" Height="36" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" />
+      <TextBlock Text="Select a file to review" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" />
+      <TextBlock Text="Choose a staged or unstaged file to see its changes." FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource MutedBrush}" />
+    </StackPanel>
+    <Grid Grid.Row="1" RowDefinitions="Auto,2,*" IsVisible="{Binding FileStatus.HasSelection}">
+      <diff:DiffNotice DataContext="{Binding WorkingDiff.Diff}" Margin="14,10" />
+      <ProgressBar Classes="thin" Grid.Row="1" IsVisible="{Binding WorkingDiff.Diff.IsBusy}" />
+      <diff:DiffView Grid.Row="2" Name="FileDiffView" IsVisible="{Binding FileStatus.HasSelection}" Document="{Binding WorkingDiff.Diff.Document.Presentation}" Mode="{Binding Layout.DiffMode, Mode=TwoWay}" SplitRatio="{Binding Layout.DiffSplitRatio, Mode=TwoWay}" Offer="{Binding WorkingDiff.Offer}" HunkCommand="{Binding WorkingDiff.TakeHunkCommand}" DiscardHunkCommand="{Binding WorkingDiff.DiscardHunkCommand}" />
+    </Grid>
+  </Grid>
+</UserControl>

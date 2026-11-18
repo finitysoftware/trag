@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:accounts="using:Trag.ViewModels.Accounts"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             x:Class="Trag.Desktop.Dialogs.Settings.GitLabAccountCard" x:DataType="accounts:AccountsViewModel" x:CompileBindings="True">
+  <!-- GitLab: GitLab.com and self-managed servers with a personal access token; each account can be checked, given a new token or
+       removed, the removal confirmed on its own row. -->
+  <Border Classes="card"><StackPanel Spacing="12">
+    <Grid ColumnDefinitions="32,*,Auto" ColumnSpacing="12">
+      <Path Data="M2,2 L8,10 L22,10 L28,2 L30,18 L15,29 L0,18 Z" Fill="{DynamicResource GitLabLogoBrush}" Width="30" Height="30" Stretch="Uniform" VerticalAlignment="Center" />
+      <StackPanel Grid.Column="1" Spacing="5"><TextBlock Text="GitLab" FontWeight="SemiBold" FontSize="15" /><TextBlock Classes="muted" Text="GitLab.com and self-managed servers" /></StackPanel>
+      <Button Grid.Column="2" Name="AddGitLabButton" Content="Add account  +" Command="{Binding AddGitLabCommand}" IsEnabled="{Binding IsIdle}" VerticalAlignment="Center" />
+    </Grid>
+    <ItemsControl ItemsSource="{Binding GitLabAccounts}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate><DataTemplate x:DataType="text:AccountRow">
+      <Border BorderBrush="{DynamicResource SettingsLine}" BorderThickness="0,1,0,0" Padding="0,12,0,0"><StackPanel Spacing="6">
+        <TextBlock Text="{Binding Display}" TextWrapping="Wrap" FontWeight="SemiBold" /><TextBlock Classes="muted" Text="{Binding StorageText}" /><TextBlock Classes="muted" Text="{Binding IdentityText}" />
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,6,0,0">
+          <Button Content="Check connection" Command="{Binding $parent[ItemsControl].((accounts:AccountsViewModel)DataContext).VerifyAccountCommand}" CommandParameter="{Binding Account}" />
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+            <Button Content="Replace token" Command="{Binding $parent[ItemsControl].((accounts:AccountsViewModel)DataContext).ReplaceTokenCommand}" CommandParameter="{Binding Account}" />
+            <Button Content="Remove" IsVisible="{Binding !ConfirmsRemoval}" Command="{Binding $parent[ItemsControl].((accounts:AccountsViewModel)DataContext).RequestRemovalCommand}" CommandParameter="{Binding Account}" />
+            <Button Content="Cancel" IsVisible="{Binding ConfirmsRemoval}" Command="{Binding $parent[ItemsControl].((accounts:AccountsViewModel)DataContext).KeepAccountCommand}" />
+            <Button Content="Confirm" Classes="accent" IsVisible="{Binding ConfirmsRemoval}" Command="{Binding $parent[ItemsControl].((accounts:AccountsViewModel)DataContext).ConfirmRemovalCommand}" />
+          </StackPanel>
+        </Grid>
+      </StackPanel></Border>
+    </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+  </StackPanel></Border>
+</UserControl>

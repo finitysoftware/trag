@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             x:Class="Trag.Desktop.Views.Shell.WelcomePane" x:DataType="shell:FileStatusPage" x:CompileBindings="True">
+  <!-- Shown in place of the file status while no repository is open. -->
+  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="14" MaxWidth="450" Margin="25">
+    <TextBlock Text="A clear view of your changes" FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap" />
+    <TextBlock Text="Open an existing Git repository to see your branch, staged files and working tree changes." TextWrapping="Wrap" Opacity="0.6" FontSize="13" LineHeight="21" />
+    <Button Content="Open repository…" Command="{Binding Open}" HorizontalAlignment="Left" Margin="0,8,0,0" /><TextBlock Text="Local files · no account required" FontSize="11" Opacity="0.45" />
+  </StackPanel>
+</UserControl>

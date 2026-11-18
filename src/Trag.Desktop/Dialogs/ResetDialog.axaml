@@ -1,0 +1,39 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:reset="using:Trag.ViewModels.Reset"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.ResetDialog" x:DataType="reset:ResetViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Question.IsOpen}" CloseCommand="{Binding Question.CancelCommand}"
+                    Title="{Binding Title}" Subtitle="{Binding Question.Text}"
+                    Icon="reset" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #CancelResetButton}">
+  <!-- The current branch back to the commit chosen in History, with what happens to the changes of the commits that
+       leave it chosen here; a hard reset turns Reset red and says what uncommitted work it takes. What keeps the reset
+       back is said instead of the modes, and Reset waits for it. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Name="ResetRefusal" Text="{Binding Refusal}" IsVisible="{Binding HasRefusal}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+    <StackPanel Spacing="10" IsVisible="{Binding !HasRefusal}">
+      <RadioButton Name="ResetSoftOption" GroupName="ResetMode" IsChecked="{Binding IsSoft}" AutomationProperties.Name="Soft">
+        <StackPanel Spacing="1"><TextBlock Text="Soft" FontSize="12" FontWeight="SemiBold" /><TextBlock Text="Keep the changes of the leaving commits, staged." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" /></StackPanel>
+      </RadioButton>
+      <RadioButton Name="ResetMixedOption" GroupName="ResetMode" IsChecked="{Binding IsMixed}" AutomationProperties.Name="Mixed">
+        <StackPanel Spacing="1"><TextBlock Text="Mixed" FontSize="12" FontWeight="SemiBold" /><TextBlock Text="Keep the changes of the leaving commits in the working tree, unstaged." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" /></StackPanel>
+      </RadioButton>
+      <RadioButton Name="ResetHardOption" GroupName="ResetMode" IsChecked="{Binding IsHard}" AutomationProperties.Name="Hard">
+        <StackPanel Spacing="1"><TextBlock Text="Hard" FontSize="12" FontWeight="SemiBold" /><TextBlock Text="Discard those changes and every uncommitted change; the tracked files become this commit's." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" /></StackPanel>
+      </RadioButton>
+    </StackPanel>
+    <TextBlock Name="ResetLoss" Text="{Binding Loss}" IsVisible="{Binding Loss, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <TextBlock Name="ResetPushedWarning" Text="{Binding PushedWarning}" IsVisible="{Binding PushedWarning, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Question.IsRunning}" />
+    <TextBlock Text="{Binding Question.Message}" IsVisible="{Binding Question.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelResetButton" Content="Cancel" Command="{Binding Question.CancelCommand}" Padding="18,8" />
+      <Button Name="ConfirmResetButton" Classes="accent" Classes.danger="{Binding IsHard}" Content="Reset" Command="{Binding Question.ConfirmCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

@@ -1,0 +1,61 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:branches="using:Trag.ViewModels.Branches"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.GoToCommitDialog" x:DataType="branches:GoToCommitViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Target.IsOpen}" CloseCommand="{Binding CancelGoToCommitCommand}"
+                    Title="{Binding Dialog.Title}" Subtitle="{Binding Dialog.Subtitle}"
+                    Icon="branch" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #GoToBranchNameEditor}" behaviors:FocusOnOpen.SelectAll="True"
+                    behaviors:FocusOnOpen.Fallback="{Binding #SwitchToTipButton}">
+  <!-- Double-click in History: a branch at that commit (default) or a detached look. The suggested name is selected, so typing replaces it and Enter accepts it.
+       A branch's tip only switches there. Uncommitted changes block the dialog like the merge dialog: Stash opens on top and this dialog follows the result;
+       a merge or rebase in progress blocks it too and offers its view. -->
+  <dialogs:DialogHost.KeyBindings>
+    <KeyBinding Gesture="Enter" Command="{Binding CreateBranchAtCommitCommand}" />
+    <KeyBinding Gesture="Enter" Command="{Binding SwitchToTipCommand}" />
+  </dialogs:DialogHost.KeyBindings>
+  <StackPanel Spacing="12">
+    <Separator />
+    <Border Name="GoToBlockedCard" Classes="mergebox blocked" IsVisible="{Binding Dialog.IsBlocked}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="blocked" Width="18" Height="18" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Text="{Binding Dialog.BlockedTitle}" FontWeight="SemiBold" FontSize="12" />
+          <TextBlock Text="{Binding Dialog.BlockedText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+            <Button Name="GoToOperationViewButton" Command="{Binding OpenOperationViewCommand}" IsVisible="{Binding Dialog.IsBlockedByOperation}" FontSize="12" Padding="10,5" AutomationProperties.Name="{Binding Dialog.OperationViewText}">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="merge" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" IsVisible="{Binding !Dialog.IsBlockedByRebase}" VerticalAlignment="Center" /><controls:LineIcon Kind="rebase" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" IsVisible="{Binding Dialog.IsBlockedByRebase}" VerticalAlignment="Center" /><TextBlock Text="{Binding Dialog.OperationViewText}" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+            <Button Name="GoToStashButton" IsVisible="{Binding !Dialog.IsBlockedByOperation}" Command="{Binding OpenStash}" FontSize="12" Padding="10,5" AutomationProperties.Name="Stash changes">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="stash" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Stash changes…" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+            <Button Name="GoToReviewButton" IsVisible="{Binding !Dialog.IsBlockedByOperation}" Command="{Binding ReviewChangesCommand}" FontSize="12" Padding="10,5" AutomationProperties.Name="Review in File status">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="file" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Review in File status" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+    <StackPanel Spacing="12" IsVisible="{Binding !Dialog.IsTip}">
+      <TextBlock Text="BRANCH NAME" Classes="caption" />
+      <TextBox Name="GoToBranchNameEditor" Text="{Binding Target.Name}" FontSize="12" IsEnabled="{Binding !Repository.IsWriting}" AutomationProperties.Name="Branch name" />
+      <TextBlock Text="{Binding Target.NameError}" IsVisible="{Binding Target.HasNameError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+      <TextBlock Text="Creates the branch at this commit and switches to it." FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    </StackPanel>
+    <TextBlock Name="GoToTipText" Text="{Binding Dialog.TipText}" IsVisible="{Binding Dialog.IsTip}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Repository.IsWriting}" />
+    <TextBlock Text="{Binding Target.Notice}" IsVisible="{Binding Target.HasNotice}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+      <StackPanel Spacing="2" VerticalAlignment="Center" IsVisible="{Binding !Dialog.IsTip}">
+        <Button Name="DetachAtCommitButton" Classes="link" Content="Just look around" Command="{Binding DetachAtCommitCommand}" ToolTip.Tip="Check out the commit without a branch (detached HEAD)" />
+        <TextBlock Text="Commits made there are on no branch. Trag offers to keep them when you leave." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+      <Button Grid.Column="1" Name="CancelGoToCommitButton" Content="Cancel" Command="{Binding CancelGoToCommitCommand}" Padding="18,8" VerticalAlignment="Center" />
+      <Button Grid.Column="2" Name="CreateBranchAtCommitButton" Classes="primary" Content="Create branch here" Command="{Binding CreateBranchAtCommitCommand}" IsVisible="{Binding !Dialog.IsTip}" Padding="18,8" VerticalAlignment="Center" />
+      <Button Grid.Column="2" Name="SwitchToTipButton" Classes="primary" Content="{Binding Dialog.Title}" Command="{Binding SwitchToTipCommand}" IsVisible="{Binding Dialog.IsTip}" Padding="18,8" VerticalAlignment="Center" />
+    </Grid>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

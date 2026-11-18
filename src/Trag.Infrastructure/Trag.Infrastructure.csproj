@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Trag.Domain/Trag.Domain.csproj" />
+    <ProjectReference Include="../Trag.Application/Trag.Application.csproj" />
+    <InternalsVisibleTo Include="Trag.Infrastructure.UnitTests" />
+  </ItemGroup>
+</Project>

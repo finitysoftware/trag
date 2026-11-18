@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:branches="using:Trag.ViewModels.Branches"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Views.Pickers.BranchPicker" x:DataType="branches:BranchesViewModel" x:CompileBindings="True" Width="292"
+             behaviors:FocusOnOpen.Target="{Binding #BranchSearchEditor}">
+  <UserControl.Resources>
+    <!-- A local or a remote branch row: its menu offers what the row allows (BranchRow); a remote branch's icon is muted. -->
+    <DataTemplate x:Key="BranchRowTemplate" x:DataType="branches:BranchRow">
+      <Button Classes="branch" Command="{Binding $parent[UserControl].((branches:BranchesViewModel)DataContext).SwitchToBranchCommand}" CommandParameter="{Binding}" ToolTip.Tip="{Binding Tooltip}">
+        <Grid ColumnDefinitions="24,*,Auto" ColumnSpacing="10"><controls:LineIcon Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" IsVisible="{Binding !IsRemote}" VerticalAlignment="Center" HorizontalAlignment="Right" /><controls:LineIcon Kind="branch" Width="15" Height="15" Foreground="{DynamicResource MutedBrush}" IsVisible="{Binding IsRemote}" VerticalAlignment="Center" HorizontalAlignment="Right" /><TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          <Button Grid.Column="2" Classes="rowmore" ToolTip.Tip="Branch actions" AutomationProperties.Name="Branch actions">
+            <Button.Flyout><MenuFlyout FlyoutPresenterClasses="actions" Placement="BottomEdgeAlignedLeft">
+              <MenuItem Header="Rename" IsVisible="{Binding CanRename}" Command="{Binding $parent[UserControl].((branches:BranchesViewModel)DataContext).RequestRenameCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="edit" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="{Binding MergeTip}" IsVisible="{Binding CanMerge}" Command="{Binding $parent[UserControl].((branches:BranchesViewModel)DataContext).RequestMergeCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="merge" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="{Binding RequestLabel}" IsVisible="{Binding CanRequest}" Command="{Binding $parent[UserControl].((branches:BranchesViewModel)DataContext).CreatePullRequestCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="{Binding RequestIcon}" /></MenuItem.Icon></MenuItem>
+              <Separator IsVisible="{Binding CanDelete}" />
+              <MenuItem Classes="danger" Header="{Binding DeleteTitle}" IsVisible="{Binding CanDelete}" Command="{Binding $parent[UserControl].((branches:BranchesViewModel)DataContext).RequestDeleteCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="trash" /></MenuItem.Icon></MenuItem>
+            </MenuFlyout></Button.Flyout>
+            <controls:LineIcon Kind="more" Width="14" Height="14" />
+          </Button></Grid>
+      </Button>
+    </DataTemplate>
+    <!-- The rows of a list are drawn only while they are in the scroll viewer's view: a repository can have thousands. -->
+    <ItemsPanelTemplate x:Key="BranchRowsPanel"><VirtualizingStackPanel /></ItemsPanelTemplate>
+  </UserControl.Resources>
+  <!-- The flyout presenter has no padding of its own (FlyoutPresenter.branches), so the busy bar can sit on the very bottom edge.
+       The rows are plain records; every action is a command of the branches view model that takes the row. -->
+  <Grid RowDefinitions="*,Auto">
+    <StackPanel Spacing="8" Margin="16,15,16,12">
+      <TextBlock Text="Switch or create a branch" FontWeight="SemiBold" FontSize="13" />
+      <TextBox Name="BranchSearchEditor" Text="{Binding BranchSearch}" PlaceholderText="Find a branch…" FontSize="12" MaxLength="255" AutomationProperties.Name="Find a branch">
+        <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding SwitchToFirstMatchCommand}" /></TextBox.KeyBindings>
+      </TextBox>
+      <TextBlock Text="{Binding List.Message}" IsVisible="{Binding List.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <TextBlock Text="{x:Static text:BranchText.ListCut}" IsVisible="{Binding List.Value.Truncated}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <!-- The scroll bar is drawn over the content, so the list scrolls across the picker's right margin and keeps it free: the bar lies beside the rows' buttons.
+           Each row's actions are one menu behind its …, which shows while the pointer is over the row: the current branch
+           offers renaming and its pull or merge request, another local branch renaming, merging, that request and
+           deleting, a remote branch merging and deleting. -->
+      <ScrollViewer MaxHeight="380" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-16,0"><StackPanel Spacing="2" Margin="0,0,16,0">
+        <Button Classes="branch current plain" Name="CurrentBranchButton" IsVisible="{Binding Visible.HasCurrent}" AutomationProperties.Name="{Binding Visible.Current.Name}" Command="{Binding SwitchToBranchCommand}" CommandParameter="{Binding Visible.Current}" ToolTip.Tip="{Binding Visible.Current.Tooltip}">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10"><controls:LineIcon Kind="check" Width="14" Height="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><controls:LineIcon Grid.Column="1" Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Text="{Binding Visible.Current.Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <Button Grid.Column="3" Classes="rowmore" ToolTip.Tip="Branch actions" AutomationProperties.Name="Branch actions">
+              <Button.Flyout><MenuFlyout FlyoutPresenterClasses="actions" Placement="BottomEdgeAlignedLeft">
+                <MenuItem Header="Rename" Command="{Binding RequestRenameCommand}" CommandParameter="{Binding Visible.Current}"><MenuItem.Icon><controls:LineIcon Kind="edit" /></MenuItem.Icon></MenuItem>
+                <MenuItem Header="{Binding Visible.Current.RequestLabel}" Command="{Binding CreatePullRequestCommand}" CommandParameter="{Binding Visible.Current}"><MenuItem.Icon><controls:LineIcon Kind="{Binding Visible.Current.RequestIcon}" /></MenuItem.Icon></MenuItem>
+              </MenuFlyout></Button.Flyout>
+              <controls:LineIcon Kind="more" Width="14" Height="14" />
+            </Button></Grid>
+        </Button>
+        <TextBlock Classes="section" Text="LOCAL" IsVisible="{Binding Visible.HasLocal}" />
+        <ItemsControl Name="LocalBranchList" ItemsSource="{Binding Visible.Local}" ItemTemplate="{StaticResource BranchRowTemplate}" ItemsPanel="{StaticResource BranchRowsPanel}" />
+        <ItemsControl ItemsSource="{Binding Visible.RemoteGroups}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="branches:BranchGroup">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="section" Text="{Binding Title}" />
+            <ItemsControl ItemsSource="{Binding Rows}" ItemTemplate="{StaticResource BranchRowTemplate}" ItemsPanel="{StaticResource BranchRowsPanel}" />
+          </StackPanel>
+        </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+        <TextBlock Text="No branches match." IsVisible="{Binding !Visible.HasAny}" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="10,8" />
+      </StackPanel></ScrollViewer>
+      <Separator />
+      <Button Classes="branch plain" Name="CreateBranchButton" Command="{Binding OpenCreateBranchCommand}" AutomationProperties.Name="Create new branch">
+        <Grid ColumnDefinitions="24,*" ColumnSpacing="10"><controls:LineIcon Kind="plus" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" /><TextBlock Grid.Column="1" Text="Create new branch" VerticalAlignment="Center" /></Grid>
+      </Button>
+    </StackPanel>
+    <!-- A fixed 2 px slot on the bottom edge: the busy bar appears and disappears without resizing the popup. -->
+    <Border Grid.Row="1" Name="BranchBusySlot" Height="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+      <controls:BusyBar Name="BranchBusyBar" IsActive="{Binding List.IsBusy}" Height="2" MinHeight="2" />
+    </Border>
+  </Grid>
+</UserControl>

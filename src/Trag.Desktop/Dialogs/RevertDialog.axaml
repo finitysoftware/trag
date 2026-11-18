@@ -1,0 +1,24 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:revert="using:Trag.ViewModels.Revert"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.RevertDialog" x:DataType="revert:RevertViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Question.IsOpen}" CloseCommand="{Binding Question.CancelCommand}"
+                    Title="{Binding Title}" Subtitle="{Binding Question.Text}"
+                    Icon="discard" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #CancelRevertButton}">
+  <!-- The commit chosen in History undone by a new commit; what keeps the revert back is said here, and Revert waits for it. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Name="RevertRefusal" Text="{Binding Refusal}" IsVisible="{Binding HasRefusal}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Question.IsRunning}" />
+    <TextBlock Text="{Binding Question.Message}" IsVisible="{Binding Question.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelRevertButton" Content="Cancel" Command="{Binding Question.CancelCommand}" Padding="18,8" />
+      <Button Name="ConfirmRevertButton" Classes="accent" Content="Revert" Command="{Binding Question.ConfirmCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

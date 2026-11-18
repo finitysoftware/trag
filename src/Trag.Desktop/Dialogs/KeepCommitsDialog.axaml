@@ -1,0 +1,28 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:branches="using:Trag.ViewModels.Branches"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.KeepCommitsDialog" x:DataType="branches:GoToCommitViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Keep.IsOpen}" CloseCommand="{Binding CancelKeepCommitsCommand}"
+                    Title="{Binding KeepCommitsTitle}" Subtitle="You are leaving a detached HEAD."
+                    Icon="commit" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #KeepBranchNameEditor}" behaviors:FocusOnOpen.SelectAll="True">
+  <!-- Leaving a detached HEAD that has commits of its own: keep them as a branch, discard them, or stay. -->
+  <dialogs:DialogHost.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding KeepCommitsCommand}" /></dialogs:DialogHost.KeyBindings>
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="These commits are on no branch. Leaving without one drops them from the history; Git keeps them in the reflog for a while." FontSize="12" TextWrapping="Wrap" />
+    <TextBlock Text="BRANCH NAME" Classes="caption" />
+    <TextBox Name="KeepBranchNameEditor" Text="{Binding Keep.Name}" FontSize="12" IsEnabled="{Binding !IsLeavingDetached}" AutomationProperties.Name="Branch name for the kept commits" />
+    <TextBlock Text="{Binding Keep.NameError}" IsVisible="{Binding Keep.HasNameError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding IsLeavingDetached}" />
+    <TextBlock Text="{Binding Keep.Notice}" IsVisible="{Binding Keep.HasNotice}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelKeepCommitsButton" Content="Cancel" Command="{Binding CancelKeepCommitsCommand}" Padding="18,8" />
+      <Button Name="DiscardCommitsButton" Classes="danger" Content="Discard" Command="{Binding DiscardCommitsCommand}" Padding="18,8" />
+      <Button Name="KeepCommitsButton" Classes="primary" Content="Keep as branch" Command="{Binding KeepCommitsCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

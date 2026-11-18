@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             xmlns:viewsMerge="using:Trag.Desktop.Views.Merge"
+             x:Class="Trag.Desktop.Views.Merge.MergeView" x:DataType="shell:MergePage" x:CompileBindings="True">
+  <!-- A merge in progress: the banner with the direction and what is left; the conflict panels shared with the rebase view;
+       the merge message with the markers notice, Abort and Finish. Every sentence comes from Domain through the view models. -->
+  <Grid RowDefinitions="Auto,*,Auto">
+    <viewsMerge:OperationBanner Name="MergeBanner" Title="{x:Static text:MergeText.InProgress}" Direction="{Binding Merge.Overview.Direction}" Remaining="{Binding Merge.Overview.Remaining}"
+                                Progress="{Binding Merge.Overview.Progress}" ProgressText="{Binding Merge.Overview.ProgressText}" IsAlarm="{Binding Merge.Overview.HasMarkers}"
+                                ReviewCommand="{Binding Navigator.ShowFileStatusCommand}" />
+
+    <controls:RatioGrid Grid.Row="1" Ratio="{Binding Conflicts.Layout.DiffFilesRatio, Mode=TwoWay}">
+      <viewsMerge:ConflictFilesPanel DataContext="{Binding Conflicts}" />
+      <controls:PaneSplitter Grid.Column="1" AutomationProperties.Name="Resize conflict panels" ToolTip.Tip="Drag to resize · Double-click to restore" />
+      <viewsMerge:ConflictDetailPanel Grid.Column="2" DataContext="{Binding Conflicts}" />
+    </controls:RatioGrid>
+
+    <Border Grid.Row="2" Background="{DynamicResource ChromeBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="14,9">
+      <Grid>
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6" IsVisible="{Binding !Merge.Abort.IsOpen}">
+          <StackPanel Spacing="2"><TextBlock Text="{Binding Commit.AuthorText}" FontSize="11" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Commit.AuthorText}" /><TextBlock Text="{Binding Commit.CommitterText}" FontSize="10" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Commit.CommitterText}" IsVisible="{Binding Commit.CommitterText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" /></StackPanel>
+          <TextBox Grid.Row="1" Name="MergeMessageEditor" Text="{Binding Merge.Message}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="54" MaxHeight="64" MaxLength="65536" IsEnabled="{Binding !Repository.IsWriting}" FontSize="12" PlaceholderText="Merge commit message" AutomationProperties.Name="Merge commit message" />
+          <viewsMerge:MarkersNotice Grid.Row="2" DataContext="{Binding Conflicts.Resolution}" />
+          <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+            <Button Name="RequestAbortMergeButton" Content="Abort merge…" Command="{Binding Merge.RequestAbortMergeCommand}" FontSize="11" Padding="10,5" />
+            <TextBlock Grid.Column="1" Name="FinishHint" Text="{Binding Merge.Overview.FinishHint}" TextWrapping="Wrap" FontSize="10" Opacity="0.65" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Name="FinishMergeButton" Content="Finish merge" Command="{Binding Merge.FinishMergeCommand}" FontSize="12" Padding="14,6" />
+          </Grid>
+        </Grid>
+        <StackPanel IsVisible="{Binding Merge.Abort.IsOpen}" Spacing="10">
+          <TextBlock Text="{x:Static text:MergeText.AbortTitle}" FontWeight="SemiBold" FontSize="13" />
+          <TextBlock Text="{Binding Merge.Abort.Text}" TextWrapping="Wrap" FontSize="12" />
+          <ProgressBar Classes="thin" IsVisible="{Binding Merge.Abort.IsRunning}" />
+          <TextBlock Text="{Binding Merge.Abort.Message}" IsVisible="{Binding Merge.Abort.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" />
+          <StackPanel Orientation="Horizontal" Spacing="10"><Button Name="KeepMergeButton" Content="Keep merge" Command="{Binding Merge.Abort.CancelCommand}" FontSize="12" /><Button Name="ConfirmAbortMergeButton" Classes="danger" Content="Abort this merge" Command="{Binding Merge.Abort.ConfirmCommand}" FontSize="12" /></StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

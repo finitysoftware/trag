@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+artifacts/
+/dist/
+/portable/
+.vs/
+.idea/
+TestResults/
+*.user
+*.suo
+*.log
+.env
+.env.*
+/publish/
+__pycache__/

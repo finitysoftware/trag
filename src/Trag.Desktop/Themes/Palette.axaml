@@ -1,0 +1,87 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:themes="using:Trag.Desktop.Themes">
+  <!-- Every colour the app draws with. Theme-dependent brushes live in the five dictionaries; tints and marks that look
+       the same in every theme are plain entries below them. Dialogs draw on the surface in White and Espresso, and a
+       step above it in Graphite. Every colour of text and icons keeps 4.5:1 (WCAG AA for text) on every background of its
+       theme, so the warning text and the two sides of a conflict, ours blue and theirs green, take a shade per theme.
+       Menus and the pickers open on MenuBrush: the surface in White, the sidebar's colour in the dark themes. -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="ChromeBrush" Color="#F1EFEC" /><SolidColorBrush x:Key="SurfaceBrush" Color="#FCFBF9" /><SolidColorBrush x:Key="DialogBrush" Color="#FCFBF9" /><SolidColorBrush x:Key="MenuBrush" Color="#FCFBF9" />
+      <SolidColorBrush x:Key="DividerBrush" Color="#DDD8D1" /><SolidColorBrush x:Key="TextBrush" Color="#2D2925" />
+      <SolidColorBrush x:Key="MutedBrush" Color="#696259" /><SolidColorBrush x:Key="AccentBrush" Color="#984E33" /><SolidColorBrush x:Key="AccentStrongBrush" Color="#984E33" />
+      <SolidColorBrush x:Key="HoverBrush" Color="#E9E4DE" /><SolidColorBrush x:Key="SelectedBrush" Color="#EADDD2" />
+      <SolidColorBrush x:Key="ControlBrush" Color="#FAF8F5" />
+      <SolidColorBrush x:Key="DiffAddedBrush" Color="#24713D" /><SolidColorBrush x:Key="DiffRemovedBrush" Color="#A94040" />
+      <SolidColorBrush x:Key="WarningTextBrush" Color="#7B5E27" /><SolidColorBrush x:Key="MineBrush" Color="#2163AE" /><SolidColorBrush x:Key="TheirsBrush" Color="#2D6E50" />
+      <SolidColorBrush x:Key="SettingsSurface" Color="#FAF9F7" /><SolidColorBrush x:Key="SettingsCard" Color="#F0EEEB" /><SolidColorBrush x:Key="SettingsLine" Color="#D6D1CB" /><SolidColorBrush x:Key="SettingsSelected" Color="#E4E1DC" /><SolidColorBrush x:Key="SettingsHover" Color="#EAE7E3" />
+    </ResourceDictionary>
+    <!-- Espresso: the warm dark theme Trag had first, drawn from Dark. Both dark themes fill with the orange of the graph's
+         first lane (AccentStrongBrush) and draw text, icons and thin lines a shade lighter (AccentBrush), so a thin line
+         looks as bright as a filled surface. White has one accent for both. Espresso, Obsidian and Vantablack give their
+         settings window the main window's shades: the bars' for its background and cards, which only their lines set apart,
+         the panes' for the chosen section. -->
+    <ResourceDictionary x:Key="{x:Static themes:AppThemes.DarkEspresso}">
+      <SolidColorBrush x:Key="ChromeBrush" Color="#272421" /><SolidColorBrush x:Key="SurfaceBrush" Color="#201E1C" /><SolidColorBrush x:Key="DialogBrush" Color="#201E1C" /><SolidColorBrush x:Key="MenuBrush" Color="#272421" />
+      <SolidColorBrush x:Key="DividerBrush" Color="#403A34" /><SolidColorBrush x:Key="TextBrush" Color="#EAE5DE" />
+      <SolidColorBrush x:Key="MutedBrush" Color="#A79F95" /><SolidColorBrush x:Key="AccentBrush" Color="#E88B5E" /><SolidColorBrush x:Key="AccentStrongBrush" Color="#E07A3F" />
+      <SolidColorBrush x:Key="HoverBrush" Color="#35302B" /><SolidColorBrush x:Key="SelectedBrush" Color="#44342C" />
+      <SolidColorBrush x:Key="ControlBrush" Color="#2D2925" />
+      <SolidColorBrush x:Key="DiffAddedBrush" Color="#8DD6A6" /><SolidColorBrush x:Key="DiffRemovedBrush" Color="#E99797" />
+      <SolidColorBrush x:Key="WarningTextBrush" Color="#C59945" /><SolidColorBrush x:Key="MineBrush" Color="#6CA3E3" /><SolidColorBrush x:Key="TheirsBrush" Color="#4AB483" />
+      <SolidColorBrush x:Key="SettingsSurface" Color="#272421" /><SolidColorBrush x:Key="SettingsCard" Color="#272421" /><SolidColorBrush x:Key="SettingsLine" Color="#4C4741" /><SolidColorBrush x:Key="SettingsSelected" Color="#201E1C" /><SolidColorBrush x:Key="SettingsHover" Color="#242220" />
+    </ResourceDictionary>
+    <!-- Graphite, Avalonia's Dark: cool graphite. Hover sits between its card and border colours, and the selection is
+         tinted with the accent, as in Espresso. -->
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="ChromeBrush" Color="#1B2027" /><SolidColorBrush x:Key="SurfaceBrush" Color="#14171C" /><SolidColorBrush x:Key="DialogBrush" Color="#1E242C" /><SolidColorBrush x:Key="MenuBrush" Color="#1B2027" />
+      <SolidColorBrush x:Key="DividerBrush" Color="#35404D" /><SolidColorBrush x:Key="TextBrush" Color="#E6EAF0" />
+      <SolidColorBrush x:Key="MutedBrush" Color="#A3ADBA" /><SolidColorBrush x:Key="AccentBrush" Color="#E38D5D" /><SolidColorBrush x:Key="AccentStrongBrush" Color="#E07A3F" />
+      <SolidColorBrush x:Key="HoverBrush" Color="#2C3540" /><SolidColorBrush x:Key="SelectedBrush" Color="#443630" />
+      <SolidColorBrush x:Key="ControlBrush" Color="#252D37" />
+      <SolidColorBrush x:Key="DiffAddedBrush" Color="#8DD6A6" /><SolidColorBrush x:Key="DiffRemovedBrush" Color="#E99797" />
+      <SolidColorBrush x:Key="WarningTextBrush" Color="#C9A053" /><SolidColorBrush x:Key="MineBrush" Color="#76AAE5" /><SolidColorBrush x:Key="TheirsBrush" Color="#54B98A" />
+      <SolidColorBrush x:Key="SettingsSurface" Color="#1E242C" /><SolidColorBrush x:Key="SettingsCard" Color="#252D37" /><SolidColorBrush x:Key="SettingsLine" Color="#35404D" /><SolidColorBrush x:Key="SettingsSelected" Color="#171C22" /><SolidColorBrush x:Key="SettingsHover" Color="#222932" />
+    </ResourceDictionary>
+    <!-- Obsidian, drawn from Dark: near-black neutral greys under Graphite's accents; dialogs a step above the surface, the
+         selection tinted with the accent. -->
+    <ResourceDictionary x:Key="{x:Static themes:AppThemes.DarkObsidian}">
+      <SolidColorBrush x:Key="ChromeBrush" Color="#0E0E10" /><SolidColorBrush x:Key="SurfaceBrush" Color="#0C0C0E" /><SolidColorBrush x:Key="DialogBrush" Color="#121214" /><SolidColorBrush x:Key="MenuBrush" Color="#0E0E10" />
+      <SolidColorBrush x:Key="DividerBrush" Color="#232326" /><SolidColorBrush x:Key="TextBrush" Color="#E6E6E8" />
+      <SolidColorBrush x:Key="MutedBrush" Color="#919196" /><SolidColorBrush x:Key="AccentBrush" Color="#E38D5D" /><SolidColorBrush x:Key="AccentStrongBrush" Color="#E07A3F" />
+      <SolidColorBrush x:Key="HoverBrush" Color="#1B1B1E" /><SolidColorBrush x:Key="SelectedBrush" Color="#36281F" />
+      <SolidColorBrush x:Key="ControlBrush" Color="#17171A" />
+      <SolidColorBrush x:Key="DiffAddedBrush" Color="#8DD6A6" /><SolidColorBrush x:Key="DiffRemovedBrush" Color="#E99797" />
+      <SolidColorBrush x:Key="WarningTextBrush" Color="#B98D3A" /><SolidColorBrush x:Key="MineBrush" Color="#5495DE" /><SolidColorBrush x:Key="TheirsBrush" Color="#43A477" />
+      <SolidColorBrush x:Key="SettingsSurface" Color="#0E0E10" /><SolidColorBrush x:Key="SettingsCard" Color="#0E0E10" /><SolidColorBrush x:Key="SettingsLine" Color="#232326" /><SolidColorBrush x:Key="SettingsSelected" Color="#0C0C0E" /><SolidColorBrush x:Key="SettingsHover" Color="#151517" />
+    </ResourceDictionary>
+    <!-- Vantablack, drawn from Dark: black bars, panes, controls and settings with neutral grey lines and selection under
+         Graphite's accents; dialogs a step above the black, so they stand off the window behind. -->
+    <ResourceDictionary x:Key="{x:Static themes:AppThemes.DarkVantablack}">
+      <SolidColorBrush x:Key="ChromeBrush" Color="#000000" /><SolidColorBrush x:Key="SurfaceBrush" Color="#000000" /><SolidColorBrush x:Key="DialogBrush" Color="#0A0A0A" /><SolidColorBrush x:Key="MenuBrush" Color="#000000" />
+      <SolidColorBrush x:Key="DividerBrush" Color="#1E1E1E" /><SolidColorBrush x:Key="TextBrush" Color="#E6E6E6" />
+      <SolidColorBrush x:Key="MutedBrush" Color="#8A8A8A" /><SolidColorBrush x:Key="AccentBrush" Color="#E38D5D" /><SolidColorBrush x:Key="AccentStrongBrush" Color="#E07A3F" />
+      <SolidColorBrush x:Key="HoverBrush" Color="#121212" /><SolidColorBrush x:Key="SelectedBrush" Color="#181818" />
+      <SolidColorBrush x:Key="ControlBrush" Color="#000000" />
+      <SolidColorBrush x:Key="DiffAddedBrush" Color="#8DD6A6" /><SolidColorBrush x:Key="DiffRemovedBrush" Color="#E99797" />
+      <SolidColorBrush x:Key="WarningTextBrush" Color="#B98D3A" /><SolidColorBrush x:Key="MineBrush" Color="#438ADB" /><SolidColorBrush x:Key="TheirsBrush" Color="#43A477" />
+      <SolidColorBrush x:Key="SettingsSurface" Color="#000000" /><SolidColorBrush x:Key="SettingsCard" Color="#000000" /><SolidColorBrush x:Key="SettingsLine" Color="#1E1E1E" /><SolidColorBrush x:Key="SettingsSelected" Color="#000000" /><SolidColorBrush x:Key="SettingsHover" Color="#0E0E0E" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+  <!-- Translucent tints over any surface: dialog scrim, banners, badges and the round icon plates of the dialogs. -->
+  <SolidColorBrush x:Key="ScrimBrush" Color="#66000000" />
+  <SolidColorBrush x:Key="DangerTintBrush" Color="#20D65050" />
+  <SolidColorBrush x:Key="NoticeTintBrush" Color="#20438ADB" />
+  <SolidColorBrush x:Key="WarningTintBrush" Color="#20D6A044" />
+  <SolidColorBrush x:Key="AccentTintBrush" Color="#20AB5839" />
+  <SolidColorBrush x:Key="OkTintBrush" Color="#2043A477" />
+  <SolidColorBrush x:Key="DiffAddedTintBrush" Color="#2443A477" />
+  <SolidColorBrush x:Key="DiffRemovedTintBrush" Color="#24DB6464" />
+  <!-- Opaque marks that keep their colour in both themes. -->
+  <SolidColorBrush x:Key="PreviewAddedBrush" Color="#43A477" />
+  <SolidColorBrush x:Key="GitLabBrush" Color="#E24329" />
+  <SolidColorBrush x:Key="GitLabLogoBrush" Color="#FC6D26" />
+  <!-- The Windows caption Close button: red while hovered, lighter red while pressed. -->
+  <SolidColorBrush x:Key="CaptionCloseBrush" Color="#E81123" />
+  <SolidColorBrush x:Key="CaptionClosePressedBrush" Color="#F1707A" />
+</ResourceDictionary>

@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="using:Avalonia.Data.Converters"
+        xmlns:shell="using:Trag.ViewModels.Shell"
+        xmlns:text="using:Trag.Domain.Presentation.Text"
+        xmlns:repositories="using:Trag.ViewModels.Repositories"
+        xmlns:dialogs="using:Trag.Desktop.Dialogs"
+        xmlns:viewsShell="using:Trag.Desktop.Views.Shell"
+        xmlns:workspace="using:Trag.Desktop.Views.Workspace"
+        xmlns:history="using:Trag.Desktop.Views.History"
+        x:Class="Trag.Desktop.Views.MainWindow" x:DataType="shell:ShellViewModel" x:CompileBindings="True"
+        Title="{x:Static text:AboutText.WindowTitle}" WindowState="Maximized" Width="1180" Height="760" MinWidth="880" MinHeight="580" Background="{DynamicResource SurfaceBrush}">
+  <!-- Title bar, toolbar, the status bar's error, notice and repository warning, the repository list page or the workspace
+       (sidebar and the shown section), the status bar, and the dialogs over everything
+       below the title bar, which stays the window's to drag and double-click. -->
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="{Binding $parent[Window].OffScreenMargin}">
+    <viewsShell:AppTitleBar />
+    <Border Grid.Row="1" Padding="10,3" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource DividerBrush}" Background="{DynamicResource ChromeBrush}">
+      <Grid ColumnDefinitions="*,Auto">
+        <!-- The repository list's toolbar over that page, the workspace's toolbar otherwise. -->
+        <ContentControl Content="{Binding CurrentPage}" HorizontalContentAlignment="Stretch">
+          <ContentControl.DataTemplates><DataTemplate DataType="repositories:RepositoryCatalogViewModel"><viewsShell:RepositoriesToolBar /></DataTemplate></ContentControl.DataTemplates>
+        </ContentControl>
+        <viewsShell:WorkspaceToolBar IsVisible="{Binding ShowsWorkspace}" />
+        <viewsShell:ShellActionsBar Name="ActionsBar" Grid.Column="1" />
+      </Grid>
+    </Border>
+    <!-- Raised from every section, so they sit above all of them: a Save this version from History or a failed start that
+         shows the repository list says so where it happens. -->
+    <workspace:NotificationBanners Grid.Row="2" DataContext="{Binding StatusBar}" />
+    <!-- The repository list page is created when it shows and dropped when it hides; the workspace underneath stays alive. -->
+    <ContentControl Grid.Row="3" Content="{Binding CurrentPage}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+    <Grid Grid.Row="3" ColumnDefinitions="210,1,*" IsVisible="{Binding ShowsWorkspace}">
+      <viewsShell:WorkspaceSidebar Name="SidebarView" />
+      <Border Grid.Column="1" Background="{DynamicResource DividerBrush}" />
+      <!-- History, merge and the synthetic preview are created when their section shows and dropped when it hides; the file status stays, so its lists keep their rows. -->
+      <ContentControl Grid.Column="2" Content="{Binding CurrentSection}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+      <Panel Grid.Column="2" IsVisible="{Binding CurrentSection, Converter={x:Static converters:ObjectConverters.IsNull}}">
+        <workspace:FileStatusView Name="Workspace" DataContext="{Binding FileStatusPage}" />
+      </Panel>
+      <!-- A blame covers the shown section and leaves it as it is underneath, so going back finds it unchanged. -->
+      <history:BlameView Grid.Column="2" Name="BlameOverlay" DataContext="{Binding Blame}" />
+    </Grid>
+    <viewsShell:ShellStatusBar Grid.Row="4" />
+    <!-- In-window dialogs: each one is a DialogHost over its feature view model; Escape and ✕ close it, focus follows FocusOnOpen. -->
+    <dialogs:CreateBranchDialog Name="CreateBranchOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Branches}" />
+    <dialogs:RenameBranchDialog Name="RenameBranchOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Branches}" />
+    <dialogs:CreateTagDialog Name="CreateTagOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Tags}" />
+    <dialogs:RevertDialog Name="RevertOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Revert}" />
+    <dialogs:CherryPickDialog Name="CherryPickOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding CherryPick}" />
+    <dialogs:ResetDialog Name="ResetOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Reset}" />
+    <dialogs:RewriteDialog Name="RewriteOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Rewrite}" />
+    <dialogs:RemotesDialog Name="RemotesOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding RemoteSettings}" />
+    <dialogs:RepositoryDetailsDialog Name="RepositoryDetailsOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding RepositoryDetails}" />
+    <dialogs:PublishDialog Name="PublishOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Publish}" />
+    <dialogs:DeleteBranchDialog Name="DeleteBranchOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Branches}" />
+    <dialogs:DeleteTagDialog Name="DeleteTagOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Tags}" />
+    <dialogs:GoToCommitDialog Name="GoToCommitOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding GoTo}" />
+    <dialogs:KeepCommitsDialog Name="KeepCommitsOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding GoTo}" />
+    <!-- Merge sits below Stash: its "Stash changes…" opens the stash dialog on top, and the merge dialog follows the result. -->
+    <dialogs:MergeBranchesDialog Name="MergeBranchesOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding MergeDialog}" />
+    <dialogs:StashDialog Name="StashOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Stash}" />
+    <dialogs:DropStashDialog Name="DropStashOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Stash}" />
+    <dialogs:DiscardDialog Name="DiscardOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Discard}" />
+    <dialogs:DiscardHunkDialog Name="DiscardHunkOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding WorkingDiff}" />
+    <dialogs:RestoreFileDialog Name="RestoreFileOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Files}" />
+    <dialogs:CloneDialog Name="CloneDialog" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Catalog.Clone}" />
+    <dialogs:GitSetupDialog Name="GitSetupOverlay" Grid.Row="1" Grid.RowSpan="4" DataContext="{Binding Git}" />
+  </Grid>
+</Window>

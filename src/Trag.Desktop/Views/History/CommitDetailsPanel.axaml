@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:history="using:Trag.ViewModels.History"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:diff="using:Trag.Desktop.Controls.Diff"
+             x:Class="Trag.Desktop.Views.History.CommitDetailsPanel" x:DataType="shell:HistoryPage" x:CompileBindings="True">
+  <!-- The lower history pane: the selected commit (or stash preview) with its actions above, the changed files and their
+       diff below. The message keeps the height its divider gives it (a third of the pane at first, up to none at all), so
+       moving the history divider resizes the files and diff; past them it takes the message, whose divider stays on the
+       pane, and gives the message its height back first. What does not fit is cut at the line. -->
+  <Grid ClipToBounds="True">
+    <StackPanel IsVisible="{Binding !History.Details.HasSubject}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12" Margin="24">
+      <controls:LineIcon Kind="commit" Width="36" Height="36" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" />
+      <TextBlock Text="Select a commit to explore" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" />
+      <TextBlock Text="Its files and changes will appear here." FontSize="12" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" />
+    </StackPanel>
+    <controls:RatioGrid Name="CommitDetailsPanels" Orientation="Vertical" IsVisible="{Binding History.Details.HasSubject}"
+                        DefaultRatio="0.3333333333333333" FirstPaneLength="{Binding Layout.CommitMessageHeight, Mode=TwoWay}">
+      <Border Background="{DynamicResource ChromeBrush}" Padding="12,8" ClipToBounds="True">
+        <!-- The names stay on top, beside the actions; the message and the comparison below them scroll across the whole
+             pane in whatever height it has, the bar at the pane's edge and the text keeping its margin. -->
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,*" ColumnSpacing="12">
+          <StackPanel Spacing="4">
+            <TextBlock Name="StashPreviewTitle" IsVisible="{Binding Stash.IsStashPreview}" Text="{Binding Stash.StashPreviewTitle}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis" />
+            <SelectableTextBlock Name="CommitHeading" Text="{Binding History.Details.Panel.Heading}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding History.Details.Panel.Heading}" />
+            <TextBlock Text="{Binding History.Details.Panel.Identity}" FontSize="11" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding History.Details.Panel.Identity}" />
+            <TextBlock Name="CommitCoAuthorText" Text="{Binding History.Details.Panel.CoAuthorText}" FontSize="11" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding History.Details.Panel.CoAuthorText}"
+                       IsVisible="{Binding History.Details.Panel.CoAuthorText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock Name="CommitSignatureText" Text="{Binding History.Details.Panel.Signature}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap"
+                       IsVisible="{Binding History.Details.Panel.Signature, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+          </StackPanel>
+          <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" Name="CommitMessageScroll" Margin="0,4,-12,0" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="4" Margin="0,0,12,0">
+              <SelectableTextBlock IsVisible="{Binding History.Details.Panel.Body, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" Text="{Binding History.Details.Panel.Body}" TextWrapping="Wrap" FontSize="12" />
+              <TextBlock Text="{Binding History.Details.Panel.Comparison}" FontSize="11" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding History.Details.Panel.Comparison}" />
+            </StackPanel>
+          </ScrollViewer>
+          <!-- What a commit can become, behind one button on its first line: the menu a right-click on its row opens
+               (CommitListPanel), without the commit's name, which is right beside it here. -->
+          <Button Grid.Column="1" Name="CommitActionsButton" Classes="more" VerticalAlignment="Top" IsVisible="{Binding !Stash.IsStashPreview}" ToolTip.Tip="Commit actions" AutomationProperties.Name="Commit actions">
+            <controls:LineIcon Kind="more" Width="18" Height="18" />
+            <Button.Flyout>
+              <MenuFlyout FlyoutPresenterClasses="actions" Placement="BottomEdgeAlignedRight">
+                <MenuItem Header="Create branch" Command="{Binding Branches.CreateBranchFromCommitCommand}"><MenuItem.Icon><controls:LineIcon Kind="branch" /></MenuItem.Icon></MenuItem>
+                <MenuItem Header="Create tag" Command="{Binding Tags.OpenCreateTagCommand}"><MenuItem.Icon><controls:LineIcon Kind="tag" /></MenuItem.Icon></MenuItem>
+                <Separator />
+                <MenuItem Header="Revert" Command="{Binding Revert.RequestRevertCommand}"><MenuItem.Icon><controls:LineIcon Kind="discard" /></MenuItem.Icon></MenuItem>
+                <MenuItem Header="Cherry-pick" Command="{Binding CherryPick.RequestCherryPickCommand}"><MenuItem.Icon><controls:LineIcon Kind="cherrypick" /></MenuItem.Icon></MenuItem>
+                <Separator />
+                <MenuItem Header="Reset current branch to here" Command="{Binding Reset.RequestResetCommand}"><MenuItem.Icon><controls:LineIcon Kind="reset" /></MenuItem.Icon></MenuItem>
+                <MenuItem Header="Edit commits from here" Command="{Binding Rewrite.RequestRewriteCommand}"><MenuItem.Icon><controls:LineIcon Kind="rebase" /></MenuItem.Icon></MenuItem>
+                <Separator />
+                <MenuItem Header="Copy SHA" Command="{Binding History.CopyCommitIdCommand}"><MenuItem.Icon><controls:LineIcon Kind="link" /></MenuItem.Icon></MenuItem>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" IsVisible="{Binding Stash.IsStashPreview}">
+            <Button Name="ApplyStashButton" Command="{Binding Stash.ApplyCommand}" CommandParameter="{Binding Stash.SelectedStash}" FontSize="12" Padding="10,6" ToolTip.Tip="Bring these changes back into the working tree; the entry is kept">
+              <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="pull" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="Apply" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+            <Button Name="DropStashButton" Command="{Binding Stash.RequestDropCommand}" CommandParameter="{Binding Stash.SelectedStash}" FontSize="12" Padding="10,6" ToolTip.Tip="Remove this entry from the stash list">
+              <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="trash" Width="16" Height="16" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Center" /><TextBlock Text="Drop" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+      <controls:PaneSplitter Name="CommitMessageDivider" Grid.Row="1" AutomationProperties.Name="Resize commit message" ToolTip.Tip="Drag to resize the message · Double-click to restore · Home/End to collapse" />
+      <Grid Grid.Row="2" RowDefinitions="2,*">
+        <ProgressBar Classes="thin" IsVisible="{Binding History.Details.IsBusy}" />
+        <controls:RatioGrid Name="HistoryFilePanels" Grid.Row="1" Ratio="{Binding Layout.DiffFilesRatio, Mode=TwoWay}">
+          <Grid RowDefinitions="Auto,*" ClipToBounds="True">
+            <TextBlock Text="{Binding History.Details.Panel.FileNotice}" FontSize="11" Opacity="0.65" Margin="12,8" TextWrapping="Wrap" />
+            <ListBox Grid.Row="1" Name="CommitFilesList" Classes="virtualized" Focusable="True" DataContext="{Binding History.Details.Panel}" x:DataType="history:CommitPanel" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Commit changed files">
+              <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="history:CommitFileRow"><Setter Property="AutomationProperties.Name" Value="{Binding PathText}" /></Style></ListBox.Styles>
+              <ListBox.ItemTemplate><DataTemplate x:DataType="history:CommitFileRow">
+                <Grid ColumnDefinitions="32,*" Background="Transparent" ToolTip.Tip="{Binding Description}">
+                  <!-- A right-click opens the working tree's file, shows it in the file manager or copies its path, saves the version
+                       this commit left or gives it back to the file, undoes what this commit did to the file, or looks it up by the name it
+                       has in this commit: its history, or its lines blamed here. -->
+                  <Grid.ContextFlyout>
+                    <MenuFlyout FlyoutPresenterClasses="actions">
+                      <MenuItem Header="Open" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Files.OpenCommand}" CommandParameter="{Binding File.Path}"><MenuItem.Icon><controls:LineIcon Kind="external" /></MenuItem.Icon></MenuItem>
+                      <MenuItem Header="Open in File Explorer" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Files.RevealCommand}" CommandParameter="{Binding File.Path}"><MenuItem.Icon><controls:LineIcon Kind="folder" /></MenuItem.Icon></MenuItem>
+                      <MenuItem Header="Copy path" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Files.CopyPathCommand}" CommandParameter="{Binding File.Path}"><MenuItem.Icon><controls:LineIcon Kind="link" /></MenuItem.Icon></MenuItem>
+                      <Separator />
+                      <MenuItem Header="Save this version" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Files.SaveVersionCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="file" /></MenuItem.Icon></MenuItem>
+                      <MenuItem Header="Restore this version" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Files.RequestRestoreCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="reset" /></MenuItem.Icon></MenuItem>
+                      <MenuItem Header="Revert changes in this file" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Files.RevertFileCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="discard" /></MenuItem.Icon></MenuItem>
+                      <Separator />
+                      <MenuItem Header="File history" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).History.ShowCommitFileHistoryCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="history" /></MenuItem.Icon></MenuItem>
+                      <MenuItem Header="Blame" Command="{Binding $parent[UserControl].((shell:HistoryPage)DataContext).Blame.BlameCommitFileCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="commit" /></MenuItem.Icon></MenuItem>
+                    </MenuFlyout>
+                  </Grid.ContextFlyout>
+                  <TextBlock Text="{Binding Status}" FontSize="11" Foreground="{DynamicResource AccentBrush}" /><TextBlock Grid.Column="1" Text="{Binding PathText}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                </Grid>
+              </DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+          <controls:PaneSplitter Name="HistoryFilesDivider" Grid.Column="1" AutomationProperties.Name="Resize commit files and diff" ToolTip.Tip="Drag to resize · Double-click to restore · Home/End to collapse" />
+          <Grid Grid.Column="2" RowDefinitions="Auto,2,*" ClipToBounds="True">
+            <diff:DiffNotice DataContext="{Binding History.Details.Diff}" Margin="12,8" />
+            <ProgressBar Classes="thin" Grid.Row="1" IsVisible="{Binding History.Details.Diff.IsBusy}" />
+            <diff:DiffView Grid.Row="2" Name="CommitDiffView" IsVisible="{Binding History.Details.Panel.HasSelection}" Document="{Binding History.Details.Diff.Document.Presentation}" Mode="{Binding Layout.DiffMode, Mode=TwoWay}" SplitRatio="{Binding Layout.DiffSplitRatio, Mode=TwoWay}" />
+          </Grid>
+        </controls:RatioGrid>
+      </Grid>
+    </controls:RatioGrid>
+  </Grid>
+</UserControl>

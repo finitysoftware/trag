@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:diff="using:Trag.Desktop.Controls.Diff" xmlns:converters="using:Avalonia.Data.Converters"
+             x:Class="Trag.Desktop.Controls.Diff.DiffView" x:DataType="diff:DiffView" x:CompileBindings="True">
+  <Grid RowDefinitions="Auto,Auto,*,Auto" DataContext="{Binding $parent[diff:DiffView]}">
+    <Border Background="{DynamicResource ChromeBrush}" Padding="8,4" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
+      <DockPanel HorizontalSpacing="8">
+        <ComboBox Name="DiffModeSelector" DockPanel.Dock="Left" SelectedIndex="{Binding Mode, Mode=TwoWay}" FontSize="11" MinHeight="26" Width="108" Padding="8,3" AutomationProperties.Name="Diff view mode">
+          <ComboBoxItem Content="Unified" /><ComboBoxItem Content="Split" />
+        </ComboBox>
+        <!-- The badge and the counts stand at the right edge, and what does not fit beside the mode selector takes another line, so a narrow diff, as in History, keeps its counts. -->
+        <WrapPanel DockPanel.Dock="Right" ItemSpacing="10" LineSpacing="4" VerticalAlignment="Center">
+          <Border Classes="changeBadge" Classes.added="{Binding Document.IsNewFile}" Classes.removed="{Binding Document.IsDeletedFile}" CornerRadius="10" Padding="9,3" IsVisible="{Binding Document.ChangeLabel, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Name="ChangeLabel" Classes="changeLabel" Classes.added="{Binding Document.IsNewFile}" Classes.removed="{Binding Document.IsDeletedFile}" Text="{Binding Document.ChangeLabel}" FontSize="11" />
+          </Border>
+          <TextBlock Name="AddedLinesLabel" Text="{Binding Document.AddedText}" Foreground="{DynamicResource DiffAddedBrush}" FontSize="11" VerticalAlignment="Center" IsVisible="{Binding Document.AddedText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+          <TextBlock Name="RemovedLinesLabel" Text="{Binding Document.RemovedText}" Foreground="{DynamicResource DiffRemovedBrush}" FontSize="11" VerticalAlignment="Center" IsVisible="{Binding Document.RemovedText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+        </WrapPanel>
+        <TextBlock Text="{Binding Document.SyntaxNotice}" FontSize="10" Opacity="0.6" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding Document.SyntaxNotice}" />
+      </DockPanel>
+    </Border>
+    <controls:RatioGrid Name="SideHeaders" Grid.Row="1" Ratio="{Binding SplitRatio, Mode=TwoWay}" IsVisible="{Binding IsSplit}" Background="{DynamicResource ChromeBrush}">
+      <TextBlock Text="Before" FontSize="10" Margin="10,4" Opacity="0.65" />
+      <controls:PaneSplitter Grid.Column="1" AutomationProperties.Name="Resize diff sides" ToolTip.Tip="Drag to resize sides · Double-click to restore · Home/End to collapse" />
+      <TextBlock Grid.Column="2" Text="After" FontSize="10" Margin="10,4" Opacity="0.65" />
+    </controls:RatioGrid>
+    <Panel Name="RowsArea" Grid.Row="2">
+      <ListBox Name="Rows" Classes="virtualized" SelectionMode="Multiple" Focusable="True" BorderThickness="0" Padding="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" AutomationProperties.Name="Diff rows">
+        <ListBox.ContextFlyout><MenuFlyout FlyoutPresenterClasses="actions" /></ListBox.ContextFlyout>
+        <ListBox.Styles><Style Selector="ListBoxItem"><Setter Property="Padding" Value="0" /><Setter Property="MinHeight" Value="22" /><Setter Property="Height" Value="22" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style></ListBox.Styles>
+      </ListBox>
+      <StackPanel Name="HunkActions" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right" VerticalAlignment="Top">
+        <Button Name="DiscardHunkButton" Classes="hunk discard" Command="{Binding DiscardHunkCommand}" IsVisible="False"><controls:LineIcon Kind="discard" Width="13" Height="13" /></Button>
+        <Button Name="HunkButton" Classes="hunk" Command="{Binding HunkCommand}" IsVisible="False"><controls:LineIcon Name="HunkIcon" Kind="plus" Width="13" Height="13" /></Button>
+      </StackPanel>
+    </Panel>
+    <ScrollBar Name="HorizontalBar" Grid.Row="3" Orientation="Horizontal" Value="{Binding HorizontalOffset, Mode=TwoWay}" SmallChange="36" MinHeight="12" AutomationProperties.Name="Scroll diff columns" />
+  </Grid>
+</UserControl>

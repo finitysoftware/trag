@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Shell.ShellActionsBar" x:DataType="shell:ShellViewModel" x:CompileBindings="True">
+  <!-- The right end of the toolbar, small buttons with the icon beside the caption: a terminal in the open repository's
+       folder, shown with the workspace, and More. More holds the repository's less frequent actions, shown with the
+       workspace too, and under a separator Settings, which is always there. -->
+  <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+    <Button Classes="tool" Name="TerminalButton" IsVisible="{Binding ShowsRepositoryActions}" Command="{Binding OpenTerminalCommand}" ToolTip.Tip="Open a terminal in the repository folder" AutomationProperties.Name="Terminal">
+      <!-- The terminal's frame sits 1 px high, so it reaches as far above the caption's capitals as below its baseline,
+           without changing the button's height. -->
+      <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="terminal" Width="18" Height="18" Margin="0,-1,0,1" Foreground="{DynamicResource TextBrush}" /><TextBlock Text="Terminal" /></StackPanel>
+    </Button>
+    <Button Classes="tool" Name="MoreButton" ToolTip.Tip="More actions and settings" AutomationProperties.Name="More">
+      <Button.Flyout>
+        <MenuFlyout FlyoutPresenterClasses="actions" Placement="BottomEdgeAlignedRight">
+          <MenuItem Name="RemotesMenuItem" IsVisible="{Binding ShowsRepositoryActions}" Header="Remotes" Command="{Binding RemoteSettings.OpenCommand}">
+            <MenuItem.Icon><controls:LineIcon Kind="cloud" /></MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Name="RepositoryDetailsMenuItem" IsVisible="{Binding ShowsRepositoryActions}" Header="Repository details" Command="{Binding RepositoryDetails.OpenCommand}">
+            <MenuItem.Icon><controls:LineIcon Kind="info" /></MenuItem.Icon>
+          </MenuItem>
+          <Separator IsVisible="{Binding ShowsRepositoryActions}" />
+          <MenuItem Name="SettingsMenuItem" Header="Settings" Command="{Binding Catalog.RequestSettingsCommand}" ToolTip.Tip="Settings (Ctrl+,)"><MenuItem.Icon><controls:LineIcon Kind="settings" /></MenuItem.Icon></MenuItem>
+        </MenuFlyout>
+      </Button.Flyout>
+      <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="more" Width="18" Height="18" Foreground="{DynamicResource TextBrush}" /><TextBlock Text="More" /></StackPanel>
+    </Button>
+  </StackPanel>
+</UserControl>

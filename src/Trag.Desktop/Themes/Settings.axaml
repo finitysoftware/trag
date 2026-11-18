@@ -1,0 +1,22 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The settings window has its own card, muted text and button sizes; the window carries the "settings" class. The ✕ of
+       a dialog over it keeps the dialog's own size. -->
+  <Style Selector="Window.settings Border.card"><Setter Property="Background" Value="{DynamicResource SettingsCard}" /><Setter Property="BorderBrush" Value="{DynamicResource SettingsLine}" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="6" /><Setter Property="Padding" Value="16" /></Style>
+  <Style Selector="Window.settings TextBlock.muted"><Setter Property="Opacity" Value="0.65" /><Setter Property="FontSize" Value="12" /><Setter Property="TextWrapping" Value="Wrap" /></Style>
+  <Style Selector="Window.settings Button:not(#CloseButton)"><Setter Property="FontSize" Value="12" /><Setter Property="Padding" Value="10,6" /></Style>
+  <!-- A section in the left list, as in Windows 11 Settings: the chosen one has the fill, the accent bar and semibold text,
+       a hovered one a lighter fill. The fill and bar are template parts, so only the conditional styles below can change them. -->
+  <Style Selector="Window.settings RadioButton.section">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template"><ControlTemplate>
+      <Border Name="PART_Fill" Background="Transparent" CornerRadius="5"><Grid ColumnDefinitions="4,*">
+        <Border Name="PART_Bar" Background="{DynamicResource AccentBrush}" CornerRadius="2" Margin="0,9" IsVisible="False" />
+        <ContentPresenter Grid.Column="1" Name="PART_ContentPresenter" Content="{TemplateBinding Content}" Margin="14,12" />
+      </Grid></Border>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style Selector="Window.settings RadioButton.section:pointerover /template/ Border#PART_Fill"><Setter Property="Background" Value="{DynamicResource SettingsHover}" /></Style>
+  <Style Selector="Window.settings RadioButton.section:checked /template/ Border#PART_Fill"><Setter Property="Background" Value="{DynamicResource SettingsSelected}" /></Style>
+  <Style Selector="Window.settings RadioButton.section:checked /template/ Border#PART_Bar"><Setter Property="IsVisible" Value="True" /></Style>
+  <Style Selector="Window.settings RadioButton.section:checked"><Setter Property="FontWeight" Value="SemiBold" /></Style>
+</Styles>

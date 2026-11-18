@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="using:Trag.ViewModels.Diff"
+             x:Class="Trag.Desktop.Controls.Diff.DiffNotice" x:DataType="viewModels:DiffViewModel" x:CompileBindings="True"
+             IsVisible="{Binding Document.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+  <!-- Why the diff above which it stands is not shown, and the limited preview that shows it anyway. Where it stands sets
+       its margin. -->
+  <StackPanel Spacing="8">
+    <TextBlock Text="{Binding Document.Message}" TextWrapping="Wrap" FontSize="12" Opacity="0.7" />
+    <Button Content="Load limited preview" Command="{Binding LoadPreviewCommand}" IsVisible="{Binding Document.CanPreview}" HorizontalAlignment="Left" FontSize="12" />
+  </StackPanel>
+</UserControl>

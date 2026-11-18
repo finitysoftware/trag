@@ -1,0 +1,6 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Trag.Desktop.Controls">
+  <Style Selector="controls|PaneSplitter"><Setter Property="Background" Value="{DynamicResource DividerBrush}" /></Style>
+  <!-- No hover colour on splitters (owner's request); keyboard focus alone shows the accent. -->
+  <Style Selector="controls|PaneSplitter:focus-visible"><Setter Property="Background" Value="{DynamicResource AccentBrush}" /></Style>
+</Styles>

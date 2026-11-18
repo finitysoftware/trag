@@ -1,0 +1,25 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:discard="using:Trag.ViewModels.Discard"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.DiscardDialog" x:DataType="discard:DiscardViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Confirmation.IsOpen}" CloseCommand="{Binding Confirmation.CancelCommand}"
+                    Title="{Binding Confirmation.Subject.Title}" Subtitle="{Binding Confirmation.Text}"
+                    Icon="discard" IconBrush="{DynamicResource DiffRemovedBrush}" PlateBrush="{DynamicResource DangerTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #CancelDiscardButton}">
+  <!-- Discard has no undo: red confirmation, with Stash as the way out that keeps the work. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="{Binding Confirmation.Subject.Description}" FontSize="12" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Confirmation.IsRunning}" />
+    <TextBlock Text="{Binding Confirmation.Message}" IsVisible="{Binding Confirmation.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+      <Button Name="StashInsteadButton" Classes="link" Content="Stash all changes instead" Command="{Binding StashInsteadOfDiscardCommand}" VerticalAlignment="Center" ToolTip.Tip="Set every current change aside as a stash instead of losing it" />
+      <Button Grid.Column="1" Name="CancelDiscardButton" Content="Cancel" Command="{Binding Confirmation.CancelCommand}" Padding="18,8" />
+      <Button Grid.Column="2" Name="ConfirmDiscardButton" Classes="danger" Content="Discard" Command="{Binding Confirmation.ConfirmCommand}" Padding="18,8" />
+    </Grid>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

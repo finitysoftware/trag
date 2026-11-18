@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:commit="using:Trag.ViewModels.Commit" xmlns:writes="using:Trag.Domain.Writes"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:pickers="using:Trag.Desktop.Views.Pickers"
+             x:Class="Trag.Desktop.Views.Workspace.CommitComposer" x:DataType="commit:CommitViewModel" x:CompileBindings="True">
+  <!-- The commit area: identity with the co-authors the message names, message, the Amend box and the Commit button,
+       and under them what an amend of a pushed commit means. The same 8 px sits between the editor and the button as between the button and the bottom edge. -->
+  <Border Name="CommitArea" Padding="14,10,14,8" Background="{DynamicResource ChromeBrush}">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="8">
+      <StackPanel Spacing="3">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <TextBlock Text="{Binding AuthorText}" FontSize="11" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding AuthorText}" VerticalAlignment="Center" />
+          <Button Grid.Column="1" Name="AddCoAuthorButton" Classes="link" Content="Add co-author" FontSize="11" IsEnabled="{Binding !Repository.IsWriting}" behaviors:FlyoutOpen.Command="{Binding CoAuthorPicker.OpenCommand}" behaviors:FlyoutOpen.IsOpen="{Binding CoAuthorPicker.IsOpen, Mode=TwoWay}" ToolTip.Tip="Write a Co-authored-by line for someone who worked on this commit">
+            <Button.Flyout><Flyout Placement="BottomEdgeAlignedRight" ShowMode="Standard" FlyoutPresenterClasses="branches"><pickers:CoAuthorPicker DataContext="{Binding CoAuthorPicker}" /></Flyout></Button.Flyout>
+          </Button>
+        </Grid>
+        <ItemsControl Name="CoAuthorList" ItemsSource="{Binding CoAuthorList}" IsVisible="{Binding !!CoAuthorList.Count}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate x:DataType="writes:GitIdentity">
+            <Border Classes="chip" Margin="0,2,6,2" ToolTip.Tip="{Binding Display}"><StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="{Binding Name}" FontSize="11" VerticalAlignment="Center" />
+              <Button Name="RemoveCoAuthorButton" Classes="chipclose" IsEnabled="{Binding !$parent[ItemsControl].((commit:CommitViewModel)DataContext).Repository.IsWriting}" Command="{Binding $parent[ItemsControl].((commit:CommitViewModel)DataContext).RemoveCoAuthorCommand}" CommandParameter="{Binding}" ToolTip.Tip="Take this co-author out of the message" AutomationProperties.Name="Remove co-author"><controls:LineIcon Kind="close" Width="10" Height="10" /></Button>
+            </StackPanel></Border>
+          </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl><TextBlock Text="{Binding CommitterText}" FontSize="10" IsVisible="{Binding CommitterText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" /><TextBlock Name="CommitSigningText" Text="{Binding SigningText}" FontSize="10" Foreground="{DynamicResource MutedBrush}" IsVisible="{Binding SigningText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+      <TextBox Grid.Row="1" Name="CommitMessageEditor" Text="{Binding CommitMessage}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" FontSize="12" PlaceholderText="Commit message" IsEnabled="{Binding !Repository.IsWriting}" AutomationProperties.Name="Commit message" />
+      <StackPanel Grid.Row="2" Spacing="6">
+        <TextBlock Name="CommitMessageHint" Text="{Binding MessageHint}" IsVisible="{Binding MessageHint, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+        <!-- Fluent's check box is 32 px tall; it gives the 4 px it has over the button back, so the row is the button's. -->
+        <Grid ColumnDefinitions="*,Auto">
+          <CheckBox Name="AmendBox" Content="Amend last commit" IsChecked="{Binding IsAmending}" IsEnabled="{Binding CanAmend}" FontSize="12" Margin="0,-2" VerticalAlignment="Center" ToolTip.Tip="Replace the last commit instead of making a new one; the editor starts from its message" />
+          <Button Grid.Column="1" Name="CommitButton" Classes="primary" ToolTip.Tip="{Binding CommitTip}" Content="{Binding CommitActionText}" Command="{Binding CommitCommand}" Padding="14,6" FontSize="12" />
+        </Grid>
+        <TextBlock Name="AmendWarning" Text="{Binding AmendWarning}" IsVisible="{Binding AmendWarning, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,76 @@
+Trag Source-Available License 1.0
+
+Copyright (c) 2026 Finity Software. All rights reserved.
+
+This license applies to Trag, its source code, documentation and the builds made from it (together, "the Software"),
+as published by Finity Software ("the Licensor") in the official repository at https://github.com/finitysoftware/trag
+("the Official Repository"). By using, copying or changing the Software you accept these terms. If you do not accept
+them, you may not use the Software.
+
+1. Use of the official builds
+
+   You may install and use the builds the Licensor publishes ("Official Builds") free of charge, for any purpose,
+   personal or commercial, on any number of devices, including within a company or other organization.
+
+2. Use of the source code
+
+   You may read the source code, compile it and change it, but only:
+
+   a. for your own use, or the internal use of your organization, on devices you or your organization control; or
+   b. to prepare a contribution to the Official Repository.
+
+3. What you may not do
+
+   Except as section 4 allows, you may not:
+
+   a. distribute, publish or otherwise make available to anyone else the source code or any build of the Software,
+      whether original or changed, in whole or in part;
+   b. sell, rent, lease or otherwise charge for the Software or for access to it;
+   c. sublicense the Software or grant anyone else any rights in it;
+   d. publish, offer or present the Software, or any work based on it, under another name or as your own work; or
+   e. remove or change this license, the copyright notice or any other notice of the Licensor's rights.
+
+4. Forks for contributions
+
+   You may make a copy ("fork") of the Official Repository on the same platform that hosts it, and change it there,
+   solely to submit changes to the Official Repository through that platform's pull request mechanism. A fork may not
+   be used to distribute the Software or builds of it, or for any other purpose.
+
+5. Contributions
+
+   By submitting a contribution to the Official Repository (code, documentation, or any other material, including in a
+   pull request, an issue or a comment), you:
+
+   a. grant the Licensor a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, copy, change,
+      distribute, sublicense and otherwise exploit the contribution, as part of the Software or otherwise, under any
+      license terms the Licensor chooses, including open-source and commercial terms; and
+   b. confirm that the contribution is your own work, or that you have the right to grant this license for it, and that
+      granting it does not break any agreement or right of anyone else.
+
+6. Third-party components
+
+   The Software includes components owned by others. They are licensed under their own terms, which ship with the
+   Software in THIRD-PARTY-NOTICES.txt, and those terms, not this license, govern them.
+
+7. No warranty
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+   WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.
+
+8. Limitation of liability
+
+   TO THE EXTENT THE LAW ALLOWS, IN NO EVENT SHALL THE LICENSOR OR ANY CONTRIBUTOR BE LIABLE FOR ANY CLAIM, DAMAGES OR
+   OTHER LIABILITY, WHETHER DIRECT, INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL, INCLUDING LOSS OF DATA, PROFITS OR
+   BUSINESS, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+   SOFTWARE OR ITS USE.
+
+9. Termination
+
+   If you break any of these terms, your rights under this license end automatically, without notice. You must then
+   stop using the Software and delete every copy of its source code and of any build made from it that you hold. The
+   licenses you granted under section 5 do not end.
+
+10. Reservation of rights
+
+   The Licensor keeps every right not expressly granted in this license. No other right, license or permission, express
+   or implied, is granted, including any right in the Licensor's names, logos or trademarks.

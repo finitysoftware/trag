@@ -1,0 +1,9 @@
+# The global Git configuration of the integration suite. SuiteGitConfig names this file in
+# GIT_CONFIG_GLOBAL and sets GIT_CONFIG_NOSYSTEM=1 unless the run names a global configuration itself, so a test reads
+# no configuration of the machine it runs on.
+# What git lfs install writes for the user: a clone reads Git LFS as set up from here, as it does for such a user.
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

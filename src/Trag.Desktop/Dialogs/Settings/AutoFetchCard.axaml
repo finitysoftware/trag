@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sync="using:Trag.ViewModels.Sync"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             x:Class="Trag.Desktop.Dialogs.Settings.AutoFetchCard" x:DataType="sync:AutoFetchViewModel" x:CompileBindings="True">
+  <!-- How often Trag fetches on its own, and what that fetch does and never does. -->
+  <Border Classes="card">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+      <StackPanel Spacing="5" VerticalAlignment="Center">
+        <TextBlock Text="{x:Static text:AutoFetchText.Title}" FontWeight="SemiBold" FontSize="15" />
+        <TextBlock Classes="muted" Text="{x:Static text:AutoFetchText.Explanation}" />
+      </StackPanel>
+      <ComboBox Grid.Column="1" Name="AutoFetchInterval" ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" MinWidth="170" VerticalAlignment="Center" AutomationProperties.Name="{x:Static text:AutoFetchText.Title}">
+        <ComboBox.ItemTemplate><DataTemplate x:DataType="text:AutoFetchOption"><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+      </ComboBox>
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:viewsShell="using:Trag.Desktop.Views.Shell" xmlns:workspace="using:Trag.Desktop.Views.Workspace"
+             xmlns:viewsSync="using:Trag.Desktop.Views.Sync" xmlns:converters="using:Avalonia.Data.Converters"
+             x:Class="Trag.Desktop.Views.Workspace.FileStatusView" x:DataType="shell:FileStatusPage" x:CompileBindings="True">
+  <!-- The file status section: the staged and unstaged panels beside the diff, and the commit area below; the welcome pane without a repository.
+       During a merge a banner sends the open conflicts to the merge view, where they are resolved; a branch rewritten after
+       it was pushed offers to replace the remote branch. -->
+  <Grid RowDefinitions="Auto,*">
+    <!-- The file status stays alive while other sections show, so its texts change while hidden. A bound Run that changes
+         then is never laid out again (the text block stays empty), so every changing text here is a TextBlock's Text. -->
+    <StackPanel>
+      <Border Name="MergeConflictsBanner" Background="{DynamicResource WarningTintBrush}" Padding="16,8" IsVisible="{Binding Resolution.Scope.ShowsBanner}">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+          <controls:LineIcon Kind="warning" Width="17" Height="17" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" />
+          <DockPanel Grid.Column="1" VerticalAlignment="Center">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding Resolution.Scope.Lead}" FontWeight="SemiBold" FontSize="12" Margin="0,0,4,0" />
+            <TextBlock Text="{Binding Resolution.Scope.Banner}" TextWrapping="Wrap" FontSize="12" />
+          </DockPanel>
+          <Button Grid.Column="2" Name="OpenMergeViewButton" Classes="accent" Command="{Binding Resolution.ShowConflictCommand}" FontSize="12" Padding="12,5" AutomationProperties.Name="{Binding Resolution.Scope.OpenText}">
+            <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="{Binding Resolution.Scope.Icon}" Width="14" Height="14" Foreground="White" VerticalAlignment="Center" /><TextBlock Text="{Binding Resolution.Scope.OpenText}" VerticalAlignment="Center" /></StackPanel>
+          </Button>
+        </Grid>
+      </Border>
+      <viewsSync:ForcePushBanner DataContext="{Binding ForcePush}" />
+      <!-- Submodules not at the commits the branch records, beside the update that checks those commits out. -->
+      <Border Name="SubmoduleBanner" Background="{DynamicResource WarningTintBrush}" Padding="16,8" IsVisible="{Binding FileStatus.SubmoduleNotice, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+          <controls:LineIcon Kind="warning" Width="17" Height="17" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding FileStatus.SubmoduleNotice}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" />
+          <Button Grid.Column="2" Name="UpdateSubmodulesButton" Content="Update submodules" Command="{Binding FileStatus.UpdateSubmodulesCommand}" FontSize="12" Padding="12,5" />
+        </Grid>
+      </Border>
+    </StackPanel>
+    <!-- The commit area is the lower pane: its top edge drags up to half the column and never below the area's natural height.
+         A merge or a rebase in progress is finished in its own view, so the commit area steps aside meanwhile. -->
+    <controls:RatioGrid Name="CommitPanels" Grid.Row="1" Orientation="Vertical" Ratio="{Binding Layout.CommitPanelRatio, Mode=TwoWay}" MinRatio="0.5" DefaultRatio="1" KeepSecondPaneNaturalSize="True" IsSecondPaneCollapsed="{Binding Resolution.Scope.HasView}" IsVisible="{Binding Repository.HasRepository}">
+      <controls:RatioGrid Name="StatusFilePanels" Ratio="{Binding Layout.DiffFilesRatio, Mode=TwoWay}">
+        <controls:RatioGrid Name="StagePanels" Orientation="Vertical" Ratio="{Binding Layout.StagePanelRatio, Mode=TwoWay}">
+          <workspace:StagedFilesPanel Name="Staged" />
+          <controls:PaneSplitter Grid.Row="1" AutomationProperties.Name="Resize staged and unstaged files" ToolTip.Tip="Drag to resize · Double-click to restore" />
+          <workspace:UnstagedFilesPanel Name="Unstaged" Grid.Row="2" />
+        </controls:RatioGrid>
+        <controls:PaneSplitter Name="StatusFilesDivider" Grid.Column="1" AutomationProperties.Name="Resize files and diff" ToolTip.Tip="Drag to resize · Double-click to restore · Home/End to collapse" />
+        <workspace:FileDiffPanel Name="Diff" Grid.Column="2" />
+      </controls:RatioGrid>
+      <controls:PaneSplitter Grid.Row="1" Name="CommitDivider" AutomationProperties.Name="Resize the commit area" ToolTip.Tip="Drag to resize · Double-click to restore" />
+      <Panel Grid.Row="2" IsVisible="{Binding !Resolution.Scope.HasView}"><workspace:CommitComposer Name="Composer" DataContext="{Binding Commit}" /></Panel>
+    </controls:RatioGrid>
+    <viewsShell:WelcomePane Grid.Row="1" IsVisible="{Binding !Repository.HasRepository}" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,164 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:system="using:System"
+             xmlns:coreHistory="using:Trag.Domain.History"
+             xmlns:branches="using:Trag.ViewModels.Branches"
+             xmlns:rebase="using:Trag.ViewModels.Rebase"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Dialogs.RebasePane" x:DataType="rebase:RebaseBranchViewModel" x:CompileBindings="True"
+             behaviors:FocusOnOpen.Target="{Binding #RebaseOntoSelector}">
+  <!-- The rebase side of the merge dialog: the current branch → the branch it goes onto, what stops the rebase, whether it
+       rewrites the branch others build on (with the way round), what it will do and leave out (the preview card with its
+       replay graph and the commits replayed), whether the branch is already on its remote, and the files changed on both
+       sides. Every text and flag comes from the Domain summary. -->
+  <StackPanel Spacing="12">
+    <Grid ColumnDefinitions="*,76,*" RowDefinitions="Auto,Auto,Auto">
+      <TextBlock Classes="caption" Text="REBASE" Margin="2,0,0,6" />
+      <Border Grid.Row="1" Name="RebaseBranchBox" Classes="fixedchoice">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+          <controls:LineIcon Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding Draft.Branch.Name, FallbackValue=''}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          <Border Grid.Column="2" Classes="currentpill"><TextBlock Text="current" /></Border>
+        </Grid>
+      </Border>
+      <TextBlock Grid.Row="2" Name="RebaseBranchHint" Text="{Binding Summary.BranchHint}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="2,6,0,0" />
+      <Border Grid.Column="1" Grid.Row="1" Width="34" Height="34" CornerRadius="17" Background="{DynamicResource AccentStrongBrush}" HorizontalAlignment="Center">
+        <controls:LineIcon Kind="arrow" Width="18" Height="18" Foreground="White" />
+      </Border>
+      <TextBlock Grid.Column="2" Classes="caption" Text="ONTO" Margin="2,0,0,6" />
+      <ComboBox Grid.Column="2" Grid.Row="1" Name="RebaseOntoSelector" ItemsSource="{Binding Draft.OntoOptions}" SelectedItem="{Binding Draft.Onto}" PlaceholderText="Choose a branch" IsEnabled="{Binding !IsRebasing}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Branch to rebase onto">
+        <ComboBox.ItemTemplate><DataTemplate x:DataType="branches:BranchRow">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <controls:LineIcon Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" IsVisible="{Binding !IsRemote}" VerticalAlignment="Center" />
+            <controls:LineIcon Kind="cloud" Width="15" Height="15" Foreground="{DynamicResource MutedBrush}" IsVisible="{Binding IsRemote}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          </Grid>
+        </DataTemplate></ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Grid.Column="2" Grid.Row="2" Name="RebaseOntoHint" Text="{Binding Summary.OntoHint}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="2,6,0,0" />
+    </Grid>
+
+    <Border Name="RebaseBlockedCard" Classes="mergebox blocked" IsVisible="{Binding Summary.IsBlocked}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="blocked" Width="18" Height="18" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Text="{x:Static text:BranchText.ChangesInTheWay}" FontWeight="SemiBold" FontSize="12" />
+          <TextBlock Text="{Binding Summary.BlockedText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+            <Button Name="RebaseStashButton" Command="{Binding OpenStash}" FontSize="12" Padding="10,5" AutomationProperties.Name="Stash changes">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="stash" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Stash changes…" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+            <Button Name="RebaseReviewButton" Command="{Binding ReviewChangesCommand}" FontSize="12" Padding="10,5" AutomationProperties.Name="Review in File status">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="file" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Review in File status" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Before the preview, so the warning is read before the button: rebasing the branch others build on. -->
+    <Border Name="RebaseMainlineCard" Classes="mergebox conflict" IsVisible="{Binding Summary.ShowsMainline}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="warning" Width="18" Height="18" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Name="RebaseMainlineTitle" Text="{Binding Summary.MainlineTitle}" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Summary.MainlineText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+          <Button Name="RebaseOtherWayButton" Command="{Binding RebaseOtherWayCommand}" IsVisible="{Binding Summary.CanRebaseOtherWay}" FontSize="12" Padding="10,5" Margin="0,6,0,0" HorizontalAlignment="Left" AutomationProperties.Name="{Binding Summary.OtherWayAction}">
+            <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="rebase" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="{Binding Summary.OtherWayAction}" VerticalAlignment="Center" /></StackPanel>
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Name="RebasePreviewCard" Classes="mergepreview" IsVisible="{Binding Summary.Choice.IsComplete}">
+      <StackPanel>
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" Margin="14,12">
+          <Panel Grid.ColumnSpan="2" Height="82" IsVisible="{Binding Preview.IsBusy}">
+            <Arc Name="RebasePreviewSpinner" Classes="spinner" Classes.spinning="{Binding Preview.IsBusy}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Panel>
+          <!-- The replay: the onto branch goes on, the branch's commits leave their old base and come again on top of it. -->
+          <Canvas Name="RebaseGraph" Width="250" Height="82" IsVisible="{Binding Summary.ShowsResult}">
+            <TextBlock Canvas.Left="0" Canvas.Top="18" Width="80" Text="{Binding Draft.Onto.Name, FallbackValue=''}" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Canvas.Left="0" Canvas.Top="56" Width="80" Text="before" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" />
+            <Path Data="M86,62 C98,62 98,24 110,24 L150,24" Stroke="{DynamicResource MutedBrush}" StrokeThickness="2" Opacity="0.55" />
+            <Path Data="M86,62 L150,62" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.6" StrokeDashArray="2,2" Opacity="0.55" />
+            <Path Data="M150,24 L236,24" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="2" />
+            <Path Data="M156,60 C176,58 184,46 190,34" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="1.5" StrokeDashArray="2.5,2" />
+            <Path Data="M185,36 L191,32 L193,39" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="1.5" StrokeLineCap="Round" StrokeJoin="Round" />
+            <Ellipse Canvas.Left="81.5" Canvas.Top="57.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+            <Ellipse Canvas.Left="117.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+            <Ellipse Canvas.Left="141.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+            <Ellipse Canvas.Left="102" Canvas.Top="58" Width="8" Height="8" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.5" StrokeDashArray="1.5,1.5" Opacity="0.7" />
+            <Ellipse Canvas.Left="122" Canvas.Top="58" Width="8" Height="8" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.5" StrokeDashArray="1.5,1.5" Opacity="0.7" />
+            <Ellipse Canvas.Left="142" Canvas.Top="58" Width="8" Height="8" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.5" StrokeDashArray="1.5,1.5" Opacity="0.7" />
+            <Ellipse Canvas.Left="167" Canvas.Top="19" Width="10" Height="10" Fill="{DynamicResource AccentStrongBrush}" />
+            <Ellipse Canvas.Left="191" Canvas.Top="19" Width="10" Height="10" Fill="{DynamicResource AccentStrongBrush}" />
+            <Ellipse Canvas.Left="215" Canvas.Top="19" Width="10" Height="10" Fill="{DynamicResource AccentStrongBrush}" />
+            <TextBlock Canvas.Left="140" Canvas.Top="2" Width="110" Text="{Binding Draft.Branch.Name, FallbackValue=''}" TextAlignment="Right" FontSize="9.5" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Canvas.Left="196" Canvas.Top="40" Width="54" Text="new ids" TextAlignment="Center" FontSize="9.5" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" />
+          </Canvas>
+          <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+            <TextBlock Name="RebaseResultTitle" Text="{Binding Summary.ResultTitle}" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Summary.ResultText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+            <TextBlock Name="RebaseLeftOut" Text="{Binding Summary.LeftOutText}" IsVisible="{Binding Summary.LeftOutText, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+            <StackPanel Name="RebaseCheckLine" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0" IsVisible="{Binding Summary.ShowsCheck}">
+              <controls:LineIcon Kind="check" Width="15" Height="15" Foreground="{DynamicResource DiffAddedBrush}" IsVisible="{Binding Summary.IsCheckKnown}" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding Summary.CheckText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource DiffAddedBrush}" IsVisible="{Binding Summary.IsCheckKnown}" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding Summary.CheckText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" IsVisible="{Binding !Summary.IsCheckKnown}" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </StackPanel>
+            <TextBlock Text="{Binding Preview.Message}" IsVisible="{Binding Preview.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
+        <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="14,10,14,12" IsVisible="{Binding Summary.ShowsResult}">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="caption" Text="{Binding Summary.CommitsCaption}" Margin="0,0,0,5" />
+            <ItemsControl Name="RebaseCommitList" ItemsSource="{Binding Summary.Commits}">
+              <ItemsControl.ItemTemplate><DataTemplate x:DataType="coreHistory:HistoryCommit">
+                <Grid ColumnDefinitions="84,*,96,108" Height="23" ToolTip.Tip="{Binding Id}">
+                  <TextBlock Text="{Binding ShortId}" FontFamily="Consolas,DejaVu Sans Mono,monospace" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding Subject}" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,10,0" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding Author}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="3" Text="{Binding DateText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+              </DataTemplate></ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{Binding Summary.MoreCommits}" IsVisible="{Binding Summary.MoreCommits, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <Border Name="RebasePublishedCard" Classes="mergebox conflict" IsVisible="{Binding Summary.ShowsPublished}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="warning" Width="18" Height="18" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Text="{Binding Summary.PublishedTitle}" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Summary.PublishedText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Name="RebaseBothSidesCard" Classes="mergebox conflict" IsVisible="{Binding Summary.HasBothSides}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="warning" Width="18" Height="18" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="6">
+          <TextBlock Text="{Binding Summary.ConflictTitle}" FontWeight="SemiBold" FontSize="12" />
+          <ItemsControl ItemsSource="{Binding Summary.ConflictFiles}">
+            <ItemsControl.ItemTemplate><DataTemplate x:DataType="system:String"><TextBlock Text="{Binding}" FontFamily="Consolas,DejaVu Sans Mono,monospace" FontSize="11.5" TextTrimming="CharacterEllipsis" Margin="0,1" /></DataTemplate></ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="{Binding Summary.ConflictMore}" IsVisible="{Binding Summary.ConflictMore, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" />
+          <TextBlock Text="{Binding Summary.ConflictText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Name="RebaseLocalOnlyCard" Classes="mergebox notice" IsVisible="{Binding Summary.ShowsLocalOnly}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="info" Width="17" Height="17" Foreground="{DynamicResource MineBrush}" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Text="{Binding Summary.LocalOnlyText}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+    <ProgressBar Classes="thin" IsVisible="{Binding IsRebasing}" />
+    <TextBlock Name="RebaseNotice" Text="{Binding Draft.Notice}" IsVisible="{Binding Draft.HasNotice}" FontSize="12" TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

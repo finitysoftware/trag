@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:platform="using:Trag.Desktop.Platform"
+             x:Class="Trag.Desktop.Views.Shell.AppTitleBar" x:DataType="shell:ShellViewModel" x:CompileBindings="True">
+  <!-- On Windows the client area extends into the title bar: Avalonia draws the caption buttons and the window title on the left; this row supplies the background, the app icon in front of that title, and the centred repository name. -->
+  <Border Name="TitleBar" Height="{x:Static platform:WindowChrome.TitleBarHeight}" Background="{DynamicResource ChromeBrush}" WindowDecorationProperties.ElementRole="TitleBar">
+    <Grid ColumnDefinitions="150,*,150">
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,0,0,0" VerticalAlignment="Center"><Image Name="TitleIcon" Source="/Assets/trag-titlebar.ico" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" /><TextBlock Name="TitleAppName" Text="{x:Static text:AboutText.WindowTitle}" FontSize="12" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" IsVisible="{Binding !$parent[Window].IsExtendedIntoWindowDecorations}" /></StackPanel>
+      <TextBlock Grid.Column="1" Name="TitleRepositoryName" Text="{Binding Header.RepositoryName}" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+    </Grid>
+  </Border>
+</UserControl>

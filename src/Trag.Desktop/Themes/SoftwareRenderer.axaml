@@ -1,0 +1,4 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Tooltips appear at once: the theme's opacity fade renders text garbled on the software renderer until the fade ends. -->
+  <Style Selector="ToolTip"><Setter Property="Transitions"><Transitions /></Setter></Style>
+</Styles>

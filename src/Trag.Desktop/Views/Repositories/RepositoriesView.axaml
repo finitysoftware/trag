@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:catalog="using:Trag.ViewModels.Repositories"
+             xmlns:repositories="using:Trag.Desktop.Views.Repositories"
+             x:Class="Trag.Desktop.Views.Repositories.RepositoriesView" x:DataType="catalog:RepositoryCatalogViewModel" x:CompileBindings="True">
+  <!-- The repository list page: filters on the left, the searchable list in the middle, the selected repository on the right. -->
+  <Grid ColumnDefinitions="230,1,*,1,340">
+    <repositories:CatalogFilterSidebar />
+    <Border Grid.Column="1" Background="{DynamicResource DividerBrush}" />
+    <!-- The bar under the search has a row of its own, so the list keeps its place when the bar goes. -->
+    <Grid Grid.Column="2" RowDefinitions="Auto,Auto,8,*" Margin="24,20,24,0">
+      <TextBlock Text="Repositories" FontSize="21" FontWeight="SemiBold" />
+      <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,14,0,6">
+        <TextBox Name="CatalogSearchEditor" Text="{Binding Filter.CatalogSearch}" PlaceholderText="Search repositories" FontSize="12" MaxLength="512" AutomationProperties.Name="Search repositories" />
+        <Button Grid.Column="1" Classes="filter" Classes.active="{Binding Filter.IsAllFilter}" Content="All" Command="{Binding Filter.ShowAllRepositoriesCommand}" />
+        <Button Grid.Column="2" Classes="filter" Classes.active="{Binding Filter.IsLocalFilter}" Content="Local" Command="{Binding Filter.ShowLocalRepositoriesCommand}" />
+      </Grid>
+      <ProgressBar Classes="thin" Grid.Row="2" IsVisible="{Binding State.IsBusy}" VerticalAlignment="Top" />
+      <!-- The list scrolls across the column's right margin, so its bar lies at the divider beside the rows, not over
+           their actions; the rows keep the margin. -->
+      <ScrollViewer Grid.Row="3" Name="CatalogScroll" Margin="0,0,-24,0" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="20" Margin="0,4,24,24">
+        <repositories:LocalRepositoryList IsVisible="{Binding Filter.ShowLocalGroup}" />
+        <repositories:AccountGroupSection />
+      </StackPanel></ScrollViewer>
+    </Grid>
+    <Border Grid.Column="3" Background="{DynamicResource DividerBrush}" />
+    <repositories:RepositoryDetailsPane Grid.Column="4" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,74 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:rebase="using:Trag.ViewModels.Rebase"
+                    xmlns:text="using:Trag.Domain.Presentation.Text"
+                    xmlns:controls="using:Trag.Desktop.Controls"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.RewriteDialog" x:DataType="rebase:RewriteViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Question.IsOpen}" CloseCommand="{Binding Question.CancelCommand}"
+                    Title="{Binding Title}" Subtitle="{Binding Question.Text}" DialogWidth="640"
+                    Icon="rebase" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #RewriteRows}">
+  <!-- The current branch's commits from the one chosen in History, oldest first: what happens to each, chosen in its
+       row, a dropped one dimmed and a joined one indented under the commit it joins; a row's handle drags its commit,
+       and Alt and an arrow or the buttons beside the list move the chosen one. Below, the message its commit gets, written where a reword or a squash
+       sets one; what keeps the edit back or what the upstream already has is said above the buttons. The hint and the
+       refusal keep their room while hidden, one line and two (blanks in their font hold it, whatever the font), so the
+       dialog keeps its height as a drag turns the plan changed and back. -->
+  <dialogs:DialogHost.Styles>
+    <Style Selector="Grid.rewriterow.dropped > TextBlock"><Setter Property="Opacity" Value="0.45" /><Setter Property="TextDecorations" Value="Strikethrough" /></Style>
+    <Style Selector="Grid.rewriterow.folded"><Setter Property="Margin" Value="18,0,0,0" /></Style>
+  </dialogs:DialogHost.Styles>
+  <StackPanel Spacing="10">
+    <Separator />
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+      <!-- The bar is drawn over the list's content, so the rows keep a gutter as wide as it on the right. -->
+      <ListBox Name="RewriteRows" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" Focusable="True" MaxHeight="264" Padding="0,0,16,0" AutomationProperties.Name="Commits to edit">
+        <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="rebase:RewriteRow"><Setter Property="AutomationProperties.Name" Value="{Binding Subject}" /></Style></ListBox.Styles>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="rebase:RewriteRow">
+            <Grid Classes="rewriterow" Classes.dropped="{Binding IsDropped}" Classes.folded="{Binding IsFolded}" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="10">
+              <Border Classes="grip" Background="Transparent" Cursor="SizeNorthSouth" Width="16" ToolTip.Tip="Drag to move the commit">
+                <controls:LineIcon Kind="grip" Width="14" Height="14" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+              </Border>
+              <ComboBox Grid.Column="1" ItemsSource="{Binding $parent[ListBox].((rebase:RewriteViewModel)DataContext).Actions}" SelectedValue="{Binding Action, Mode=TwoWay}"
+                        SelectedValueBinding="{Binding Action, DataType=text:RewriteChoice}" Width="104" MinHeight="26" Padding="8,3" FontSize="12"
+                        AutomationProperties.Name="What happens to the commit">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="text:RewriteChoice"><TextBlock Text="{Binding Name}" ToolTip.Tip="{Binding Hint}" /></DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBlock Grid.Column="2" Text="{Binding ShortId}" FontSize="11" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="3" Text="{Binding Subject}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding Subject}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Top">
+        <Button Name="MoveUpButton" Classes="rowaction" Command="{Binding MoveUpCommand}" ToolTip.Tip="Move the commit up (Alt+Up)" AutomationProperties.Name="Move up">
+          <controls:LineIcon Kind="chevron" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" RenderTransform="rotate(180deg)" />
+        </Button>
+        <Button Name="MoveDownButton" Classes="rowaction" Command="{Binding MoveDownCommand}" ToolTip.Tip="Move the commit down (Alt+Down)" AutomationProperties.Name="Move down">
+          <controls:LineIcon Kind="chevron" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" />
+        </Button>
+      </StackPanel>
+    </Grid>
+    <StackPanel Spacing="4">
+      <TextBlock Text="Message" FontSize="11" Foreground="{DynamicResource MutedBrush}" />
+      <TextBox Name="RewriteMessage" Text="{Binding Message}" IsReadOnly="{Binding !CanEditMessage}" AcceptsReturn="True" TextWrapping="Wrap" Height="96" FontSize="12"
+               AutomationProperties.Name="Message of the chosen commit" />
+      <Panel><TextBlock Text=" " FontSize="11" Opacity="0" IsHitTestVisible="False" /><TextBlock Text="Choose Reword or Squash to write a new message." IsVisible="{Binding !CanEditMessage}" FontSize="11" Foreground="{DynamicResource MutedBrush}" /></Panel>
+    </StackPanel>
+    <TextBlock Name="RewriteWarning" Text="{Binding Warning}" IsVisible="{Binding Warning, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+    <Panel><TextBlock Text="&#x20;&#10;&#x20;" FontSize="12" Opacity="0" IsHitTestVisible="False" /><TextBlock Name="RewriteRefusal" Text="{Binding Refusal}" IsVisible="{Binding Refusal, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" /></Panel>
+    <ProgressBar Classes="thin" IsVisible="{Binding Question.IsRunning}" />
+    <TextBlock Text="{Binding Question.Message}" IsVisible="{Binding Question.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelRewriteButton" Content="Cancel" Command="{Binding Question.CancelCommand}" Padding="18,8" />
+      <Button Name="StartRewriteButton" Classes="accent" Content="Edit commits" Command="{Binding Question.ConfirmCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

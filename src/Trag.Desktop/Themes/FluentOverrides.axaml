@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:themes="using:Trag.Desktop.Themes">
+  <!-- Fluent resource keys the app redefines. Disabled controls stay light: a slightly deeper surface with muted text instead of
+       Fluent's dark grey. Every dark theme gives a text field its surface colour, at rest, under the pointer and in focus,
+       where Fluent tints it darker or black on whatever lies under it, and a menu of Fluent's own the sidebar's colour, as
+       Trag's menus have; Graphite also drops a list on its cards. The dark themes select a row in the lighter accent and
+       let more of the surface through than Fluent, whose strong orange glares there. -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#F4F2EF" /><SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#E6E1DA" /><SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#A39A90" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#F4F2EF" /><SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#E6E1DA" /><SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#A39A90" /><SolidColorBrush x:Key="ComboBoxDropDownGlyphForegroundDisabled" Color="#B9B1A7" />
+      <SolidColorBrush x:Key="CheckBoxForegroundUncheckedDisabled" Color="#A39A90" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" Color="#D8D2CA" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" Color="#F4F2EF" />
+      <SolidColorBrush x:Key="CheckBoxForegroundCheckedDisabled" Color="#A39A90" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" Color="#E3C4B6" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" Color="#E3C4B6" /><SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" Color="White" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="{x:Static themes:AppThemes.DarkEspresso}">
+      <SolidColorBrush x:Key="ComboBoxBackground" Color="#201E1C" /><SolidColorBrush x:Key="TextControlBackground" Color="#201E1C" /><SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#201E1C" /><SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#201E1C" /><SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#272421" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#2B2B2B" /><SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="Black" Opacity="0.36" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#E88B5E" Opacity="0.55" /><SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#E88B5E" Opacity="0.65" /><SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#E88B5E" Opacity="0.75" />
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#292624" /><SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#3B3631" /><SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#7E766D" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#292624" /><SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#3B3631" /><SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#7E766D" /><SolidColorBrush x:Key="ComboBoxDropDownGlyphForegroundDisabled" Color="#6F675F" />
+      <SolidColorBrush x:Key="CheckBoxForegroundUncheckedDisabled" Color="#7E766D" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" Color="#4A443E" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" Color="#292624" />
+      <SolidColorBrush x:Key="CheckBoxForegroundCheckedDisabled" Color="#7E766D" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" Color="#6B4A3C" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" Color="#6B4A3C" /><SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" Color="#D9CFC7" />
+    </ResourceDictionary>
+    <!-- Graphite's disabled controls: a step off its cards in its own graphite, the checked ones in a dimmed copper. -->
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="TextControlBackground" Color="#14171C" /><SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#14171C" /><SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#14171C" /><SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#1B2027" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#252D37" /><SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#35404D" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#E38D5D" Opacity="0.55" /><SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#E38D5D" Opacity="0.65" /><SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#E38D5D" Opacity="0.75" />
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#212831" /><SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#303A46" /><SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#77818E" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#212831" /><SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#303A46" /><SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#77818E" /><SolidColorBrush x:Key="ComboBoxDropDownGlyphForegroundDisabled" Color="#66707C" />
+      <SolidColorBrush x:Key="CheckBoxForegroundUncheckedDisabled" Color="#77818E" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" Color="#404B59" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" Color="#212831" />
+      <SolidColorBrush x:Key="CheckBoxForegroundCheckedDisabled" Color="#77818E" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" Color="#725B52" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" Color="#725B52" /><SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" Color="#D5DAE1" />
+    </ResourceDictionary>
+    <!-- Obsidian follows Graphite's rules in its own near-black greys. Espresso, Obsidian and Vantablack give a drop-down
+         their surface, where Fluent tints the card under it. -->
+    <ResourceDictionary x:Key="{x:Static themes:AppThemes.DarkObsidian}">
+      <SolidColorBrush x:Key="ComboBoxBackground" Color="#0C0C0E" /><SolidColorBrush x:Key="TextControlBackground" Color="#0C0C0E" /><SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#0C0C0E" /><SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#0C0C0E" /><SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#0E0E10" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#17171A" /><SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#232326" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#E38D5D" Opacity="0.55" /><SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#E38D5D" Opacity="0.65" /><SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#E38D5D" Opacity="0.75" />
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#121214" /><SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#1F1F22" /><SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#6E6E74" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#121214" /><SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#1F1F22" /><SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#6E6E74" /><SolidColorBrush x:Key="ComboBoxDropDownGlyphForegroundDisabled" Color="#5C5C62" />
+      <SolidColorBrush x:Key="CheckBoxForegroundUncheckedDisabled" Color="#6E6E74" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" Color="#2C2C30" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" Color="#121214" />
+      <SolidColorBrush x:Key="CheckBoxForegroundCheckedDisabled" Color="#6E6E74" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" Color="#5E463A" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" Color="#5E463A" /><SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" Color="#D5D5D9" />
+    </ResourceDictionary>
+    <!-- Vantablack follows Graphite's rules in black and neutral greys. -->
+    <ResourceDictionary x:Key="{x:Static themes:AppThemes.DarkVantablack}">
+      <SolidColorBrush x:Key="ComboBoxBackground" Color="#000000" /><SolidColorBrush x:Key="TextControlBackground" Color="#000000" /><SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#000000" /><SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#000000" /><SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#000000" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#111111" /><SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#1E1E1E" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#E38D5D" Opacity="0.55" /><SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#E38D5D" Opacity="0.65" /><SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#E38D5D" Opacity="0.75" />
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#0A0A0A" /><SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#1A1A1A" /><SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#6A6A6A" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#0A0A0A" /><SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#1A1A1A" /><SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#6A6A6A" /><SolidColorBrush x:Key="ComboBoxDropDownGlyphForegroundDisabled" Color="#555555" />
+      <SolidColorBrush x:Key="CheckBoxForegroundUncheckedDisabled" Color="#6A6A6A" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" Color="#2A2A2A" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" Color="#0A0A0A" />
+      <SolidColorBrush x:Key="CheckBoxForegroundCheckedDisabled" Color="#6A6A6A" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" Color="#5A4338" /><SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" Color="#5A4338" /><SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" Color="#D5D5D5" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

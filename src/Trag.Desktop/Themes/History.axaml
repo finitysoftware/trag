@@ -1,0 +1,40 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Trag.Desktop.Controls" xmlns:history="using:Trag.Desktop.Views.History">
+  <!-- Lists inside the history view are denser than the file lists; the rules stay scoped to that view. -->
+  <Style Selector="history|HistoryView ListBox"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="BorderThickness" Value="0" /></Style>
+  <Style Selector="history|HistoryView ListBoxItem"><Setter Property="Padding" Value="10,4" /><Setter Property="MinHeight" Value="26" /></Style>
+  <Style Selector="history|HistoryView ListBox#HistoryList ListBoxItem"><Setter Property="Padding" Value="10,0" /><Setter Property="MinHeight" Value="28" /></Style>
+  <!-- The names on a commit, before its message: the branch checked out is filled, other local branches outlined, a
+       remote-tracking branch and a tag muted, a detached HEAD solid. -->
+  <Style Selector="Border.refbadge"><Setter Property="BorderThickness" Value="1" /><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter Property="CornerRadius" Value="9" /><Setter Property="Padding" Value="6,0" /><Setter Property="Height" Value="18" /><Setter Property="Margin" Value="0,0,5,0" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <!-- The button that opens a commit's actions from the commit pane: three plain dots that tint on hover, like the scope toggle. -->
+  <Style Selector="Button.more"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="4" /><Setter Property="Margin" Value="0,-5,-4,0" /></Style>
+  <Style Selector="Button.more:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button.more controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Border.refbadge TextBlock"><Setter Property="FontSize" Value="11" /><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="Border.refbadge controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="Border.refbadge.current"><Setter Property="Background" Value="{DynamicResource AccentTintBrush}" /></Style>
+  <Style Selector="Border.refbadge.current TextBlock"><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="Border.refbadge.remote, Border.refbadge.tag"><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /></Style>
+  <Style Selector="Border.refbadge.remote TextBlock, Border.refbadge.tag TextBlock"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Border.refbadge.remote controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Border.refbadge.head"><Setter Property="Background" Value="{DynamicResource AccentStrongBrush}" /></Style>
+  <Style Selector="Border.refbadge.head TextBlock"><Setter Property="Foreground" Value="{DynamicResource SurfaceBrush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <!-- In a file's history, the path the file came from on the commit that renamed or copied it: muted like a remote branch. -->
+  <Style Selector="Border.pathbadge"><Setter Property="BorderThickness" Value="1" /><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="CornerRadius" Value="9" /><Setter Property="Padding" Value="6,0" /><Setter Property="Height" Value="18" /><Setter Property="Margin" Value="0,0,5,0" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Border.pathbadge TextBlock"><Setter Property="FontSize" Value="11" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <!-- A blamed file's lines are dense like code; the first line of each block is set off by a hairline above it. -->
+  <Style Selector="ListBox.blame ListBoxItem"><Setter Property="Padding" Value="0" /><Setter Property="MinHeight" Value="20" /></Style>
+  <Style Selector="Border.blameline.blockstart"><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="0,1,0,0" /></Style>
+  <Style Selector="TextBlock.blamelabel"><Setter Property="FontSize" Value="11" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Margin" Value="8,0" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <!-- The file a history follows, beside the section's name: a tinted pill with a plain × that tints on hover. -->
+  <Style Selector="Border.chip"><Setter Property="Background" Value="{DynamicResource AccentTintBrush}" /><Setter Property="CornerRadius" Value="11" /><Setter Property="Padding" Value="9,2,3,2" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Border.chip controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+  <Style Selector="Button.chipclose"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="4" /><Setter Property="CornerRadius" Value="9" /></Style>
+  <Style Selector="Button.chipclose:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button.chipclose controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="Button.scope"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="6,4" /></Style>
+  <Style Selector="Button.scope:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button.scope controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Opacity" Value="0.6" /></Style>
+  <Style Selector="Button.scope.active controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+</Styles>

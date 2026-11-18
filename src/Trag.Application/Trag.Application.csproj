@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <!-- The live model is observable: the toolkit's ComponentModel and Input only, never a UI framework. -->
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <ProjectReference Include="../Trag.Domain/Trag.Domain.csproj" />
+  </ItemGroup>
+</Project>

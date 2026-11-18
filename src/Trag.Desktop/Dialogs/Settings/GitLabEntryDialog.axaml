@@ -1,0 +1,25 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:accounts="using:Trag.ViewModels.Accounts" xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.Settings.GitLabEntryDialog" x:DataType="accounts:AccountsViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding ShowGitLabEntry}" CloseCommand="{Binding CancelCommand}"
+                    Title="Add a GitLab account" Subtitle="GitLab.com or a self-managed server, with a personal access token."
+                    Icon="gitlab" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #GitLabTokenEditor}">
+  <!-- Adding a GitLab account over the whole settings window, as the GitHub sign-in: the server address and the personal
+       access token, which has the keys when the entry opens and is cleared as soon as its bytes are handed over; a bar
+       runs while the token is checked, and the line under it says what the check needs or how it ended. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <StackPanel Spacing="6">
+      <TextBlock Classes="muted" Text="Server address" />
+      <TextBox Name="GitLabAddressEditor" Text="{Binding GitLabAddress}" AutomationProperties.Name="GitLab address" IsEnabled="{Binding IsIdle}" PlaceholderText="https://gitlab.com" />
+    </StackPanel>
+    <StackPanel Spacing="6">
+      <TextBlock Classes="muted" Text="Personal access token · read_user + write_repository (add api to create projects from Trag)" />
+      <TextBox Name="GitLabTokenEditor" PasswordChar="●" IsUndoEnabled="False" MaxLength="1024" IsEnabled="{Binding IsIdle}" PlaceholderText="Paste your token" AutomationProperties.Name="GitLab personal access token" />
+    </StackPanel>
+    <Button Name="ConnectGitLabButton" Classes="accent" Content="Connect GitLab" Click="ConnectGitLab" IsEnabled="{Binding IsIdle}" HorizontalAlignment="Right" Padding="18,8" />
+    <ProgressBar Classes="thin" IsVisible="{Binding IsBusy}" />
+    <TextBlock Name="GitLabEntryStatus" Classes="muted" Text="{Binding Status}" />
+  </StackPanel>
+</dialogs:DialogHost>

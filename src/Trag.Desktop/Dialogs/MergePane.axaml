@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:system="using:System"
+             xmlns:coreHistory="using:Trag.Domain.History"
+             xmlns:branches="using:Trag.ViewModels.Branches"
+             xmlns:merge="using:Trag.ViewModels.Merge"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Dialogs.MergePane" x:DataType="merge:MergeBranchesViewModel" x:CompileBindings="True"
+             behaviors:FocusOnOpen.Target="{Binding #MergeFromSelector}">
+  <!-- The merge side of the merge dialog: From → Into with Swap, what stops the merge, where Trag goes for another branch,
+       what the merge will do (the preview card with its mini graph and the incoming commits), the conflicts Git expects,
+       the message and the push. Every text and flag comes from the Domain summary; the rows of both lists are the picker's. -->
+  <StackPanel Spacing="12">
+    <Grid ColumnDefinitions="*,76,*" RowDefinitions="Auto,Auto,Auto">
+      <TextBlock Classes="caption" Text="MERGE FROM" Margin="2,0,0,6" />
+      <ComboBox Grid.Row="1" Name="MergeFromSelector" ItemsSource="{Binding Draft.FromOptions}" SelectedItem="{Binding Draft.From}" PlaceholderText="Choose a branch" IsEnabled="{Binding !IsMerging}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Merge from">
+        <ComboBox.ItemTemplate><DataTemplate x:DataType="branches:BranchRow">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+            <controls:LineIcon Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" IsVisible="{Binding !IsRemote}" VerticalAlignment="Center" />
+            <controls:LineIcon Kind="cloud" Width="15" Height="15" Foreground="{DynamicResource MutedBrush}" IsVisible="{Binding IsRemote}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <Border Grid.Column="2" Classes="currentpill" IsVisible="{Binding IsCurrent}"><TextBlock Text="current" /></Border>
+          </Grid>
+        </DataTemplate></ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Grid.Row="2" Name="MergeFromHint" Text="{Binding Summary.FromHint}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="2,6,0,0" />
+      <Border Grid.Column="1" Grid.Row="1" Width="34" Height="34" CornerRadius="17" Background="{DynamicResource AccentStrongBrush}" HorizontalAlignment="Center">
+        <controls:LineIcon Kind="arrow" Width="18" Height="18" Foreground="White" />
+      </Border>
+      <Button Grid.Column="1" Grid.Row="2" Name="MergeSwapButton" Classes="swap" Command="{Binding SwapCommand}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,6,0,0" ToolTip.Tip="Swap the direction: merge the other way round" AutomationProperties.Name="Swap direction">
+        <StackPanel Orientation="Horizontal" Spacing="4"><controls:LineIcon Kind="swap" Width="12" Height="12" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /><TextBlock Text="Swap" VerticalAlignment="Center" /></StackPanel>
+      </Button>
+      <TextBlock Grid.Column="2" Classes="caption" Text="INTO" Margin="2,0,0,6" />
+      <ComboBox Grid.Column="2" Grid.Row="1" Name="MergeIntoSelector" ItemsSource="{Binding Draft.IntoOptions}" SelectedItem="{Binding Draft.Into}" PlaceholderText="Choose a branch" IsEnabled="{Binding !IsMerging}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Merge into">
+        <ComboBox.ItemTemplate><DataTemplate x:DataType="branches:BranchRow">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+            <controls:LineIcon Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <Border Grid.Column="2" Classes="currentpill" IsVisible="{Binding IsCurrent}"><TextBlock Text="current" /></Border>
+          </Grid>
+        </DataTemplate></ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Grid.Column="2" Grid.Row="2" Name="MergeIntoHint" Text="{Binding Summary.IntoHint}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="2,6,0,0" />
+    </Grid>
+
+    <Border Name="MergeBlockedCard" Classes="mergebox blocked" IsVisible="{Binding Summary.IsBlocked}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="blocked" Width="18" Height="18" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Text="{x:Static text:BranchText.ChangesInTheWay}" FontWeight="SemiBold" FontSize="12" />
+          <TextBlock Text="{Binding Summary.BlockedText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+            <Button Name="MergeStashButton" Command="{Binding OpenStash}" FontSize="12" Padding="10,5" AutomationProperties.Name="Stash changes">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="stash" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Stash changes…" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+            <Button Name="MergeReviewButton" Command="{Binding ReviewChangesCommand}" FontSize="12" Padding="10,5" AutomationProperties.Name="Review in File status">
+              <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="file" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Review in File status" VerticalAlignment="Center" /></StackPanel>
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Name="MergeSwitchCard" Classes="mergebox notice" IsVisible="{Binding Summary.Choice.SwitchesBranch}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="branch" Width="17" Height="17" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="8">
+          <TextBlock Text="{Binding Summary.SwitchText}" FontSize="12" TextWrapping="Wrap" />
+          <CheckBox Name="MergeStayCheck" Content="{Binding Summary.StayLabel}" IsChecked="{Binding Draft.StayOnTarget}" IsEnabled="{Binding !IsMerging}" FontSize="12" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Name="MergePreviewCard" Classes="mergepreview" IsVisible="{Binding Summary.Choice.IsComplete}">
+      <StackPanel>
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" Margin="14,12">
+          <Panel Grid.ColumnSpan="2" Height="78" IsVisible="{Binding Preview.IsBusy}">
+            <Arc Name="MergePreviewSpinner" Classes="spinner" Classes.spinning="{Binding Preview.IsBusy}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Panel>
+          <Panel Width="250" Height="78" IsVisible="{Binding Summary.ShowsResult}">
+            <!-- A merge commit: the target's own commits above, the incoming ones below, joined by the new commit. -->
+            <Canvas Name="MergeCommitGraph" IsVisible="{Binding Summary.CreatesMergeCommit}">
+              <TextBlock Canvas.Left="0" Canvas.Top="16" Width="88" Text="{Binding Draft.Into.Name, FallbackValue=''}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Canvas.Left="0" Canvas.Top="50" Width="88" Text="{Binding Draft.From.Name, FallbackValue=''}" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" />
+              <Path Data="M96,58 L184,58" Stroke="{DynamicResource MutedBrush}" StrokeThickness="2" Opacity="0.55" />
+              <Path Data="M96,58 C108,58 108,24 120,24 L226,24" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="2" />
+              <Path Data="M184,58 C206,58 206,24 226,24" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="2" StrokeDashArray="2,1.5" />
+              <Ellipse Canvas.Left="91.5" Canvas.Top="53.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="113.5" Canvas.Top="53.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="135.5" Canvas.Top="53.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="157.5" Canvas.Top="53.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="179.5" Canvas.Top="53.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="127.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource AccentStrongBrush}" />
+              <Ellipse Canvas.Left="151.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource AccentStrongBrush}" />
+              <Ellipse Canvas.Left="215" Canvas.Top="13" Width="22" Height="22" Fill="{DynamicResource AccentTintBrush}" />
+              <Ellipse Canvas.Left="220" Canvas.Top="18" Width="12" Height="12" Fill="{DynamicResource SurfaceBrush}" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="2" />
+              <TextBlock Canvas.Left="212" Canvas.Top="38" Width="28" Text="new" TextAlignment="Center" FontSize="9.5" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" />
+            </Canvas>
+            <!-- A fast-forward: the target simply moves to the newest incoming commit. -->
+            <Canvas Name="FastForwardGraph" IsVisible="{Binding Summary.IsFastForward}">
+              <TextBlock Canvas.Left="0" Canvas.Top="16" Width="88" Text="{Binding Draft.From.Name, FallbackValue=''}" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Canvas.Left="0" Canvas.Top="50" Width="88" Text="{Binding Draft.Into.Name, FallbackValue=''}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis" />
+              <Path Data="M96,58 C108,58 108,24 120,24 L200,24" Stroke="{DynamicResource MutedBrush}" StrokeThickness="2" Opacity="0.55" />
+              <Path Data="M104,58 L186,58 Q200,58 200,46 L200,38" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="1.8" StrokeDashArray="2,1.6" />
+              <Path Data="M195,42 L200,36 L205,42" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" />
+              <Ellipse Canvas.Left="91.5" Canvas.Top="53.5" Width="9" Height="9" Fill="{DynamicResource AccentStrongBrush}" />
+              <Ellipse Canvas.Left="131.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="163.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="195.5" Canvas.Top="19.5" Width="9" Height="9" Fill="{DynamicResource MutedBrush}" Opacity="0.55" />
+              <Ellipse Canvas.Left="189" Canvas.Top="13" Width="22" Height="22" Stroke="{DynamicResource AccentStrongBrush}" StrokeThickness="1.5" StrokeDashArray="2,1.6" />
+              <TextBlock Canvas.Left="214" Canvas.Top="16" Width="36" Text="{Binding Draft.Into.Name, FallbackValue=''}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextTrimming="CharacterEllipsis" />
+            </Canvas>
+          </Panel>
+          <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+            <TextBlock Name="MergeResultTitle" Text="{Binding Summary.ResultTitle}" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Summary.ResultText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+            <StackPanel Name="MergeCheckLine" Orientation="Horizontal" Spacing="6" Margin="0,6,0,0" IsVisible="{Binding Summary.ShowsCheck}">
+              <controls:LineIcon Kind="check" Width="15" Height="15" Foreground="{DynamicResource DiffAddedBrush}" IsVisible="{Binding Summary.IsCheckKnown}" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding Summary.CheckText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource DiffAddedBrush}" IsVisible="{Binding Summary.IsCheckKnown}" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding Summary.CheckText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" IsVisible="{Binding !Summary.IsCheckKnown}" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </StackPanel>
+            <TextBlock Text="{Binding Preview.Message}" IsVisible="{Binding Preview.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
+        <CheckBox Name="MergeNoFastForwardCheck" Content="Create a merge commit anyway (no fast-forward)" IsChecked="{Binding Draft.NoFastForward}" IsVisible="{Binding Summary.ShowsNoFastForward}" IsEnabled="{Binding !IsMerging}" FontSize="12" Margin="14,0,14,12" />
+        <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="14,10,14,12" IsVisible="{Binding Summary.ShowsResult}">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="caption" Text="{Binding Summary.CommitsCaption}" Margin="0,0,0,5" />
+            <ItemsControl Name="MergeCommitList" ItemsSource="{Binding Summary.Commits}">
+              <ItemsControl.ItemTemplate><DataTemplate x:DataType="coreHistory:HistoryCommit">
+                <Grid ColumnDefinitions="84,*,96,108" Height="23" ToolTip.Tip="{Binding Id}">
+                  <TextBlock Text="{Binding ShortId}" FontFamily="Consolas,DejaVu Sans Mono,monospace" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding Subject}" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,10,0" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding Author}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="3" Text="{Binding DateText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+              </DataTemplate></ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{Binding Summary.MoreCommits}" IsVisible="{Binding Summary.MoreCommits, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <Border Name="MergeConflictCard" Classes="mergebox conflict" IsVisible="{Binding Summary.HasConflicts}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="11">
+        <controls:LineIcon Kind="warning" Width="18" Height="18" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="6">
+          <TextBlock Text="{Binding Summary.ConflictTitle}" FontWeight="SemiBold" FontSize="12" />
+          <ItemsControl ItemsSource="{Binding Summary.ConflictFiles}">
+            <ItemsControl.ItemTemplate><DataTemplate x:DataType="system:String"><TextBlock Text="{Binding}" FontFamily="Consolas,DejaVu Sans Mono,monospace" FontSize="11.5" TextTrimming="CharacterEllipsis" Margin="0,1" /></DataTemplate></ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="{Binding Summary.ConflictMore}" IsVisible="{Binding Summary.ConflictMore, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" />
+          <TextBlock Text="{Binding Summary.ConflictText}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <StackPanel Spacing="6" IsVisible="{Binding Summary.CreatesMergeCommit}">
+      <TextBlock Classes="caption" Text="MERGE COMMIT MESSAGE" Margin="2,0,0,0" />
+      <TextBox Name="MergeMessageEditor" Text="{Binding Draft.Message}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" MaxHeight="90" MaxLength="65536" IsEnabled="{Binding !IsMerging}" FontSize="12" AutomationProperties.Name="Merge commit message" />
+    </StackPanel>
+    <CheckBox Name="MergePushCheck" Content="{Binding Summary.PushLabel}" IsChecked="{Binding Draft.PushAfter}" IsVisible="{Binding Summary.CanPush}" IsEnabled="{Binding !IsMerging}" FontSize="12" />
+    <ProgressBar Classes="thin" IsVisible="{Binding IsMerging}" />
+    <TextBlock Name="MergeNotice" Text="{Binding Draft.Notice}" IsVisible="{Binding Draft.HasNotice}" FontSize="12" TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

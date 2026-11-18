@@ -1,0 +1,18 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Caption buttons of the drawn Windows title bar (extended client area). The application Button styles also reach them, so restore a flat caption look:
+       square buttons with no gap, red only while hovering Close, and no fullscreen button, which Windows title bars do not have.
+       The :not(:fullscreen) activator gives the Spacing setter trigger priority, so it overrides the value set inside the theme template. -->
+  <Style Selector="WindowDrawnDecorations /template/ Button">
+    <Setter Property="CornerRadius" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="0" />
+    <Setter Property="Template"><ControlTemplate><ContentPresenter Name="PART_ContentPresenter" Background="Transparent" Content="{TemplateBinding Content}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" /></ControlTemplate></Setter>
+  </Style>
+  <Style Selector="WindowDrawnDecorations /template/ Button:pointerover /template/ ContentPresenter"><Setter Property="Background" Value="{TemplateBinding Background}" /></Style>
+  <Style Selector="WindowDrawnDecorations /template/ Button:pressed /template/ ContentPresenter"><Setter Property="Background" Value="{TemplateBinding BorderBrush}" /></Style>
+  <Style Selector="WindowDrawnDecorations /template/ Button#PART_FullScreenButton"><Setter Property="IsVisible" Value="False" /></Style>
+  <Style Selector="WindowDrawnDecorations:not(:fullscreen) /template/ StackPanel#PART_OverlayPanel"><Setter Property="Spacing" Value="0" /></Style>
+  <!-- The drawn title starts to the right of the 16 px app icon that MainWindow places at the left of its TitleBar row. -->
+  <Style Selector="WindowDrawnDecorations /template/ :is(Control)#PART_TitleTextPanel"><Setter Property="Margin" Value="24,0,0,0" /></Style>
+  <Style Selector="WindowDrawnDecorations /template/ Button#PART_CloseButton:pointerover"><Setter Property="Background" Value="{DynamicResource CaptionCloseBrush}" /></Style>
+  <Style Selector="WindowDrawnDecorations /template/ Button#PART_CloseButton:pressed"><Setter Property="Background" Value="{DynamicResource CaptionClosePressedBrush}" /></Style>
+  <Style Selector="WindowDrawnDecorations /template/ Button#PART_CloseButton:pointerover Path"><Setter Property="Fill" Value="White" /></Style>
+</Styles>

@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:viewsMerge="using:Trag.Desktop.Views.Merge"
+             x:Class="Trag.Desktop.Views.Merge.OperationBanner">
+  <!-- The banner over the merge view and the rebase view: what is in progress, which branch goes where and what is left,
+       how far it got, and the way to the staged files. The view that uses it supplies every text. -->
+  <Border Name="Banner" Classes="mergebanner" x:DataType="viewsMerge:OperationBanner" Classes.markers="{Binding IsAlarm}">
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+      <StackPanel Spacing="3" VerticalAlignment="Center">
+        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" />
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Left" Name="BannerDirection" Text="{Binding Direction}" FontWeight="SemiBold" FontSize="11.5" Margin="0,0,8,0" />
+          <TextBlock Name="BannerRemaining" Text="{Binding Remaining}" TextWrapping="Wrap" FontSize="11.5" />
+        </DockPanel>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Width="200" Spacing="4" VerticalAlignment="Center" IsVisible="{Binding Direction, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}">
+        <ProgressBar Classes="mergeprogress" Value="{Binding Progress}" />
+        <TextBlock Text="{Binding ProgressText}" FontSize="10.5" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Right" />
+      </StackPanel>
+      <Button Grid.Column="2" Content="Review staged files" Command="{Binding ReviewCommand}" FontSize="11" VerticalAlignment="Center" />
+    </Grid>
+  </Border>
+</UserControl>

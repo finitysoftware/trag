@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             xmlns:viewsMerge="using:Trag.Desktop.Views.Merge"
+             x:Class="Trag.Desktop.Views.Merge.StashConflictsView" x:DataType="shell:ConflictsPage" x:CompileBindings="True">
+  <!-- Conflicts a stash left: the banner with what is left, and the conflict panels the merge and rebase views share.
+       Nothing is finished here; a file is done once it is marked as resolved. -->
+  <Grid RowDefinitions="Auto,*">
+    <viewsMerge:OperationBanner Name="StashConflictsBanner" Title="{x:Static text:MergeText.ConflictResolution}" Remaining="{Binding Resolution.Scope.ViewLine}"
+                                ReviewCommand="{Binding Navigator.ShowFileStatusCommand}" />
+
+    <controls:RatioGrid Grid.Row="1" Ratio="{Binding Layout.DiffFilesRatio, Mode=TwoWay}">
+      <viewsMerge:ConflictFilesPanel />
+      <controls:PaneSplitter Grid.Column="1" AutomationProperties.Name="Resize conflict panels" ToolTip.Tip="Drag to resize · Double-click to restore" />
+      <viewsMerge:ConflictDetailPanel Grid.Column="2" />
+    </controls:RatioGrid>
+  </Grid>
+</UserControl>

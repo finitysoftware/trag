@@ -1,0 +1,24 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:files="using:Trag.ViewModels.Files"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.RestoreFileDialog" x:DataType="files:FileActionsViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Restore.IsOpen}" CloseCommand="{Binding Restore.CancelCommand}"
+                    Title="Restore file" Subtitle="{Binding Restore.Text}"
+                    Icon="reset" IconBrush="{DynamicResource DiffRemovedBrush}" PlateBrush="{DynamicResource DangerTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #CancelRestoreFileButton}">
+  <!-- Asked only when the file has changes of its own: they have no undo, like a discard. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="The file gets the content it has in this commit, and its changes in the working tree are lost. The index is not changed." FontSize="12" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Restore.IsRunning}" />
+    <TextBlock Text="{Binding Restore.Message}" IsVisible="{Binding Restore.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelRestoreFileButton" Content="Cancel" Command="{Binding Restore.CancelCommand}" Padding="18,8" />
+      <Button Name="ConfirmRestoreFileButton" Classes="danger" Content="Restore" Command="{Binding Restore.ConfirmCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

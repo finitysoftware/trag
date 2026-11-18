@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <!-- Trag's version: About shows it, and a crash log records it with the commit the build came from. -->
+    <Version>1.0.0</Version>
+    <!-- The publisher Windows shows in a file's details and the installer in Programs and Features. -->
+    <Company>Finity Software</Company>
+    <Copyright>© 2026 Finity Software</Copyright>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>14.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- An unused using fails the build (IDE0005 in .editorconfig). The analyzer only runs in a build that writes the
+         documentation file, so the file is written and its missing-comment warning is off. -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- The documentation file is only there for the analyzer; a published build does not carry it. -->
+    <PublishDocumentationFiles>false</PublishDocumentationFiles>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+    <ILLinkTreatWarningsAsErrors>true</ILLinkTreatWarningsAsErrors>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <Deterministic>true</Deterministic>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

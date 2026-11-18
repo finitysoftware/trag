@@ -1,0 +1,40 @@
+<Application xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell" xmlns:repositories="using:Trag.ViewModels.Repositories"
+             xmlns:preview="using:Trag.Desktop.Diagnostics.Preview"
+             xmlns:viewsRepositories="using:Trag.Desktop.Views.Repositories" xmlns:viewsHistory="using:Trag.Desktop.Views.History"
+             xmlns:viewsMerge="using:Trag.Desktop.Views.Merge" xmlns:viewsRebase="using:Trag.Desktop.Views.Rebase"
+             x:Class="Trag.Desktop.App" RequestedThemeVariant="Default">
+  <!-- The pages the shell hands out as objects; the window's content controls pick the view by the page's type. -->
+  <Application.DataTemplates>
+    <DataTemplate DataType="repositories:RepositoryCatalogViewModel"><viewsRepositories:RepositoriesView /></DataTemplate>
+    <DataTemplate DataType="shell:HistoryPage"><viewsHistory:HistoryView /></DataTemplate>
+    <DataTemplate DataType="shell:MergePage"><viewsMerge:MergeView /></DataTemplate>
+    <DataTemplate DataType="shell:RebasePage"><viewsRebase:RebaseView /></DataTemplate>
+    <DataTemplate DataType="shell:ConflictsPage"><viewsMerge:StashConflictsView /></DataTemplate>
+    <DataTemplate DataType="shell:PickPage"><viewsMerge:PickView /></DataTemplate>
+    <DataTemplate DataType="preview:SyntheticPreview"><preview:PreviewView /></DataTemplate>
+  </Application.DataTemplates>
+  <!-- Colours, Fluent overrides and control themes come from Themes/; the style files follow, general ones first so a later, more specific rule wins. -->
+  <Application.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://Trag/Themes/Palette.axaml" />
+    <ResourceInclude Source="avares://Trag/Themes/FluentOverrides.axaml" />
+    <ResourceInclude Source="avares://Trag/Themes/BusyBar.axaml" />
+    <ResourceInclude Source="avares://Trag/Themes/DialogHost.axaml" />
+  </ResourceDictionary.MergedDictionaries></ResourceDictionary></Application.Resources>
+  <Application.Styles>
+    <FluentTheme><FluentTheme.Palettes><ColorPaletteResources x:Key="Light" Accent="#AB5839" /><ColorPaletteResources x:Key="Dark" Accent="#E07A3F" /></FluentTheme.Palettes></FluentTheme>
+    <StyleInclude Source="avares://Trag/Themes/Controls.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/SoftwareRenderer.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/WindowChrome.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/PaneSplitter.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Toolbar.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Sidebar.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Dialogs.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Merge.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Pickers.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Diff.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/History.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Repositories.axaml" />
+    <StyleInclude Source="avares://Trag/Themes/Settings.axaml" />
+  </Application.Styles>
+</Application>

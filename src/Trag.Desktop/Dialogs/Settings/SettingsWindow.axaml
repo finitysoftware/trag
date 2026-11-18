@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:accounts="using:Trag.ViewModels.Accounts"
+        xmlns:settings="using:Trag.Desktop.Dialogs.Settings"
+        x:Class="Trag.Desktop.Dialogs.Settings.SettingsWindow" Classes="settings" x:DataType="accounts:AccountsViewModel" x:CompileBindings="True"
+        Title="Trag · Settings" Width="860" Height="710" MinWidth="740" MinHeight="530" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource SettingsSurface}">
+  <Panel>
+    <Grid ColumnDefinitions="205,*" Margin="10" ColumnSpacing="24">
+      <Border Classes="card" Padding="10,18"><Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
+        <TextBlock Text="Global settings" FontSize="16" FontWeight="SemiBold" Margin="9,0,0,24" />
+        <RadioButton Grid.Row="1" Name="IntegrationsSection" Classes="section" GroupName="SettingsSection" Content="Integrations" IsChecked="True" />
+        <RadioButton Grid.Row="2" Name="GitSection" Classes="section" GroupName="SettingsSection" Content="Git" Margin="0,4,0,0" />
+        <RadioButton Grid.Row="3" Name="AppearanceSection" Classes="section" GroupName="SettingsSection" Content="Appearance" Margin="0,4,0,0" />
+        <RadioButton Grid.Row="4" Name="AboutSection" Classes="section" GroupName="SettingsSection" Content="About" Margin="0,4,0,0" />
+        <StackPanel Grid.Row="6" Margin="9,18" Spacing="6"><TextBlock Text="trag" FontSize="22" FontWeight="Bold" Opacity="0.4" /><TextBlock Classes="muted" Text="Your repositories. Your accounts." /></StackPanel>
+      </Grid></Border>
+      <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="0,14,18,6" RowSpacing="14">
+        <!-- The scroll bar is drawn over the content, so the cards scroll across the column's right margin and keep it free. -->
+        <ScrollViewer Name="AccountsScroll" IsVisible="{Binding #IntegrationsSection.IsChecked}" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-18,0"><StackPanel Spacing="16" Margin="0,0,18,0">
+          <StackPanel Spacing="5"><TextBlock Text="Integrations" FontSize="21" FontWeight="SemiBold" /><TextBlock Classes="muted" Text="Connect your accounts for Fetch, Pull and Push." /></StackPanel>
+          <settings:GitHubAccountCard />
+          <settings:GitLabAccountCard />
+          <settings:CredentialStoreCard />
+          <settings:AutoFetchCard Name="AutoFetch" IsVisible="False" />
+        </StackPanel></ScrollViewer>
+        <settings:AppearanceCard Name="Appearance" IsVisible="{Binding #AppearanceSection.IsChecked}" />
+        <!-- About reaches down to 5 px above the line, where Finity Software's name sits: 14 px of row spacing and the
+             line's own 4 px margin, less 5. -->
+        <settings:AboutPage Name="About" IsVisible="{Binding #AboutSection.IsChecked}" Margin="0,0,0,-13" />
+        <settings:GitPage Name="Git" IsVisible="{Binding #GitSection.IsChecked}" />
+        <!-- The window ends as a dialog does: a line, and under it the status beside Done. -->
+        <StackPanel Grid.Row="1" Spacing="10">
+          <Separator Name="SettingsFooterLine" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <TextBlock Name="AccountStatus" Text="{Binding Status}" IsVisible="{Binding #IntegrationsSection.IsChecked}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="Done" Click="Done" />
+          </Grid>
+        </StackPanel>
+      </Grid>
+    </Grid>
+    <settings:GitLabEntryDialog Name="GitLabEntryOverlay" />
+    <settings:DeviceLoginDialog Name="DeviceLoginOverlay" />
+  </Panel>
+</Window>

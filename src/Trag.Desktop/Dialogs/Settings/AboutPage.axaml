@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:updates="using:Trag.ViewModels.Updates"
+             x:Class="Trag.Desktop.Dialogs.Settings.AboutPage">
+  <UserControl.Styles>
+    <!-- What the update check says beside the version: quiet, and in the accent once a newer Trag is out. -->
+    <Style Selector="TextBlock.update"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+    <Style Selector="TextBlock.update.available"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></Style>
+    <!-- Finity Software's name: as faint as the "trag" beside the sections until the pointer is on it, then in the
+         accent with a hand, as a link is; the app's button paints its hover on the button itself, which this replaces.
+         Small spaced capitals in Bahnschrift, or the system's Segoe UI where it is missing. -->
+    <Style Selector="Button.site"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="0" /><Setter Property="Foreground" Value="{DynamicResource TextBrush}" /><Setter Property="Opacity" Value="0.4" /><Setter Property="Cursor" Value="Hand" /></Style>
+    <Style Selector="Button.site TextBlock"><Setter Property="FontFamily" Value="Bahnschrift,Segoe UI Variable Display,Segoe UI,Inter,sans-serif" /><Setter Property="FontSize" Value="11" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="LetterSpacing" Value="1.5" /></Style>
+    <Style Selector="Button.site:pointerover"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="Button.site:pressed"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+  </UserControl.Styles>
+  <!-- Which Trag this is and whether a newer one is out, whose work it is built with, and where it leaves a crash log for
+       a bug report; Finity Software's name at its foot. -->
+  <Grid RowDefinitions="*,Auto">
+    <StackPanel Spacing="16">
+      <StackPanel Spacing="5"><TextBlock Text="About" FontSize="21" FontWeight="SemiBold" /><TextBlock Classes="muted" Text="The Trag running on this computer." /></StackPanel>
+      <!-- The version is selectable, so it can be copied into a bug report. The update check is offered only with a
+           service to ask (UpdateViewModel); it says what it learned beside the version. -->
+      <Border Classes="card">
+        <Grid Name="UpdateCard" ColumnDefinitions="*,Auto" ColumnSpacing="16" DataContext="{x:Null}" x:DataType="updates:UpdateViewModel">
+          <StackPanel Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="Trag" FontSize="16" FontWeight="SemiBold" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <SelectableTextBlock Name="AppVersion" />
+              <StackPanel Name="UpdateLine" Orientation="Horizontal" Spacing="6" IsVisible="False">
+                <TextBlock Name="UpdateSeparator" Classes="update" Text="·" IsVisible="{Binding HasStatus}" />
+                <TextBlock Name="UpdateStatus" Classes="update" Classes.available="{Binding OffersDownload}" Text="{Binding Status}" IsVisible="{Binding HasStatus}" />
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+          <Panel Grid.Column="1" Name="UpdateActions" VerticalAlignment="Center" IsVisible="False">
+            <Button Name="CheckForUpdate" Content="Update" Command="{Binding CheckCommand}" IsEnabled="{Binding CanCheck}" IsVisible="{Binding !OffersDownload}" />
+            <Button Name="DownloadUpdate" Content="Download" Command="{Binding DownloadCommand}" IsVisible="{Binding OffersDownload}" />
+          </Panel>
+        </Grid>
+      </Border>
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+          <StackPanel Spacing="5" VerticalAlignment="Center">
+            <TextBlock Text="License" FontWeight="SemiBold" FontSize="15" />
+            <TextBlock Classes="muted" Text="Trag is free to use, for yourself and at work. Its source is available to read, not to share. The license ships with it." />
+          </StackPanel>
+          <Button Grid.Column="1" Name="OpenLicense" Content="View license" Click="ShowLicense" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+          <StackPanel Spacing="5" VerticalAlignment="Center">
+            <TextBlock Text="Third-party notices" FontWeight="SemiBold" FontSize="15" />
+            <TextBlock Classes="muted" Text="Trag is built with open-source components. Their licenses and notices ship with it." />
+          </StackPanel>
+          <Button Grid.Column="1" Name="OpenNotices" Content="View notices" Click="ShowNotices" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+      <Border Classes="card" Name="CrashLogsCard">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+          <StackPanel Spacing="5" VerticalAlignment="Center">
+            <TextBlock Text="Crash logs" FontWeight="SemiBold" FontSize="15" />
+            <TextBlock Classes="muted" Text="When an error stops Trag, it writes what happened to a file here. Add the newest one to a bug report." />
+            <SelectableTextBlock Name="CrashLogsPath" FontSize="12" TextWrapping="Wrap" />
+          </StackPanel>
+          <Button Grid.Column="1" Name="OpenCrashLogs" Content="Open folder" Click="ShowCrashLogs" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+    </StackPanel>
+    <!-- Ends with the line under the page, which keeps Fluent's 12 px inset at either end; the window lets the page reach
+         down to 5 px above that line. -->
+    <Button Grid.Row="1" Name="FinitySoftwareLink" Classes="site" HorizontalAlignment="Right" Margin="0,0,12,0" Click="ShowFinitySoftware" AutomationProperties.Name="finitysoftware.io"><TextBlock Text="FINITYSOFTWARE.IO" /></Button>
+  </Grid>
+</UserControl>

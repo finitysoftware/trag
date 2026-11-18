@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:history="using:Trag.Desktop.Views.History"
+             x:Class="Trag.Desktop.Views.History.HistoryView" x:DataType="shell:HistoryPage" x:CompileBindings="True">
+  <!-- History and search: the commit list above, the commit details below, with the divider that remembers its ratio. -->
+  <controls:RatioGrid Name="HistoryPanels" Orientation="Vertical" Ratio="{Binding Layout.HistoryPanelRatio, Mode=TwoWay}">
+    <history:CommitListPanel Name="Commits" />
+    <controls:PaneSplitter Name="HistoryDivider" Grid.Row="1" AutomationProperties.Name="Resize commit details" ToolTip.Tip="Drag to resize commit details · Double-click to restore · Home/End to collapse" />
+    <history:CommitDetailsPanel Name="Details" Grid.Row="2" />
+  </controls:RatioGrid>
+</UserControl>

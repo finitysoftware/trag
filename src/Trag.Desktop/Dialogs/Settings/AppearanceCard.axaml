@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:live="using:Trag.Application.Live"
+             x:Class="Trag.Desktop.Dialogs.Settings.AppearanceCard" x:DataType="live:LayoutPreferences" x:CompileBindings="True">
+  <!-- The theme, chosen here rather than in the toolbar: Trag follows Windows, or stays light or dark. -->
+  <StackPanel Spacing="16">
+    <StackPanel Spacing="5"><TextBlock Text="Appearance" FontSize="21" FontWeight="SemiBold" /><TextBlock Classes="muted" Text="How Trag looks on this computer." /></StackPanel>
+    <Border Classes="card">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+        <StackPanel Spacing="5" VerticalAlignment="Center">
+          <TextBlock Text="Theme" FontWeight="SemiBold" FontSize="15" />
+          <TextBlock Classes="muted" Text="System follows Windows, dark in Graphite; the others stay as chosen." TextWrapping="Wrap" />
+        </StackPanel>
+        <ComboBox Grid.Column="1" Name="ThemeSelector" SelectedIndex="{Binding ThemeIndex}" MinWidth="170" VerticalAlignment="Center" AutomationProperties.Name="Theme">
+          <!-- In ThemeChoice's order: the selected index is the theme the layout saves. -->
+          <ComboBoxItem Content="System theme" /><ComboBoxItem Content="White" /><ComboBoxItem Content="Espresso" /><ComboBoxItem Content="Graphite" /><ComboBoxItem Content="Obsidian" /><ComboBoxItem Content="Vantablack" />
+        </ComboBox>
+      </Grid>
+    </Border>
+  </StackPanel>
+</UserControl>

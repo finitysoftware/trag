@@ -1,0 +1,33 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:repositories="using:Trag.ViewModels.Repositories"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.CloneDialog" x:DataType="repositories:CloneViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding IsCloneDialogOpen}" CloseCommand="{Binding CancelCloneCommand}"
+                    Title="Clone repository" DialogWidth="560"
+                    behaviors:FocusOnOpen.Target="{Binding #CloneTargetEditor}">
+  <StackPanel Spacing="12">
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+      <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource SelectedBrush}"><controls:LineIcon Kind="{Binding CloneSource.ProviderIconKind}" Width="34" Height="34" Foreground="{DynamicResource TextBrush}" /></Border>
+      <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center"><TextBlock Text="{Binding CloneTitle}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" /><TextBlock Classes="muted" Text="{Binding CloneSubtitle}" /></StackPanel>
+    </Grid>
+    <Separator />
+    <TextBlock Text="Local folder" FontWeight="SemiBold" FontSize="13" />
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+      <TextBox Name="CloneTargetEditor" Text="{Binding CloneTarget}" IsEnabled="{Binding CanEditClone}" FontSize="12" MaxLength="4096" AutomationProperties.Name="Clone target folder" />
+      <Button Grid.Column="1" Command="{Binding PickCloneFolderCommand}" IsEnabled="{Binding CanEditClone}" Padding="10,6" ToolTip.Tip="Choose the parent folder" AutomationProperties.Name="Choose the parent folder"><controls:LineIcon Kind="folder" Width="18" Height="18" Foreground="{DynamicResource TextBrush}" /></Button>
+    </Grid>
+    <TextBlock Classes="muted" Text="The repository will be cloned to this folder." />
+    <CheckBox Content="Open repository after cloning" IsChecked="{Binding CloneOpenAfter}" IsEnabled="{Binding CanEditClone}" FontSize="12" />
+    <CheckBox Name="CloneSubmodulesBox" Content="Clone submodules too" IsChecked="{Binding CloneSubmodules}" IsEnabled="{Binding CanEditClone}" FontSize="12" />
+    <ProgressBar Classes="thin" IsVisible="{Binding State.IsCloning}" />
+    <TextBlock Text="{Binding CloneStatus}" IsVisible="{Binding HasCloneStatus}" TextWrapping="Wrap" FontSize="12" />
+    <ScrollViewer MaxHeight="90" IsVisible="{Binding HasCloneDetails}"><TextBlock Text="{Binding CloneDetails}" FontFamily="Consolas,DejaVu Sans Mono,monospace" FontSize="11" TextWrapping="Wrap" /></ScrollViewer>
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelCloneButton" Content="Cancel" Command="{Binding CancelCloneCommand}" IsVisible="{Binding !State.IsCloning}" Padding="18,8" />
+      <Button Name="CancelRunningCloneButton" Content="Cancel" Command="{Binding CancelCloneCommand}" IsVisible="{Binding State.IsCloning}" Padding="18,8" />
+      <Button Name="ConfirmCloneButton" Classes="action accent" Content="Clone" Command="{Binding ConfirmCloneCommand}" Padding="22,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

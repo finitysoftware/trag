@@ -1,0 +1,177 @@
+name: Release
+
+# A tag of the form v1.0.0 publishes a release. Run by hand (workflow_dispatch), it builds the same files as artifacts
+# without a release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version of a trial build (without v)'
+        required: true
+        default: '0.0.1'
+
+permissions:
+  contents: write
+
+jobs:
+  # The installer and the portable ZIP for Windows.
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = if ('${{ github.event_name }}' -eq 'workflow_dispatch') { '${{ github.event.inputs.version }}' } else { '${{ github.ref_name }}' -replace '^v', '' }
+          if ($v -notmatch '^\d+\.\d+\.\d+') { throw "Invalid version: '$v' (expected e.g. 1.0.0)" }
+          "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Version: $v"
+
+      - name: Restore locked dependencies
+        run: dotnet restore Trag.sln --locked-mode
+
+      - name: Build
+        run: dotnet build Trag.sln -c Release --no-restore
+
+      # The integration tests run in CI and on the developer's machine; a release checks the unit tests.
+      - name: Unit tests
+        run: dotnet test Trag.sln -c Release --no-build -m:1 --filter "FullyQualifiedName!~Trag.IntegrationTests" -- xUnit.MaxParallelThreads=4
+
+      # One NativeAOT publish feeds both the installer and the portable ZIP: Trag.exe and its native libraries need no
+      # .NET runtime and only the Universal C Runtime that Windows carries.
+      - name: NativeAOT publish
+        shell: pwsh
+        run: ./scripts/Publish-Windows.ps1 -Version ${{ steps.ver.outputs.version }}
+
+      - name: Portable ZIP
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path portable, dist | Out-Null
+          Copy-Item artifacts/publish/win-x64/* portable/ -Recurse -Exclude *.pdb
+          Compress-Archive -Path portable/* -DestinationPath "dist/Trag-${{ steps.ver.outputs.version }}-win-x64-portable.zip"
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.ver.outputs.version }} installer\Trag.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC returned $LASTEXITCODE" }
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-windows
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
+  # A tar.gz and an AppImage for Linux. Every push already runs the unit tests on Linux (phase0.yml), so this job only
+  # publishes and packs.
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then v="$INPUT_VERSION"; else v="${GITHUB_REF_NAME#v}"; fi
+          echo "$v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' || { echo "Invalid version: '$v' (expected e.g. 1.0.0)"; exit 1; }
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          echo "Version: $v"
+
+      - name: NativeAOT prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang zlib1g-dev
+
+      - name: NativeAOT publish
+        run: dotnet publish src/Trag.Desktop -c Release -r linux-x64 -p:RestoreLockedMode=true -p:Version=$VERSION -o artifacts/publish/linux-x64
+
+      # The symbols stay out of what users download, as the .pdb files do on Windows.
+      - name: tar.gz
+        run: |
+          mkdir -p dist "staging/trag-$VERSION"
+          cp -a artifacts/publish/linux-x64/. "staging/trag-$VERSION/"
+          find staging \( -name '*.dbg' -o -name '*.pdb' \) -delete
+          tar -czf "dist/Trag-$VERSION-linux-x64.tar.gz" -C staging "trag-$VERSION"
+
+      # appimagetool is pinned and checked against the checksum its release publishes. It runs without FUSE, which
+      # the runner does not have, by extracting itself first.
+      - name: AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          ARCH: x86_64
+        run: |
+          curl -fsSL -o appimagetool https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
+          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  appimagetool" | sha256sum -c -
+          chmod +x appimagetool
+          mkdir -p AppDir/usr/bin
+          cp -a "staging/trag-$VERSION/." AppDir/usr/bin/
+          cp installer/linux/AppRun AppDir/AppRun
+          chmod +x AppDir/AppRun AppDir/usr/bin/Trag
+          cp installer/linux/trag.desktop AppDir/trag.desktop
+          cp docs/images/trag.png AppDir/trag.png
+          ./appimagetool AppDir "dist/Trag-$VERSION-linux-x86_64.AppImage"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-linux
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
+  # One place for every file: the checksums cover Windows and Linux alike, and a tag publishes them as one release.
+  publish:
+    runs-on: ubuntu-24.04
+    needs: [windows, linux]
+    env:
+      VERSION: ${{ needs.windows.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist
+
+      - name: SHA256 sums
+        working-directory: dist
+        run: |
+          sha256sum -- * > ../SHA256SUMS.txt
+          mv ../SHA256SUMS.txt .
+          cat SHA256SUMS.txt
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ github.ref_name }}" dist/* --repo "${{ github.repository }}" --title "Trag $VERSION" --generate-notes
+
+      # A run by hand publishes no release, only the files to check.
+      - name: Keep the files
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: actions/upload-artifact@v7
+        with:
+          name: trag-${{ env.VERSION }}
+          path: dist/
+          retention-days: 14

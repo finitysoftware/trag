@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/Trag.Infrastructure/Trag.Infrastructure.csproj" />
+    <ProjectReference Include="../Trag.TestSupport/Trag.TestSupport.csproj" />
+    <ProjectReference Include="../Trag.GitStub/Trag.GitStub.csproj" />
+    <None Update="suite.gitconfig" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

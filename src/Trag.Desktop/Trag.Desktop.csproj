@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- The program is Trag.exe; Windows names it by its title in the task manager and its details. -->
+    <AssemblyName>Trag</AssemblyName>
+    <Product>Trag</Product>
+    <AssemblyTitle>Trag - Git Client</AssemblyTitle>
+    <PublishAot>true</PublishAot>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Assets/trag-icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Prefer a smaller managed heap and automatic LOH compaction for repeated diff sessions. -->
+    <RuntimeHostConfigurationOption Include="System.GC.ConserveMemory" Value="5" />
+    <None Include="../../LICENSE" Link="LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../docs/THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+    <InternalsVisibleTo Include="Trag.Desktop.UnitTests" />
+    <ProjectReference Include="../Trag.Domain/Trag.Domain.csproj" />
+    <ProjectReference Include="../Trag.Application/Trag.Application.csproj" />
+    <ProjectReference Include="../Trag.Infrastructure/Trag.Infrastructure.csproj" />
+    <ProjectReference Include="../Trag.ViewModels/Trag.ViewModels.csproj" />
+    <AvaloniaResource Include="Assets/trag-icon.ico" />
+    <AvaloniaResource Include="Assets/trag-titlebar.ico" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+  </ItemGroup>
+</Project>

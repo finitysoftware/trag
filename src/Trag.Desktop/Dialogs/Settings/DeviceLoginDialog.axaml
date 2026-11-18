@@ -1,0 +1,21 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:accounts="using:Trag.ViewModels.Accounts" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.Settings.DeviceLoginDialog" x:DataType="accounts:AccountsViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Login.HasCode}" CloseCommand="{Binding CancelCommand}"
+                    Title="Sign in to GitHub" Subtitle="Approve Trag's access on GitHub's page."
+                    Icon="github" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}">
+  <!-- The GitHub device sign-in over the whole settings window, however many accounts are listed: the code to enter on
+       GitHub's page, the way there, the code on the clipboard, and a bar that runs while GitHub waits. The ✕ cancels it. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <StackPanel Spacing="24">
+      <TextBlock Name="DeviceCodeCaption" Text="Enter this code on GitHub" FontWeight="SemiBold" HorizontalAlignment="Center" />
+      <SelectableTextBlock Name="DeviceCode" Text="{Binding Login.UserCode}" FontSize="28" FontFamily="Consolas,monospace" HorizontalAlignment="Center" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Name="OpenDevicePageButton" Content="Open in browser" Command="{Binding OpenDevicePageCommand}" Padding="18,8" />
+        <Button Name="CopyDeviceCodeButton" Classes="accent" Content="Copy" Click="CopyCode" Padding="18,8" />
+      </StackPanel>
+    </StackPanel>
+    <ProgressBar Classes="thin" />
+  </StackPanel>
+</dialogs:DialogHost>

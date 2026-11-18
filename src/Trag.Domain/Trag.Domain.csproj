@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Git's types and the pure rules over them, and the sentences the screen shows: no state, no I/O, no package, and no
+       other Trag assembly (architecture rule DomainReferencesNoOtherAssembly). -->
+</Project>

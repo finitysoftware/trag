@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Shared test doubles, fixtures and the shell harness. No test framework dependency: every test project references this one. -->
+  <ItemGroup>
+    <ProjectReference Include="../../src/Trag.Domain/Trag.Domain.csproj" />
+    <ProjectReference Include="../../src/Trag.Application/Trag.Application.csproj" />
+    <ProjectReference Include="../../src/Trag.Infrastructure/Trag.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Trag.ViewModels/Trag.ViewModels.csproj" />
+    <ProjectReference Include="../../src/Trag.Desktop/Trag.Desktop.csproj" />
+  </ItemGroup>
+</Project>

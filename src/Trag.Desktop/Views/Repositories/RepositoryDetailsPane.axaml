@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:repositories="using:Trag.ViewModels.Repositories"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Repositories.RepositoryDetailsPane" x:DataType="repositories:RepositoryCatalogViewModel" x:CompileBindings="True">
+  <!-- The right column: the selected local or hosted repository with its facts and actions, the removal question and the pending initialization. -->
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="26,30" Spacing="14">
+    <StackPanel IsVisible="{Binding !State.HasSelection}" Spacing="12">
+      <Border Width="84" Height="84" CornerRadius="42" Background="{DynamicResource SelectedBrush}" HorizontalAlignment="Left"><controls:LineIcon Kind="folder" Width="40" Height="40" Foreground="{DynamicResource AccentBrush}" /></Border>
+      <TextBlock Text="Choose a repository" FontSize="20" FontWeight="SemiBold" />
+      <TextBlock Classes="muted" Text="{Binding State.Message}" />
+    </StackPanel>
+    <StackPanel IsVisible="{Binding State.HasSelectedLocal}" Spacing="14">
+      <Border Width="84" Height="84" CornerRadius="42" Background="{DynamicResource SelectedBrush}" HorizontalAlignment="Left"><controls:LineIcon Kind="folder" Width="40" Height="40" Foreground="{DynamicResource AccentBrush}" /></Border>
+      <TextBlock Name="DetailsName" Text="{Binding State.SelectedLocal.Name}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" />
+      <TextBlock Classes="muted" Text="{Binding State.SelectedLocal.Path}" />
+      <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="check" Width="16" Height="16" IsVisible="{Binding State.SelectedLocal.IsValid}" Foreground="{DynamicResource DiffAddedBrush}" VerticalAlignment="Center" /><TextBlock Text="{Binding State.SelectedLocal.LinkText}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" /></StackPanel>
+      <Separator />
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="14" RowSpacing="12">
+        <controls:LineIcon Kind="branch" Width="20" Height="20" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" /><StackPanel Grid.Column="1" Spacing="2"><TextBlock Classes="muted" Text="Current branch" /><TextBlock Text="{Binding State.SelectedLocal.BranchText}" FontSize="13" TextWrapping="Wrap" /></StackPanel>
+        <controls:LineIcon Grid.Row="1" Kind="clock" Width="20" Height="20" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" /><StackPanel Grid.Row="1" Grid.Column="1" Spacing="2"><TextBlock Classes="muted" Text="Last opened" /><TextBlock Text="{Binding State.SelectedLocal.LastOpenedText}" FontSize="13" /></StackPanel>
+        <controls:LineIcon Grid.Row="2" Kind="link" Width="20" Height="20" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" /><StackPanel Grid.Row="2" Grid.Column="1" Spacing="2"><TextBlock Classes="muted" Text="Origin" /><TextBlock Text="{Binding State.SelectedLocal.RemoteText}" FontSize="12" TextWrapping="Wrap" /></StackPanel>
+      </Grid>
+      <Separator />
+      <Button Classes="action accent" Name="DetailsOpenButton" Command="{Binding OpenSelectedRepositoryCommand}" AutomationProperties.Name="Open repository"><StackPanel Orientation="Horizontal" Spacing="10"><controls:LineIcon Kind="open" Width="18" Height="18" Foreground="White" /><TextBlock Text="Open repository" /></StackPanel></Button>
+      <Button Classes="action" Command="{Binding RevealCommand}" CommandParameter="{Binding State.SelectedLocal}" AutomationProperties.Name="Reveal in Explorer"><StackPanel Orientation="Horizontal" Spacing="10"><controls:LineIcon Kind="folder" Width="18" Height="18" Foreground="{DynamicResource AccentBrush}" /><TextBlock Text="Reveal in Explorer" Foreground="{DynamicResource AccentBrush}" /></StackPanel></Button>
+      <Border Classes="card" IsVisible="{Binding Local.Removal.IsOpen}"><StackPanel Spacing="10"><TextBlock Text="{Binding Local.Removal.Text}" TextWrapping="Wrap" FontSize="12" /><StackPanel Orientation="Horizontal" Spacing="8"><Button Name="ConfirmRemoveButton" Content="Remove from list" Command="{Binding Local.Removal.ConfirmCommand}" FontSize="12" /><Button Name="KeepRepositoryButton" Content="Keep" Command="{Binding Local.Removal.CancelCommand}" FontSize="12" /></StackPanel></StackPanel></Border>
+      <Separator />
+      <TextBlock Classes="muted" Text="{Binding State.Message}" />
+    </StackPanel>
+    <StackPanel IsVisible="{Binding State.HasSelectedRemote}" Spacing="14">
+      <Border Width="84" Height="84" CornerRadius="42" Background="{DynamicResource SelectedBrush}" HorizontalAlignment="Left"><controls:LineIcon Kind="{Binding State.SelectedRemote.ProviderIconKind}" Width="42" Height="42" Foreground="{DynamicResource TextBrush}" /></Border>
+      <TextBlock Text="{Binding State.SelectedRemote.FullName}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap" />
+      <TextBlock Classes="muted" Text="{Binding State.SelectedRemote.StateText}" />
+      <Button Classes="link" Command="{Binding OpenWebCommand}" CommandParameter="{Binding State.SelectedRemote}" AutomationProperties.Name="{Binding State.SelectedRemote.WebText}"><StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="link" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="{Binding State.SelectedRemote.WebText}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" /></StackPanel></Button>
+      <Separator />
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="14" RowSpacing="12">
+        <controls:LineIcon Kind="branch" Width="20" Height="20" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" /><StackPanel Grid.Column="1" Spacing="2"><TextBlock Classes="muted" Text="Default branch" /><TextBlock Text="{Binding State.SelectedRemote.DefaultBranchText}" FontSize="13" /></StackPanel>
+        <controls:LineIcon Grid.Row="1" Kind="lock" Width="20" Height="20" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" /><StackPanel Grid.Row="1" Grid.Column="1" Spacing="2"><TextBlock Classes="muted" Text="Visibility" /><TextBlock Text="{Binding State.SelectedRemote.VisibilityText}" FontSize="13" /></StackPanel>
+        <controls:LineIcon Grid.Row="2" Kind="clock" Width="20" Height="20" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Top" /><StackPanel Grid.Row="2" Grid.Column="1" Spacing="2"><TextBlock Classes="muted" Text="Last updated" /><TextBlock Text="{Binding State.SelectedRemote.UpdatedText}" FontSize="13" /></StackPanel>
+      </Grid>
+      <Separator />
+      <Button Classes="action accent" IsVisible="{Binding State.SelectedRemote.IsCloned}" Command="{Binding OpenSelectedRepositoryCommand}" AutomationProperties.Name="Open repository"><StackPanel Orientation="Horizontal" Spacing="10"><controls:LineIcon Kind="open" Width="18" Height="18" Foreground="White" /><TextBlock Text="Open repository" /></StackPanel></Button>
+      <Button Classes="action accent" Name="CloneRepositoryButton" IsVisible="{Binding !State.SelectedRemote.IsCloned}" Command="{Binding BeginCloneCommand}" CommandParameter="{Binding State.SelectedRemote}" AutomationProperties.Name="Clone repository"><StackPanel Orientation="Horizontal" Spacing="10"><controls:LineIcon Kind="pull" Width="18" Height="18" Foreground="White" /><TextBlock Text="Clone repository" /></StackPanel></Button>
+      <Button Classes="action" Command="{Binding OpenWebCommand}" CommandParameter="{Binding State.SelectedRemote}" AutomationProperties.Name="{Binding State.SelectedRemote.ViewText}"><StackPanel Orientation="Horizontal" Spacing="10"><controls:LineIcon Kind="external" Width="18" Height="18" Foreground="{DynamicResource AccentBrush}" /><TextBlock Text="{Binding State.SelectedRemote.ViewText}" Foreground="{DynamicResource AccentBrush}" /></StackPanel></Button>
+      <Separator />
+      <TextBlock Classes="muted" Text="{Binding State.SelectedRemote.Note}" />
+    </StackPanel>
+    <Border Classes="card" IsVisible="{Binding Local.Initialization.IsOpen}"><StackPanel Spacing="10">
+      <TextBlock Text="{Binding Local.Initialization.Text}" TextWrapping="Wrap" FontSize="12" />
+      <StackPanel Orientation="Horizontal" Spacing="8"><Button Name="InitializeRepositoryButton" Content="Initialize repository" Command="{Binding Local.Initialization.ConfirmCommand}" FontSize="12" /><Button Content="Cancel" Command="{Binding Local.Initialization.CancelCommand}" FontSize="12" /></StackPanel>
+    </StackPanel></Border>
+  </StackPanel></ScrollViewer>
+</UserControl>

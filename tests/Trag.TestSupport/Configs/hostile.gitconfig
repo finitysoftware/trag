@@ -1,0 +1,163 @@
+# Hostile user habits for the integration suite: each key has changed Git's output or behavior in
+# some version. Run the suite with GIT_CONFIG_GLOBAL pointing at this file and GIT_CONFIG_NOSYSTEM=1.
+# Left out on purpose:
+# - core.hooksPath and commit.template take absolute paths. GitFixture pins core.hooksPath in every fixture repository,
+#   and Trag commits with --file=- and merges with --no-edit, so Git reads no template for them.
+# - commit.gpgsign and tag.gpgSign belong to the signing tests.
+# - advice.* is on by default.
+# - core.safecrlf=true beside core.autocrlf=true makes Git itself refuse to add any LF file ("LF would be replaced by
+#   CRLF"), the fixtures' own commits included; Trag passes that refusal on like any other.
+# - feature.manyFiles=true turns on index.skipHash, and Git 2.55.0.windows.3 with core.splitIndex=true beside it writes a
+#   shared index named by the null hash and loses every staged entry while git add answers 0. The split index stays here;
+#   index.version=4 and core.untrackedCache, the rest of manyFiles, are set on their own.
+# - Keys Git honors as the user asked, the same as in a terminal, and Trag passes on: merge.log appends the merged
+#   commits' summary to the message Trag hands Git; rebase.instructionFormat words the plan's lines, which the rebase
+#   view shows as git status does; rebase.rescheduleFailedExec runs a failed exec again on continue.
+
+[color]
+	ui = always
+	diff = always
+	status = always
+	branch = always
+[core]
+	pager = less
+	quotePath = false
+	abbrev = 12
+	autocrlf = true
+	eol = crlf
+	ignoreCase = false
+	symlinks = true
+	fileMode = true
+	untrackedCache = true
+	splitIndex = true
+	preloadIndex = false
+	whitespace = cr-at-eol,tab-in-indent
+	commentChar = ";"
+	editor = false
+[pager]
+	branch = true
+[log]
+	decorate = full
+	abbrevCommit = true
+	showRoot = false
+	showSignature = true
+	date = relative
+	follow = true
+	mailmap = false
+[format]
+	pretty = oneline
+	signOff = true
+[i18n]
+	logOutputEncoding = ISO-8859-2
+[status]
+	short = true
+	branch = true
+	showStash = true
+	relativePaths = false
+	submoduleSummary = true
+	showUntrackedFiles = no
+	renames = copies
+[column]
+	ui = always
+[branch]
+	sort = -committerdate
+	autoSetupMerge = always
+	autoSetupRebase = always
+[tag]
+	sort = -version:refname
+[diff]
+	noprefix = true
+	mnemonicPrefix = true
+	relative = true
+	renames = copies
+	suppressBlankEmpty = true
+	context = 10
+	interHunkContext = 5
+	algorithm = histogram
+	indentHeuristic = false
+	colorMoved = zebra
+	wsErrorHighlight = all
+	submodule = diff
+	ignoreSubmodules = all
+	external = echo EXTERNAL-DIFF-MARKER
+	statGraphWidth = 1
+[apply]
+	whitespace = fix
+	ignoreWhitespace = change
+[commit]
+	cleanup = scissors
+	verbose = true
+	status = false
+[user]
+	useConfigOnly = true
+[trailer]
+	ifexists = addIfDifferent
+[merge]
+	ff = only
+	conflictStyle = zdiff3
+	verbosity = 5
+	autoStash = true
+	renormalize = true
+	directoryRenames = true
+[pull]
+	rebase = true
+	ff = only
+[rebase]
+	autoStash = true
+	autoSquash = true
+	updateRefs = true
+	abbreviateCommands = true
+	missingCommitsCheck = error
+[sequence]
+	editor = false
+[rerere]
+	enabled = true
+	autoUpdate = true
+[push]
+	default = nothing
+	autoSetupRemote = true
+	followTags = true
+	gpgSign = if-asked
+	recurseSubmodules = on-demand
+[fetch]
+	prune = true
+	pruneTags = true
+	recurseSubmodules = yes
+	showForcedUpdates = false
+	output = compact
+[remote]
+	pushDefault = nonexistent
+[url "https://example.invalid/rewritten/"]
+	insteadOf = https://example.invalid/original/
+[transfer]
+	fsckObjects = true
+[index]
+	version = 4
+[checkout]
+	defaultRemote = origin
+	workers = 8
+[submodule]
+	recurse = true
+[stash]
+	showPatch = true
+	showIncludeUntracked = true
+[gc]
+	auto = 1
+[maintenance]
+	auto = true
+[blame]
+	ignoreRevsFile = .git-blame-ignore-revs
+	markIgnoredLines = true
+	coloring = highlightRecent
+	date = relative
+	showEmail = true
+[alias]
+	status = log
+[credential]
+	helper =
+# What git lfs install writes for the user, so the clone takes Git LFS as set up, as it does for such a user.
+[filter "lfs"]
+	process = git-lfs filter-process
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true

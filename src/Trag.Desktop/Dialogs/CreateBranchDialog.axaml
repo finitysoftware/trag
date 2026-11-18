@@ -1,0 +1,30 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:branches="using:Trag.ViewModels.Branches"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.CreateBranchDialog" x:DataType="branches:BranchesViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Draft.IsOpen}" CloseCommand="{Binding CancelCreateBranchCommand}"
+                    Title="Create new branch" Icon="branch" IconBrush="{DynamicResource TextBrush}" DialogWidth="480"
+                    behaviors:FocusOnOpen.Target="{Binding #NewBranchNameEditor}">
+  <StackPanel Spacing="12">
+    <TextBlock Text="{Binding Draft.Subtitle}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="Branch name" FontWeight="SemiBold" FontSize="13" />
+    <TextBox Name="NewBranchNameEditor" Text="{Binding Draft.Name}" PlaceholderText="e.g. feature/new-payment-flow" MaxLength="255" FontSize="12" AutomationProperties.Name="Branch name">
+      <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding CreateBranchCommand}" /></TextBox.KeyBindings>
+    </TextBox>
+    <TextBlock Text="{Binding Draft.NameError}" IsVisible="{Binding Draft.HasNameError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="Start from" FontWeight="SemiBold" FontSize="13" />
+    <ComboBox Name="StartPointSelector" ItemsSource="{Binding Draft.StartPoints}" SelectedItem="{Binding Draft.SelectedStartPoint}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Start from">
+      <ComboBox.ItemTemplate><DataTemplate x:DataType="branches:StartPointOption"><TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+    </ComboBox>
+    <CheckBox Content="Switch to this branch after creating" IsChecked="{Binding Draft.SwitchAfterCreate}" FontSize="12" />
+    <TextBlock Text="You can publish the branch to origin later." FontSize="12" Foreground="{DynamicResource MutedBrush}" />
+    <TextBlock Text="{Binding Draft.Notice}" IsVisible="{Binding Draft.HasNotice}" FontSize="12" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelCreateBranchButton" Content="Cancel" Command="{Binding CancelCreateBranchCommand}" Padding="18,8" />
+      <Button Name="ConfirmCreateBranchButton" Classes="accent" Content="Create branch" Command="{Binding CreateBranchCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

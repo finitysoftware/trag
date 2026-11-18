@@ -1,0 +1,98 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:coreAccounts="using:Trag.Domain.Accounts"
+                    xmlns:naming="using:Trag.Domain.Naming"
+                    xmlns:corePublish="using:Trag.Domain.Publish"
+                    xmlns:coreStatus="using:Trag.Domain.Status"
+                    xmlns:publish="using:Trag.ViewModels.Publish"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.PublishDialog" x:DataType="publish:PublishViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Draft.IsOpen}" CloseCommand="{Binding CancelPublishCommand}"
+                    Title="{Binding Draft.Title}" Subtitle="{Binding Draft.Subtitle}"
+                    Icon="publish" IconSize="34" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource SelectedBrush}" DialogWidth="560">
+  <!-- Modes: create on a provider, use an existing remote URL, or publish the branch to an existing remote. Each form focuses its first field when it shows. -->
+  <!-- The scroll bar is drawn over the content, so the viewer reaches 18 px into the card's padding and the content keeps
+       those 18 px free, as in MergeBranchesDialog. -->
+  <ScrollViewer MaxHeight="522" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-18,0"><StackPanel Spacing="12" Margin="0,0,18,0">
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding Draft.ShowModeSwitch}">
+      <Button Classes="choice" Classes.active="{Binding Draft.IsProviderMode}" Name="PublishProviderModeButton" Content="Create on a provider" Command="{Binding UsePublishProviderCommand}" IsEnabled="{Binding CanEditPublish}" />
+      <Button Grid.Column="1" Classes="choice" Classes.active="{Binding Draft.IsUrlMode}" Name="PublishUrlModeButton" Content="Use existing remote URL" Command="{Binding UsePublishUrlCommand}" IsEnabled="{Binding CanEditPublish}" />
+    </Grid>
+    <Separator />
+    <StackPanel Spacing="12" IsVisible="{Binding Draft.IsProviderMode}" behaviors:FocusOnOpen.Target="{Binding #PublishNameEditor}">
+      <TextBlock IsVisible="{Binding !Accounts.HasAccounts}" Text="{Binding Accounts.EmptyMessage}" FontSize="12" TextWrapping="Wrap" />
+      <Grid ColumnDefinitions="128,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12" IsVisible="{Binding Accounts.HasAccounts}">
+        <TextBlock Classes="field" Text="Provider" />
+        <Grid Grid.Column="1" ColumnDefinitions="*,*" ColumnSpacing="8">
+          <Button Classes="choice" Classes.active="{Binding Accounts.IsGitHub}" Name="PublishGitHubButton" Command="{Binding ChoosePublishGitHubCommand}" IsEnabled="{Binding Accounts.HasGitHubAccounts}"><StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="github" Width="18" Height="18" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="GitHub" VerticalAlignment="Center" /></StackPanel></Button>
+          <Button Grid.Column="1" Classes="choice" Classes.active="{Binding Accounts.IsGitLab}" Name="PublishGitLabButton" Command="{Binding ChoosePublishGitLabCommand}" IsEnabled="{Binding Accounts.HasGitLabAccounts}"><StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="gitlab" Width="18" Height="18" Foreground="{DynamicResource GitLabBrush}" VerticalAlignment="Center" /><TextBlock Text="GitLab" VerticalAlignment="Center" /></StackPanel></Button>
+        </Grid>
+        <TextBlock Grid.Row="1" Classes="field" Text="Account" />
+        <ComboBox Grid.Row="1" Grid.Column="1" Name="PublishAccountSelector" ItemsSource="{Binding Accounts.Visible}" SelectedItem="{Binding Accounts.SelectedAccount}" IsEnabled="{Binding CanEditPublish}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Account">
+          <ComboBox.ItemTemplate><DataTemplate x:DataType="coreAccounts:AccountInfo"><TextBlock Text="{Binding UserName}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Grid.Row="2" Classes="field" Text="Owner" IsVisible="{Binding Accounts.Owners.Value.HasChoice}" />
+        <ComboBox Grid.Row="2" Grid.Column="1" Name="PublishOwnerSelector" IsVisible="{Binding Accounts.Owners.Value.HasChoice}" ItemsSource="{Binding Accounts.Owners.Value.Items}" SelectedItem="{Binding Accounts.Owners.Value.Selected}" IsEnabled="{Binding CanEditPublish}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Owner">
+          <ComboBox.ItemTemplate><DataTemplate x:DataType="corePublish:PublishOwner"><TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Grid.Row="3" Classes="field" Text="Repository name" />
+        <TextBox Grid.Row="3" Grid.Column="1" Name="PublishNameEditor" Text="{Binding Draft.Name}" MaxLength="{x:Static naming:GitLimits.PublishNameLength}" IsEnabled="{Binding CanEditPublish}" FontSize="12" AutomationProperties.Name="Repository name">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding PublishCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+        <TextBlock Grid.Row="4" Classes="field" Text="Visibility" />
+        <Grid Grid.Row="4" Grid.Column="1" ColumnDefinitions="*,*" ColumnSpacing="8">
+          <Button Classes="choice" Classes.active="{Binding Draft.IsPrivate}" Name="PublishPrivateButton" Command="{Binding SetPublishPrivateCommand}" IsEnabled="{Binding CanEditPublish}"><StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="lock" Width="16" Height="16" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" /><TextBlock Text="Private" VerticalAlignment="Center" /></StackPanel></Button>
+          <Button Grid.Column="1" Classes="choice" Classes.active="{Binding Draft.IsPublic}" Name="PublishPublicButton" Command="{Binding SetPublishPublicCommand}" IsEnabled="{Binding CanEditPublish}"><StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="globe" Width="16" Height="16" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Public" VerticalAlignment="Center" /></StackPanel></Button>
+        </Grid>
+        <TextBlock Grid.Row="5" Classes="field" Text="Remote name" IsVisible="{Binding Draft.ShowRemoteName}" />
+        <TextBox Grid.Row="5" Grid.Column="1" Name="PublishNewRemoteNameEditor" IsVisible="{Binding Draft.ShowRemoteName}" Text="{Binding Draft.RemoteName}" MaxLength="255" IsEnabled="{Binding CanEditPublish}" FontSize="12" AutomationProperties.Name="Remote name" />
+      </Grid>
+      <TextBlock Text="{Binding Draft.NameError}" IsVisible="{Binding Draft.HasNameError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+      <ProgressBar Classes="thin" IsVisible="{Binding Accounts.IsBusy}" />
+      <TextBlock Text="{Binding Accounts.Message}" IsVisible="{Binding Accounts.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Spacing="12" IsVisible="{Binding Draft.IsUrlMode}" behaviors:FocusOnOpen.Target="{Binding #PublishUrlEditor}">
+      <Grid ColumnDefinitions="128,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12">
+        <TextBlock Classes="field" Text="Remote URL" />
+        <TextBox Grid.Column="1" Name="PublishUrlEditor" Text="{Binding Draft.RemoteUrl}" PlaceholderText="https://github.com/you/repository.git" MaxLength="2048" IsEnabled="{Binding CanEditPublish}" FontSize="12" AutomationProperties.Name="Remote URL">
+          <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding PublishCommand}" /></TextBox.KeyBindings>
+        </TextBox>
+        <TextBlock Grid.Row="1" Classes="field" Text="Remote name" />
+        <TextBox Grid.Row="1" Grid.Column="1" Name="PublishRemoteNameEditor" Text="{Binding Draft.RemoteName}" MaxLength="255" IsEnabled="{Binding CanEditPublish}" FontSize="12" AutomationProperties.Name="Remote name" />
+        <TextBlock Grid.Row="2" Classes="field" Text="Account" IsVisible="{Binding Accounts.UrlAccounts.HasChoices}" />
+        <ComboBox Grid.Row="2" Grid.Column="1" Name="PublishUrlAccountSelector" IsVisible="{Binding Accounts.UrlAccounts.HasChoices}" ItemsSource="{Binding Accounts.UrlAccounts.Items}" SelectedItem="{Binding Accounts.UrlAccounts.Selected}" IsEnabled="{Binding CanEditPublish}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Account for this address">
+          <ComboBox.ItemTemplate><DataTemplate x:DataType="coreAccounts:AccountChoice"><TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+      </Grid>
+    </StackPanel>
+    <StackPanel Spacing="12" IsVisible="{Binding Draft.IsBranchMode}" behaviors:FocusOnOpen.Target="{Binding #PublishRemoteSelector}">
+      <Grid ColumnDefinitions="128,*" RowDefinitions="Auto,Auto" RowSpacing="12" ColumnSpacing="12">
+        <TextBlock Classes="field" Text="Remote" />
+        <ComboBox Grid.Column="1" Name="PublishRemoteSelector" ItemsSource="{Binding Draft.Context.Remotes}" SelectedItem="{Binding Draft.ExistingRemote}" IsEnabled="{Binding CanEditPublish}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Remote">
+          <ComboBox.ItemTemplate><DataTemplate x:DataType="coreStatus:RepositoryRemote"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Grid.Row="1" Classes="field" Text="Remote branch" />
+        <ComboBox Grid.Row="1" Grid.Column="1" Name="PublishTargetSelector" ItemsSource="{Binding Draft.Targets.Items}" SelectedItem="{Binding Draft.Targets.Selected}" IsEnabled="{Binding CanEditPublish}" HorizontalAlignment="Stretch" FontSize="12" AutomationProperties.Name="Remote branch">
+          <ComboBox.ItemTemplate><DataTemplate x:DataType="publish:PublishTargetOption"><TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /></DataTemplate></ComboBox.ItemTemplate>
+        </ComboBox>
+      </Grid>
+      <TextBlock Text="{Binding Draft.Targets.Warning}" IsVisible="{Binding Draft.Targets.HasWarning}" FontSize="11" Foreground="{DynamicResource WarningTextBrush}" TextWrapping="Wrap" />
+    </StackPanel>
+    <TextBlock Text="{Binding Draft.RemoteError}" IsVisible="{Binding Draft.HasRemoteError}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <CheckBox Name="PublishPushCheck" Content="{Binding Context.PushLabel}" IsChecked="{Binding Draft.PushAfter}" IsEnabled="{Binding Context.CanPush}" FontSize="12" />
+    <TextBlock Text="{Binding Draft.Summary}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+    <Separator />
+    <Button Classes="link" Name="PublishSwitchToUrlLink" IsVisible="{Binding Draft.IsProviderMode}" Command="{Binding UsePublishUrlCommand}" Content="Already created it? Use an existing remote URL" />
+    <Button Classes="link" Name="PublishSwitchToProviderLink" IsVisible="{Binding Draft.IsUrlMode}" Command="{Binding UsePublishProviderCommand}" Content="Create it on GitHub or GitLab instead" />
+    <Button Classes="link" Name="PublishCreateRepositoryLink" IsVisible="{Binding Draft.IsBranchMode}" Command="{Binding UsePublishProviderCommand}" Content="Create a new repository on GitHub or GitLab" />
+    <ProgressBar Classes="thin" IsVisible="{Binding IsPublishing}" />
+    <TextBlock Text="{Binding Draft.Notice}" IsVisible="{Binding Draft.HasNotice}" FontSize="12" TextWrapping="Wrap" />
+    <ScrollViewer MaxHeight="90" IsVisible="{Binding HasPublishDetails}"><TextBlock Text="{Binding PublishDetails}" FontFamily="Consolas,DejaVu Sans Mono,monospace" FontSize="11" TextWrapping="Wrap" /></ScrollViewer>
+  </StackPanel></ScrollViewer>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelPublishButton" Content="Cancel" Command="{Binding CancelPublishCommand}" Padding="18,8" />
+      <Button Name="ConfirmPublishButton" Classes="accent" Content="{Binding Draft.Title}" Command="{Binding PublishCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

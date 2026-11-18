@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:shell="using:Trag.ViewModels.Shell"
+             xmlns:merge="using:Trag.ViewModels.Merge"
+             xmlns:coreMerge="using:Trag.Domain.Merge"
+             xmlns:text="using:Trag.Domain.Presentation.Text"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             xmlns:diff="using:Trag.Desktop.Controls.Diff"
+             xmlns:views="using:Trag.Desktop.Views.Merge"
+             x:Class="Trag.Desktop.Views.Merge.ConflictDetailPanel" x:DataType="shell:ConflictsPage" x:CompileBindings="True">
+  <!-- The selected file of a merge or rebase stop: its actions and content. A conflict offers a side for the whole file,
+       the external tools and Mark as resolved, and shows its blocks as cards, yours first; a decided file shows how it was
+       decided, the way back to the conflict, and the diff of what the change does to it. The sides are named by the view:
+       mine and theirs in a merge, yours and upstream in a rebase. -->
+  <UserControl.Resources>
+    <DataTemplate x:Key="ConflictLineTemplate" x:DataType="coreMerge:ConflictLine">
+      <Grid ColumnDefinitions="56,*" Height="22"><TextBlock Classes="lineno" Text="{Binding Number}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Classes="codeline" Text="{Binding Text}" VerticalAlignment="Center" /></Grid>
+    </DataTemplate>
+  </UserControl.Resources>
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" ClipToBounds="True">
+    <StackPanel Margin="16,12,16,10" Spacing="3">
+      <TextBlock Name="MergeDetailTitle" Text="{Binding Resolution.DetailTitle}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+      <TextBlock Name="MergeDetailLine" Text="{Binding Resolution.DetailLine}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+      <!-- A conflict: a side for the whole file, the external tools, and Mark as resolved once no block is left. -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,9,0,0" IsVisible="{Binding Resolution.HasSelectedConflict}">
+        <!-- What does not fit beside Mark as resolved takes another line, so every action stays where it can be reached. -->
+        <WrapPanel ItemSpacing="8" LineSpacing="6">
+          <Button Name="UseYoursButton" Classes="mergeaction" AutomationProperties.Name="{Binding Resolution.Sides.Yours.UseAction}" Command="{Binding Resolution.UseYoursCommand}" ToolTip.Tip="{Binding Resolution.Sides.Yours.UseTip}"><StackPanel><controls:LineIcon Kind="back" Width="14" Height="14" Foreground="{DynamicResource MineBrush}" VerticalAlignment="Center" /><TextBlock Text="{Binding Resolution.Sides.Yours.UseAction}" /></StackPanel></Button>
+          <Button Name="UseOtherButton" Classes="mergeaction" AutomationProperties.Name="{Binding Resolution.Sides.Other.UseAction}" Command="{Binding Resolution.UseOtherCommand}" ToolTip.Tip="{Binding Resolution.Sides.Other.UseTip}"><StackPanel><controls:LineIcon Kind="arrow" Width="14" Height="14" Foreground="{DynamicResource TheirsBrush}" VerticalAlignment="Center" /><TextBlock Text="{Binding Resolution.Sides.Other.UseAction}" /></StackPanel></Button>
+          <Border Width="1" Height="22" Background="{DynamicResource DividerBrush}" />
+          <Button Name="ConflictEditorButton" Classes="mergeaction" AutomationProperties.Name="Open in editor" Command="{Binding Resolution.OpenConflictEditorCommand}" ToolTip.Tip="Open the configured graphical Git editor; use its wait option"><StackPanel><controls:LineIcon Kind="external" Width="14" Height="14" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Open in editor" /></StackPanel></Button>
+          <Button Name="MergeToolButton" Classes="mergeaction" AutomationProperties.Name="Merge tool" Command="{Binding Resolution.RunMergeToolCommand}" ToolTip.Tip="Open Git merge.guitool or merge.tool. Review the result, then mark it as resolved."><StackPanel><controls:LineIcon Kind="merge" Width="14" Height="14" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" /><TextBlock Text="Merge tool" /></StackPanel></Button>
+        </WrapPanel>
+        <Button Grid.Column="1" Name="StageResolutionButton" Classes="mergeaction" AutomationProperties.Name="Mark as resolved" Command="{Binding Resolution.StageResolutionCommand}" ToolTip.Tip="Stage the file's current content, or its deletion, as the resolution"><StackPanel><controls:LineIcon Kind="check" Width="14" Height="14" Foreground="{DynamicResource DiffAddedBrush}" VerticalAlignment="Center" /><TextBlock Text="Mark as resolved" /></StackPanel></Button>
+      </Grid>
+      <!-- A decided file: how it was decided, and the way back to the conflict. -->
+      <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,9,0,0" IsVisible="{Binding Resolution.HasSelectedResolved}">
+        <Border Classes="mergetag" Classes.theirs="{Binding Resolution.SelectedResolved.IsOther, FallbackValue=False}" Classes.mine="{Binding Resolution.SelectedResolved.IsYours, FallbackValue=False}"
+                Classes.edited="{Binding Resolution.SelectedResolved.IsEdited, FallbackValue=False}" Classes.markers="{Binding Resolution.SelectedResolved.HasMarkers, FallbackValue=False}" Padding="10,3"><TextBlock Text="{Binding Resolution.SelectedResolved.Title, FallbackValue=''}" FontSize="11" /></Border>
+        <Button Grid.Column="2" Name="ReopenConflictButton" Classes="mergeaction" Command="{Binding Resolution.RequestReopenCommand}" IsVisible="{Binding Resolution.SelectedResolved.CanReopen, FallbackValue=False}" ToolTip.Tip="Bring the conflict back: Git recreates the conflicted file and unstages its resolution"><StackPanel><controls:LineIcon Kind="discard" Width="14" Height="14" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" /><TextBlock Text="Mark as unresolved" /></StackPanel></Button>
+      </Grid>
+    </StackPanel>
+    <Border Grid.Row="1" Classes="mergestrip danger" IsVisible="{Binding Resolution.ShowsMarkResolvedReason}"><Grid ColumnDefinitions="Auto,*" ColumnSpacing="8"><controls:LineIcon Kind="blocked" Width="14" Height="14" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{x:Static text:MergeText.MarkResolvedWaits}" FontSize="11.5" TextWrapping="Wrap" VerticalAlignment="Center" /></Grid></Border>
+    <Border Grid.Row="2" Classes="mergestrip notice" IsVisible="{Binding Resolution.Reopen.IsOpen}">
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+        <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding Resolution.Reopen.Text}" FontSize="12" TextWrapping="Wrap" /><TextBlock Text="{Binding Resolution.Reopen.Message}" FontSize="11" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" IsVisible="{Binding Resolution.Reopen.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" /></StackPanel>
+        <Button Grid.Column="1" Content="Keep my edit" Command="{Binding Resolution.Reopen.CancelCommand}" FontSize="12" VerticalAlignment="Center" />
+        <Button Grid.Column="2" Name="ConfirmReopenButton" Classes="accent" Content="Bring the conflict back" Command="{Binding Resolution.Reopen.ConfirmCommand}" FontSize="12" VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+    <ProgressBar Classes="thin" Grid.Row="3" IsVisible="{Binding Conflict.Document.IsBusy}" />
+    <!-- A conflict shows its blocks with a few lines around each; a decided file shows the diff of what the change does. -->
+    <ScrollViewer Grid.Row="4" Name="ConflictBlocks" IsVisible="{Binding Resolution.HasSelectedConflict}" HorizontalScrollBarVisibility="Auto">
+      <StackPanel Margin="0,6,0,12">
+        <!-- The sentences over the blocks wrap within what shows; only the code beneath them scrolls sideways. -->
+        <Border MaxWidth="{Binding $parent[ScrollViewer].Viewport.Width}" Padding="16,0"><StackPanel>
+          <TextBlock Text="{Binding Conflict.Document.Value.Message}" IsVisible="{Binding Conflict.Document.Value.HasMessage}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,4" />
+          <TextBlock Text="{Binding Conflict.Document.Message}" IsVisible="{Binding Conflict.Document.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,4" />
+        </StackPanel></Border>
+        <ItemsControl Name="ConflictParts" ItemsSource="{Binding Conflict.Parts}">
+          <ItemsControl.ItemTemplate><DataTemplate x:DataType="merge:ConflictPartRow">
+            <StackPanel>
+              <TextBlock Text="⋯" IsVisible="{Binding Part.GapBefore}" Foreground="{DynamicResource MutedBrush}" Margin="44,0,0,0" />
+              <ItemsControl ItemsSource="{Binding Part.Lines}" IsVisible="{Binding !Part.IsBlock}" ItemTemplate="{StaticResource ConflictLineTemplate}" Margin="0,0,16,0" />
+              <Border Classes="conflictcard" IsVisible="{Binding Part.IsBlock}">
+                <StackPanel>
+                  <Border Classes="conflicthead">
+                    <!-- What does not fit within what shows takes another line; only the code beneath scrolls sideways. -->
+                    <WrapPanel ItemSpacing="12" LineSpacing="4" HorizontalAlignment="Left" MaxWidth="{Binding $parent[ScrollViewer].Viewport.Width, Converter={x:Static views:ConflictDetailPanel.InsideCard}}">
+                      <TextBlock Text="{Binding Part.Title}" FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <TextBlock Text="Choose what this part becomes:" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                      <Button Classes="link" Content="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Resolution.Sides.Yours.TakeAction}" FontSize="11.5" Command="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Conflict.TakeYoursCommand}" CommandParameter="{Binding}" />
+                      <TextBlock Text="·" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                      <Button Classes="link" Content="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Resolution.Sides.Other.TakeAction}" FontSize="11.5" Command="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Conflict.TakeOtherCommand}" CommandParameter="{Binding}" />
+                      <TextBlock Text="·" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+                      <Button Classes="link" Content="Take both" FontSize="11.5" Command="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Conflict.TakeBothCommand}" CommandParameter="{Binding}" />
+                    </WrapPanel>
+                  </Border>
+                  <Border Classes="conflictside mine"><TextBlock Text="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Resolution.Sides.Yours.Title}" /></Border>
+                  <Border Classes="conflictlines mine"><ItemsControl ItemsSource="{Binding Yours}" ItemTemplate="{StaticResource ConflictLineTemplate}" /></Border>
+                  <Border Classes="conflictside theirs"><TextBlock Text="{Binding $parent[UserControl].((shell:ConflictsPage)DataContext).Resolution.Sides.Other.Title}" /></Border>
+                  <Border Classes="conflictlines theirs"><ItemsControl ItemsSource="{Binding Other}" ItemTemplate="{StaticResource ConflictLineTemplate}" /></Border>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+    <!-- Nothing is selected once the last conflict is resolved: the panel says what to choose, as the file status does. -->
+    <StackPanel Grid.Row="4" IsVisible="{Binding !Resolution.HasSelection}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12" Margin="24" MaxWidth="320">
+      <controls:LineIcon Kind="file" Width="36" Height="36" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" />
+      <TextBlock Text="Select a file to review" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" />
+      <TextBlock Text="Choose a conflict to resolve it, or a decided file to see its change." FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource MutedBrush}" />
+    </StackPanel>
+    <Grid Grid.Row="4" RowDefinitions="Auto,2,*" IsVisible="{Binding Resolution.HasSelectedResolved}">
+      <diff:DiffNotice DataContext="{Binding WorkingDiff.Diff}" Margin="14,10" />
+      <ProgressBar Classes="thin" Grid.Row="1" IsVisible="{Binding WorkingDiff.Diff.IsBusy}" />
+      <diff:DiffView Grid.Row="2" Name="ConflictDiffView" IsVisible="{Binding Resolution.ShowsDiff}" Document="{Binding WorkingDiff.Diff.Document.Presentation}" Mode="{Binding Layout.DiffMode, Mode=TwoWay}" SplitRatio="{Binding Layout.DiffSplitRatio, Mode=TwoWay}" />
+    </Grid>
+  </Grid>
+</UserControl>

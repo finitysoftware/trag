@@ -1,0 +1,21 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:repositories="using:Trag.Desktop.Views.Repositories" xmlns:controls="using:Trag.Desktop.Controls">
+  <!-- The repository list page. "muted" and "card" are also names in the settings window with a different look, so both stay scoped to their view. -->
+  <Style Selector="repositories|RepositoriesView TextBlock.muted"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="FontSize" Value="12" /><Setter Property="TextWrapping" Value="Wrap" /></Style>
+  <Style Selector="TextBlock.group"><Setter Property="FontSize" Value="15" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Border.badge"><Setter Property="CornerRadius" Value="10" /><Setter Property="Padding" Value="9,3" /><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Border.badge.ok"><Setter Property="Background" Value="{DynamicResource OkTintBrush}" /></Style>
+  <Style Selector="Border.badge.bad"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="Border.badge TextBlock"><Setter Property="FontSize" Value="11" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Button.filter"><Setter Property="Padding" Value="18,7" /><Setter Property="FontSize" Value="12" /><Setter Property="MinWidth" Value="72" /><Setter Property="HorizontalContentAlignment" Value="Center" /></Style>
+  <Style Selector="Button.filter.active"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="Button.kebab"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="8,2" /><Setter Property="FontSize" Value="16" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Button.action"><Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="HorizontalContentAlignment" Value="Center" /><Setter Property="Padding" Value="14,10" /><Setter Property="FontSize" Value="13" /></Style>
+  <!-- The chevron at the right of a group's header, over the rows' ⋮, folds its list: > while folded, v while open. -->
+  <Style Selector="Button.fold"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="6" /><Setter Property="Margin" Value="0,0,10,0" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Button.fold controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="RenderTransform" Value="rotate(-90deg)" /></Style>
+  <Style Selector="Button.fold.open controls|LineIcon"><Setter Property="RenderTransform" Value="rotate(0deg)" /></Style>
+  <Style Selector="ListBox.repos"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="0" /></Style>
+  <Style Selector="ListBox.repos ListBoxItem"><Setter Property="Padding" Value="12,10" /><Setter Property="CornerRadius" Value="8" /><Setter Property="Margin" Value="0,2" /><Setter Property="MinHeight" Value="56" /></Style>
+  <Style Selector="repositories|RepositoriesView Border.card"><Setter Property="Background" Value="{DynamicResource ChromeBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="8" /><Setter Property="Padding" Value="14" /></Style>
+</Styles>

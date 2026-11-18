@@ -1,0 +1,17 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:Trag.Desktop.Controls">
+  <!-- The change badge and line counters in the diff header. -->
+  <Style Selector="Border.changeBadge"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Border.changeBadge.added"><Setter Property="Background" Value="{DynamicResource DiffAddedTintBrush}" /></Style>
+  <Style Selector="Border.changeBadge.removed"><Setter Property="Background" Value="{DynamicResource DiffRemovedTintBrush}" /></Style>
+  <Style Selector="TextBlock.changeLabel"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="TextBlock.changeLabel.added"><Setter Property="Foreground" Value="{DynamicResource DiffAddedBrush}" /></Style>
+  <Style Selector="TextBlock.changeLabel.removed"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /></Style>
+  <!-- The hunk actions beside a change block: transparent icon buttons that fit in one diff row, so the row's colour
+       shows through until the pointer is on one; stage and unstage darken their icon, discard turns red. -->
+  <Style Selector="Button.hunk"><Setter Property="Width" Value="22" /><Setter Property="Height" Value="20" /><Setter Property="Padding" Value="0" /><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="4" /><Setter Property="HorizontalContentAlignment" Value="Center" /><Setter Property="VerticalContentAlignment" Value="Center" /></Style>
+  <Style Selector="Button.hunk:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button.hunk controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+  <Style Selector="Button.hunk:pointerover controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource TextBrush}" /></Style>
+  <Style Selector="Button.hunk.discard:pointerover"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="Button.hunk.discard:pointerover controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /></Style>
+</Styles>

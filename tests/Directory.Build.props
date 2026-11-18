@@ -1,0 +1,15 @@
+<Project>
+  <Import Project="../Directory.Build.props" />
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" Condition="'$(MSBuildProjectName)' != 'Trag.Desktop.UnitTests'" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <!-- Code coverage collector for scripts/Measure-Coverage.ps1; inert unless dotnet test asks for the XPlat Code Coverage collector. -->
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

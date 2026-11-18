@@ -1,0 +1,52 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:merge="using:Trag.ViewModels.Merge"
+                    xmlns:controls="using:Trag.Desktop.Controls" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.MergeBranchesDialog" x:DataType="merge:MergeDialogViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding IsOpen}" CloseCommand="{Binding CancelCommand}"
+                    Title="{Binding Title}" Subtitle="{Binding Subtitle}"
+                    Icon="{Binding Icon}" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource SelectedBrush}" DialogWidth="600">
+  <!-- The two ways of bringing a branch in, behind one switch: the merge side (MergePane) and the rebase side (RebasePane).
+       The toolbar opens it on Merge; the switch hands the chosen branch across.
+       The scroll bar is drawn over the content, so the viewer reaches 18 px into the card's padding and the content keeps
+       those 18 px free: the bar sits in the gutter and the content stays as wide as the header. -->
+  <ScrollViewer MaxHeight="560" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-18,0"><StackPanel Spacing="12" Margin="0,0,18,0">
+    <Separator />
+    <Border Name="MergeModeSwitch" Classes="segmented">
+      <StackPanel Orientation="Horizontal" Spacing="2">
+        <Button Name="ShowMergeButton" Classes="segment" Classes.selected="{Binding !IsRebase}" Command="{Binding ShowMergeCommand}" AutomationProperties.Name="Merge">
+          <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="merge" Width="15" Height="15" VerticalAlignment="Center" /><TextBlock Text="Merge" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+        <Button Name="ShowRebaseButton" Classes="segment" Classes.selected="{Binding IsRebase}" Command="{Binding ShowRebaseCommand}" AutomationProperties.Name="Rebase">
+          <StackPanel Orientation="Horizontal" Spacing="7"><controls:LineIcon Kind="rebase" Width="15" Height="15" VerticalAlignment="Center" /><TextBlock Text="Rebase" VerticalAlignment="Center" /></StackPanel>
+        </Button>
+      </StackPanel>
+    </Border>
+    <Panel IsVisible="{Binding !IsRebase}"><dialogs:MergePane Name="MergePane" DataContext="{Binding Merge}" /></Panel>
+    <Panel IsVisible="{Binding IsRebase}"><dialogs:RebasePane Name="RebasePane" DataContext="{Binding Rebase}" /></Panel>
+    <Separator />
+  </StackPanel></ScrollViewer>
+  <dialogs:DialogHost.Footer>
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+      <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding !IsRebase}" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding Merge.Summary.IsBlocked}">
+          <controls:LineIcon Kind="blocked" Width="14" Height="14" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Merge.Summary.BlockedShort}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsRebase}" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding Rebase.Summary.IsBlocked}">
+          <controls:LineIcon Kind="blocked" Width="14" Height="14" Foreground="{DynamicResource DiffRemovedBrush}" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Rebase.Summary.BlockedShort}" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+      <Button Grid.Column="1" Name="CancelMergeButton" Content="Cancel" Command="{Binding CancelCommand}" Padding="18,8" />
+      <!-- The caption names both branches, so long names are shortened to keep the footer inside the dialog. -->
+      <Button Grid.Column="2" Name="ConfirmMergeButton" Classes="accent" Command="{Binding Merge.MergeCommand}" IsVisible="{Binding !IsRebase}" MaxWidth="360" Padding="18,8" AutomationProperties.Name="Merge">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8"><controls:LineIcon Kind="merge" Width="16" Height="16" Foreground="White" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="{Binding Merge.Summary.Action}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /></Grid>
+      </Button>
+      <Button Grid.Column="2" Name="ConfirmRebaseButton" Classes="accent" Command="{Binding Rebase.RebaseCommand}" IsVisible="{Binding IsRebase}" Padding="18,8" AutomationProperties.Name="Rebase">
+        <StackPanel Orientation="Horizontal" Spacing="8"><controls:LineIcon Kind="rebase" Width="16" Height="16" Foreground="White" VerticalAlignment="Center" /><TextBlock Text="{Binding Rebase.Summary.Action}" VerticalAlignment="Center" /></StackPanel>
+      </Button>
+    </Grid>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

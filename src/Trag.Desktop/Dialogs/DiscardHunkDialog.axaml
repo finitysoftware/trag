@@ -1,0 +1,24 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:diff="using:Trag.ViewModels.Diff"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.DiscardHunkDialog" x:DataType="diff:WorkingDiffViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding HunkDiscard.IsOpen}" CloseCommand="{Binding HunkDiscard.CancelCommand}"
+                    Title="{Binding HunkDiscard.Subject.Title}" Subtitle="{Binding HunkDiscard.Text}"
+                    Icon="discard" IconBrush="{DynamicResource DiffRemovedBrush}" PlateBrush="{DynamicResource DangerTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #CancelDiscardHunkButton}">
+  <!-- One hunk of the working tree, with no undo: the same red question as a whole file's discard. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="{Binding HunkDiscard.Subject.Description}" FontSize="12" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding HunkDiscard.IsRunning}" />
+    <TextBlock Text="{Binding HunkDiscard.Message}" IsVisible="{Binding HunkDiscard.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+      <Button Grid.Column="1" Name="CancelDiscardHunkButton" Content="Cancel" Command="{Binding HunkDiscard.CancelCommand}" Padding="18,8" />
+      <Button Grid.Column="2" Name="ConfirmDiscardHunkButton" Classes="danger" Content="Discard" Command="{Binding HunkDiscard.ConfirmCommand}" Padding="18,8" />
+    </Grid>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

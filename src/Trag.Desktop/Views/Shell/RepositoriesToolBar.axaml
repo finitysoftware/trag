@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:repositories="using:Trag.ViewModels.Repositories"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Shell.RepositoriesToolBar" x:DataType="repositories:RepositoryCatalogViewModel" x:CompileBindings="True">
+  <!-- The toolbar of the repository list page: open, add, remove and refresh entries, back to the open repository. -->
+  <StackPanel Orientation="Horizontal" Spacing="2">
+    <controls:ToolButton Name="PickerOpenButton" Kind="open" Text="Open" Accent="True" Command="{Binding OpenSelectedRepositoryCommand}" ToolTip.Tip="Open the selected repository (Enter)" AutomationProperties.Name="Open selected repository" />
+    <controls:ToolButton Name="NewRepositoryButton" Kind="plus" Text="New" Command="{Binding Local.AddRepositoryCommand}" ToolTip.Tip="Add a local folder; an empty folder can be initialized as a new repository" AutomationProperties.Name="New repository" />
+    <controls:ToolButton Name="DeleteRepositoryButton" Kind="trash" Text="Delete" Command="{Binding Local.RequestRemoveRepositoryCommand}" ToolTip.Tip="Remove the selected repository from this list; files stay on disk" AutomationProperties.Name="Delete repository entry" />
+    <controls:ToolButton Name="RefreshCatalogButton" Kind="refresh" Text="Refresh" Command="{Binding RefreshCatalogCommand}" ToolTip.Tip="Check every repository link again and reload accounts" AutomationProperties.Name="Refresh repository list" />
+    <controls:ToolButton Name="BackButton" Kind="back" Text="Back" IsVisible="{Binding Repository.HasRepository}" Command="{Binding BackCommand}" ToolTip.Tip="Back to the open repository" AutomationProperties.Name="Back to repository" />
+  </StackPanel>
+</UserControl>

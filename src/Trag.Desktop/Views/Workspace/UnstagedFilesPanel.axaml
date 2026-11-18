@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Trag.ViewModels.Shell" xmlns:status="using:Trag.ViewModels.Status" xmlns:merge="using:Trag.ViewModels.Merge"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Workspace.UnstagedFilesPanel" x:DataType="shell:FileStatusPage" x:CompileBindings="True">
+  <!-- Conflicts in a group of their own (not stageable here; a merge resolves them in its view), then the unstaged files
+       with their count, the icon-only Discard and the Stage action for the selection. -->
+  <Grid RowDefinitions="Auto,Auto,*" ClipToBounds="True">
+    <StackPanel Name="ConflictGroup" IsVisible="{Binding Resolution.HasConflicts}">
+      <Border Padding="12,6" Background="{DynamicResource ChromeBrush}"><Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
+        <controls:LineIcon Kind="warning" Width="14" Height="14" Foreground="{DynamicResource WarningTextBrush}" VerticalAlignment="Center" />
+        <StackPanel Name="ConflictHeading" Grid.Column="1" Classes="heading"><TextBlock Text="Conflicts" FontWeight="SemiBold" Foreground="{DynamicResource WarningTextBrush}" /><TextBlock Text="·" /><TextBlock Text="{Binding Resolution.Conflicts.Count}" /></StackPanel>
+        <TextBlock Grid.Column="2" Text="Not stageable here" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+      </Grid></Border>
+      <ScrollViewer MaxHeight="180" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl Name="ConflictRows" ItemsSource="{Binding Resolution.Conflicts}">
+          <ItemsControl.ItemTemplate><DataTemplate x:DataType="merge:ConflictRow">
+            <Grid ColumnDefinitions="25,*,Auto,Auto" ColumnSpacing="8" Margin="12,5" ToolTip.Tip="{Binding PathText}">
+              <TextBlock Text="!" Foreground="{DynamicResource WarningTextBrush}" FontWeight="Bold" FontSize="12" />
+              <TextBlock Grid.Column="1" Text="{Binding PathText}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="2" Text="{Binding BlocksText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" />
+              <Button Grid.Column="3" Classes="link" Content="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Resolution.Scope.ResolveText}" FontSize="11.5" IsVisible="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Resolution.Scope.HasView}"
+                      Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Resolution.ShowConflictCommand}" CommandParameter="{Binding}" />
+            </Grid>
+          </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </StackPanel>
+    <Border Grid.Row="1" Padding="12,6" Background="{DynamicResource ChromeBrush}"><Grid ColumnDefinitions="*,Auto,Auto"><StackPanel Name="UnstagedHeading" Classes="heading"><TextBlock Text="Unstaged files" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" /><TextBlock Text="·" /><TextBlock Text="{Binding FileStatus.UnstagedFiles.Count}" /></StackPanel><Button Grid.Column="1" Name="DiscardButton" Classes="headerdiscard" Command="{Binding Discard.DiscardSelectedCommand}" ToolTip.Tip="Discard the working tree changes in the selected files" AutomationProperties.Name="Discard selected" Margin="0,0,6,0"><controls:LineIcon Kind="discard" Width="14" Height="14" /></Button><Button Grid.Column="2" Name="StageButton" Content="{Binding Commit.StageActionText}" Command="{Binding Commit.StageSelectedCommand}" FontSize="11" Padding="8,4" ToolTip.Tip="Stage every current change in the selected files" /></Grid></Border>
+    <controls:StatusListBox Focusable="True" Grid.Row="2" Name="UnstagedList" Classes="virtualized" ItemsSource="{Binding FileStatus.UnstagedFiles}" SelectedItem="{Binding FileStatus.SelectedUnstaged}" SelectedItems="{Binding FileStatus.UnstagedSelection, Mode=OneWay}" SelectionMode="Multiple" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Unstaged files">
+      <ListBox.Styles><Style Selector="ListBoxItem" x:DataType="status:StatusRow"><Setter Property="AutomationProperties.Name" Value="{Binding PathText}" /></Style></ListBox.Styles>
+      <ListBox.ItemTemplate><DataTemplate x:DataType="status:StatusRow">
+        <Grid ColumnDefinitions="25,*" Background="Transparent" ToolTip.Tip="{Binding PathText}">
+          <!-- A right-click opens the file, shows it in the file manager or copies its path, ignores it, discards its changes
+               (the selection's, as the list's own Discard), or looks it up: its history, or its lines blamed in the working tree. -->
+          <Grid.ContextFlyout>
+            <MenuFlyout FlyoutPresenterClasses="actions">
+              <MenuItem Header="Open submodule" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.OpenSubmoduleCommand}" CommandParameter="{Binding File}" IsVisible="{Binding File.SubmoduleIsCheckedOut}"><MenuItem.Icon><controls:LineIcon Kind="open" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Open" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.OpenCommand}" CommandParameter="{Binding File.Path}" IsVisible="{Binding IsFile}"><MenuItem.Icon><controls:LineIcon Kind="external" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Open in File Explorer" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.RevealCommand}" CommandParameter="{Binding File.Path}" IsVisible="{Binding IsFile}"><MenuItem.Icon><controls:LineIcon Kind="folder" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Copy path" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.CopyPathCommand}" CommandParameter="{Binding File.Path}"><MenuItem.Icon><controls:LineIcon Kind="link" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Ignore" IsVisible="{Binding OffersIgnore}"><MenuItem.Icon><controls:LineIcon Kind="blocked" /></MenuItem.Icon>
+                <MenuItem Header="{Binding IgnoreFile.Label}" IsVisible="{Binding IgnoreFile, Converter={x:Static ObjectConverters.IsNotNull}}" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.IgnoreCommand}" CommandParameter="{Binding IgnoreFile}" />
+                <MenuItem Header="{Binding IgnoreExtension.Label}" IsVisible="{Binding IgnoreExtension, Converter={x:Static ObjectConverters.IsNotNull}}" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.IgnoreCommand}" CommandParameter="{Binding IgnoreExtension}" />
+                <MenuItem Header="{Binding IgnoreFolder.Label}" IsVisible="{Binding IgnoreFolder, Converter={x:Static ObjectConverters.IsNotNull}}" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Files.IgnoreCommand}" CommandParameter="{Binding IgnoreFolder}" />
+              </MenuItem>
+              <Separator />
+              <MenuItem Header="Discard" Classes="danger" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Discard.DiscardSelectedCommand}"><MenuItem.Icon><controls:LineIcon Kind="discard" /></MenuItem.Icon></MenuItem>
+              <Separator />
+              <MenuItem Header="File history" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).History.ShowStatusHistoryCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="history" /></MenuItem.Icon></MenuItem>
+              <MenuItem Header="Blame" Command="{Binding $parent[UserControl].((shell:FileStatusPage)DataContext).Blame.BlameStatusCommand}" CommandParameter="{Binding}"><MenuItem.Icon><controls:LineIcon Kind="commit" /></MenuItem.Icon></MenuItem>
+            </MenuFlyout>
+          </Grid.ContextFlyout>
+          <TextBlock Text="{Binding Code}" Foreground="{DynamicResource WarningTextBrush}" FontWeight="SemiBold" FontSize="11" /><TextBlock Grid.Column="1" Text="{Binding PathText}" FontSize="12" TextTrimming="CharacterEllipsis" />
+        </Grid>
+      </DataTemplate></ListBox.ItemTemplate>
+    </controls:StatusListBox>
+    <TextBlock Grid.Row="2" Text="No unstaged files" IsVisible="{Binding FileStatus.UnstagedEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Opacity="0.5" IsHitTestVisible="False" />
+  </Grid>
+</UserControl>

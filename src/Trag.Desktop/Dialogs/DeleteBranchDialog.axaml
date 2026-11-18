@@ -1,0 +1,23 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Avalonia.Data.Converters"
+                    xmlns:branches="using:Trag.ViewModels.Branches"
+                    xmlns:behaviors="using:Trag.Desktop.Behaviors" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.DeleteBranchDialog" x:DataType="branches:BranchesViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding Delete.IsOpen}" CloseCommand="{Binding Delete.CancelCommand}"
+                    Title="{Binding Delete.Subject.DeleteTitle}" Subtitle="{Binding Delete.Text}"
+                    Icon="trash" IconBrush="{DynamicResource DiffRemovedBrush}" PlateBrush="{DynamicResource DangerTintBrush}"
+                    behaviors:FocusOnOpen.Target="{Binding #CancelDeleteBranchButton}">
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Text="{Binding Delete.Subject.DeleteText}" FontSize="12" TextWrapping="Wrap" />
+    <ProgressBar Classes="thin" IsVisible="{Binding Delete.IsRunning}" />
+    <TextBlock Text="{Binding Delete.Message}" IsVisible="{Binding Delete.Message, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" FontSize="12" Foreground="{DynamicResource DiffRemovedBrush}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Name="CancelDeleteBranchButton" Content="Cancel" Command="{Binding Delete.CancelCommand}" Padding="18,8" />
+      <Button Name="ConfirmDeleteBranchButton" Classes="danger" Content="Remove" Command="{Binding Delete.ConfirmCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

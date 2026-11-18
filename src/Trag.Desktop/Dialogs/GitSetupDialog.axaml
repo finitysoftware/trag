@@ -1,0 +1,19 @@
+<dialogs:DialogHost xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:setup="using:Trag.ViewModels.Setup" xmlns:dialogs="using:Trag.Desktop.Dialogs"
+                    x:Class="Trag.Desktop.Dialogs.GitSetupDialog" x:DataType="setup:GitSetupViewModel" x:CompileBindings="True"
+                    IsOpen="{Binding IsOpen}" CloseCommand="{Binding CloseCommand}" DialogWidth="560"
+                    Title="Trag needs Git" Subtitle="Trag works with the Git installed on this computer."
+                    Icon="warning" IconBrush="{DynamicResource AccentBrush}" PlateBrush="{DynamicResource AccentTintBrush}">
+  <!-- Open while there is no Git to run: why, then Git's download page, or the git.exe the user already has. -->
+  <StackPanel Spacing="12">
+    <Separator />
+    <TextBlock Name="GitSetupText" Text="{Binding Text}" TextWrapping="Wrap" />
+    <Separator />
+  </StackPanel>
+  <dialogs:DialogHost.Footer>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Name="ChooseGitButton" Content="Choose git.exe" Command="{Binding ChooseGitCommand}" Padding="18,8" />
+      <Button Name="InstallGitButton" Classes="accent" Content="Install Git" Command="{Binding InstallGitCommand}" Padding="18,8" />
+    </StackPanel>
+  </dialogs:DialogHost.Footer>
+</dialogs:DialogHost>

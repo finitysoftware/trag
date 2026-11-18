@@ -1,0 +1,4 @@
+#!/bin/sh
+# Starts Trag from inside the AppImage. Its native libraries sit beside the executable, where Trag looks for them.
+here="$(dirname "$(readlink -f "$0")")"
+exec "$here/usr/bin/Trag" "$@"

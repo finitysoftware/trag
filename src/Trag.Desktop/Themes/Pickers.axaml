@@ -1,0 +1,36 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Trag.Desktop.Controls">
+  <!-- The branch and stash flyouts: row buttons, their pale row actions and section headings. -->
+  <!-- The branch picker draws its own padding so its busy bar can sit on the flyout's bottom edge. The pickers lie on the
+       theme's surface, as the row menus do, so their search box looks like the commit message box. -->
+  <Style Selector="FlyoutPresenter.branches"><Setter Property="Padding" Value="0" /><Setter Property="Background" Value="{DynamicResource MenuBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" /></Style>
+  <!-- A picker's search box takes the picker's colour, at rest, under the pointer and in focus, where Fluent tints the field
+       in its own colours. -->
+  <Style Selector="FlyoutPresenter.branches TextBox"><Setter Property="Background" Value="{DynamicResource MenuBrush}" /></Style>
+  <Style Selector="FlyoutPresenter.branches TextBox:pointerover /template/ Border#PART_BorderElement"><Setter Property="Background" Value="{DynamicResource MenuBrush}" /></Style>
+  <Style Selector="FlyoutPresenter.branches TextBox:focus /template/ Border#PART_BorderElement"><Setter Property="Background" Value="{DynamicResource MenuBrush}" /></Style>
+  <Style Selector="Button.branch"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="10,4,6,4" /><Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="FontSize" Value="12" /></Style>
+  <Style Selector="Button.branch:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <Style Selector="Button.branch.current"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="Button.branch.plain"><Setter Property="Padding" Value="10,7" /></Style>
+  <!-- The delete button stays pale until hovered, then turns red; the row itself keeps its switch or preview action. -->
+  <Style Selector="Button.trash"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="5" /><Setter Property="CornerRadius" Value="6" /><Setter Property="VerticalAlignment" Value="Center" /><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+  <Style Selector="Button.trash:pointerover"><Setter Property="Background" Value="{DynamicResource DangerTintBrush}" /></Style>
+  <Style Selector="Button.trash controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Opacity" Value="0.45" /></Style>
+  <Style Selector="Button.trash:pointerover controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+  <Style Selector="TextBlock.section"><Setter Property="FontSize" Value="10" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Margin" Value="10,10,0,4" /></Style>
+  <Style Selector="Button.stash"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="10,5,6,5" /><Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="FontSize" Value="12" /></Style>
+  <Style Selector="Button.stash:pointerover"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Style>
+  <!-- Row actions stay pale until hovered: Apply turns accent, Drop (the trash above) turns red; the row itself previews the stash. -->
+  <Style Selector="Button.rowaction"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="5" /><Setter Property="CornerRadius" Value="6" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+  <Style Selector="Button.rowaction controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /><Setter Property="Opacity" Value="0.45" /></Style>
+  <Style Selector="Button.rowaction:pointerover"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /></Style>
+  <Style Selector="Button.rowaction:pointerover controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="Opacity" Value="1" /></Style>
+  <!-- A branch row's … shows while the pointer is over its row, or while its menu is open; the menu's delete item is red. -->
+  <Style Selector="Button.rowmore"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="5" /><Setter Property="CornerRadius" Value="6" /><Setter Property="Opacity" Value="0" /></Style>
+  <Style Selector="Button.branch:pointerover Button.rowmore, Button.rowmore:flyout-open"><Setter Property="Opacity" Value="1" /></Style>
+  <Style Selector="Button.rowmore:pointerover"><Setter Property="Background" Value="{DynamicResource SelectedBrush}" /></Style>
+  <Style Selector="Button.rowmore controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}" /></Style>
+  <Style Selector="MenuItem.danger"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /></Style>
+  <Style Selector="MenuItem.danger controls|LineIcon"><Setter Property="Foreground" Value="{DynamicResource DiffRemovedBrush}" /></Style>
+</Styles>

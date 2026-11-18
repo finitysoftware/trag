@@ -1,0 +1,313 @@
+=== branch-switch-local-changes
+--- stderr
+error: Your local changes to the following files would be overwritten by checkout:
+	a.txt
+Please commit your changes or stash them before you switch branches.
+Aborting
+--- stdout
+=== branch-switch-untracked
+--- stderr
+error: The following untracked working tree files would be overwritten by checkout:
+	t.txt
+Please move or remove them before you switch branches.
+Aborting
+--- stdout
+=== branch-switch-create-exists
+--- stderr
+fatal: a branch named 'other' already exists
+--- stdout
+=== branch-switch-index-lock
+--- stderr
+fatal: Unable to create 'C:/corpus/branch/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, or the lock file may be stale
+--- stdout
+=== branch-switch-unknown-ref
+--- stderr
+fatal: invalid reference: nowhere
+--- stdout
+=== branch-delete-not-fully-merged
+--- stderr
+error: the branch 'other' is not fully merged
+hint: If you are sure you want to delete it, run 'git branch -D other'
+hint: Disable this message with "git config set advice.forceDeleteBranch false"
+--- stdout
+=== branch-switch-used-by-worktree
+--- stderr
+fatal: 'other' is already used by worktree at 'C:/corpus/linked'
+--- stdout
+=== branch-delete-used-by-worktree
+--- stderr
+error: cannot delete branch 'other' used by worktree at 'C:/corpus/linked'
+--- stdout
+=== stash-apply-local-changes
+--- stderr
+error: Your local changes to the following files would be overwritten by merge:
+	a.txt
+Please commit your changes or stash them before you merge.
+Aborting
+--- stdout
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   a.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+=== stash-apply-untracked-exists
+--- stderr
+new.txt already exists, no checkout
+error: could not restore untracked files from stash
+--- stdout
+Already up to date.
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	new.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+=== stash-apply-index-lock
+--- stderr
+error: Unable to create 'C:/corpus/stash/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, or the lock file may be stale
+error: could not write index
+--- stdout
+=== stash-push-index-lock
+--- stderr
+error: Unable to create 'C:/corpus/stash/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, or the lock file may be stale
+error: could not write index
+--- stdout
+=== stash-drop-unknown
+--- stderr
+fatal: log for 'stash' only has 1 entries
+--- stdout
+=== stash-untracked-unindexable
+--- stderr
+error: open("CON.txt"): No such file or directory
+error: unable to index file 'CON.txt'
+fatal: adding files failed
+--- stdout
+=== stash-untracked-held-open
+--- stderr
+error: open("held.txt"): Permission denied
+error: unable to index file 'held.txt'
+fatal: adding files failed
+--- stdout
+=== stash-push-only-untracked
+--- stderr
+--- stdout
+No local changes to save
+=== stash-apply-conflicts
+--- stderr
+--- stdout
+Auto-merging a.txt
+CONFLICT (content): Merge conflict in a.txt
+On branch main
+Unmerged paths:
+  (use "git restore --staged <file>..." to unstage)
+  (use "git add <file>..." to mark resolution)
+	both modified:   a.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	held.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+=== stash-drop-other-entry
+--- stderr
+--- stdout
+Dropped stash@{1} (9b5a7e00a3a14abe20a9f4fcbb076a8babb94f02)
+=== transport-push-fetch-first
+--- stderr
+error: failed to push some refs to 'C:/corpus/hub.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+--- stdout
+To C:/corpus/hub.git
+!	b75d97dd4bfdde4b7ce3f620f2b4d3f24140a592:refs/heads/main	[rejected] (fetch first)
+Done
+=== transport-push-non-fast-forward
+--- stderr
+error: failed to push some refs to 'C:/corpus/hub.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+--- stdout
+To C:/corpus/hub.git
+!	b75d97dd4bfdde4b7ce3f620f2b4d3f24140a592:refs/heads/main	[rejected] (non-fast-forward)
+Done
+=== transport-push-delete-current-branch
+--- stderr
+remote: error: By default, deleting the current branch is denied, because the next        
+remote: 'git clone' won't result in any file checked out, causing confusion.        
+remote: 
+remote: You can set 'receive.denyDeleteCurrent' configuration variable to        
+remote: 'warn' or 'ignore' in the remote repository to allow deleting the        
+remote: current branch, with or without a warning message.        
+remote: 
+remote: To squelch this message, you can set it to 'refuse'.        
+remote: error: refusing to delete the current branch: refs/heads/main        
+error: failed to push some refs to 'C:/corpus/hub.git'
+--- stdout
+To C:/corpus/hub.git
+!	:refs/heads/main	[remote rejected] (deletion of the current branch prohibited)
+Done
+=== pull-upstream-deleted
+--- stderr
+fatal: couldn't find remote ref refs/heads/gone
+--- stdout
+=== probe-bare-explicit
+--- stderr
+fatal: cannot use bare repository 'C:/corpus/hub.git' (safe.bareRepository is 'explicit')
+--- stdout
+=== transport-http-401-no-username
+--- stderr
+fatal: could not read Username for 'http://127.0.0.1:47811': terminal prompts disabled
+--- stdout
+=== transport-http-401-no-password
+--- stderr
+fatal: could not read Password for 'http://alice@127.0.0.1:47811': terminal prompts disabled
+--- stdout
+=== transport-http-401-refused
+--- stderr
+fatal: Authentication failed for 'http://127.0.0.1:47811/private/trag.git/'
+--- stdout
+=== transport-http-404-missing
+--- stderr
+fatal: repository 'http://127.0.0.1:47811/acme/none.git/' not found
+--- stdout
+=== transport-http-connection-refused
+--- stderr
+fatal: unable to access 'http://127.0.0.1:1/acme/trag.git/': Failed to connect to 127.0.0.1:1 after 2111 ms: Could not connect to server
+--- stdout
+=== clone-http-401-no-username
+--- stderr
+Cloning into 'C:/corpus/clone-http-401-no-username'...
+fatal: could not read Username for 'http://127.0.0.1:47811': terminal prompts disabled
+--- stdout
+=== clone-http-401-refused
+--- stderr
+Cloning into 'C:/corpus/clone-http-401-refused'...
+fatal: Authentication failed for 'http://127.0.0.1:47811/private/trag.git/'
+--- stdout
+=== clone-http-403-forbidden
+--- stderr
+Cloning into 'C:/corpus/clone-http-403-forbidden'...
+fatal: unable to access 'http://127.0.0.1:47811/forbidden/trag.git/': The requested URL returned error: 403
+--- stdout
+=== clone-http-404-missing
+--- stderr
+Cloning into 'C:/corpus/clone-http-404-missing'...
+fatal: repository 'http://127.0.0.1:47811/acme/none.git/' not found
+--- stdout
+=== clone-http-connection-refused
+--- stderr
+Cloning into 'C:/corpus/clone-http-connection-refused'...
+fatal: unable to access 'http://127.0.0.1:1/acme/trag.git/': Failed to connect to 127.0.0.1:1 after 2104 ms: Could not connect to server
+--- stdout
+=== clone-unresolvable-host
+--- stderr
+Cloning into 'C:/corpus/clone-unresolvable-host'...
+fatal: unable to access 'http://corpus.invalid/trag.git/': Could not resolve host: corpus.invalid
+--- stdout
+=== clone-target-exists
+--- stderr
+fatal: destination path 'C:/corpus/clone-target-exists' already exists and is not an empty directory.
+--- stdout
+=== commit-ssh-program-missing
+--- stderr
+error: cannot spawn C:/corpus/missing-keygen: No such file or directory
+error: 
+fatal: failed to write commit object
+--- stdout
+=== commit-ssh-key-passphrase
+--- stderr
+error: Enter passphrase for "C:/corpus/locked-key": Load key "C:/corpus/locked-key": incorrect passphrase supplied to decrypt private key?
+
+fatal: failed to write commit object
+--- stdout
+=== commit-gpg-no-secret-key
+--- stderr
+error: gpg failed to sign the data:
+gpg: keyblock resource 'C:/corpus/gnupg/pubring.kbx': No such file or directory
+[GNUPG:] ERROR add_keyblock_resource 33587281
+[GNUPG:] ERROR keydb_search 33554445
+gpg: skipped "DEADBEEFDEADBEEF": No secret key
+[GNUPG:] INV_SGNR 9 DEADBEEFDEADBEEF
+[GNUPG:] FAILURE sign 17
+gpg: signing failed: No secret key
+
+fatal: failed to write commit object
+--- stdout
+=== commit-hook-refuses-signed
+--- stderr
+pre-commit: tests failed
+--- stdout
+=== merge-signing-refused
+--- stderr
+error: cannot spawn C:/corpus/missing-keygen: No such file or directory
+error: 
+fatal: failed to write commit object
+--- stdout
+=== merge-conflicts-while-signing
+--- stderr
+--- stdout
+Auto-merging a.txt
+CONFLICT (content): Merge conflict in a.txt
+Automatic merge failed; fix conflicts and then commit the result.
+=== tag-signing-refused
+--- stderr
+error: cannot spawn C:/corpus/missing-keygen: No such file or directory
+error: 
+error: unable to sign the tag
+The tag message has been left in .git/TAG_EDITMSG
+--- stdout
+=== tag-needs-message
+--- stderr
+fatal: no tag message?
+--- stdout
+=== signature-openpgp-program-missing
+--- stderr
+error: cannot spawn C:/corpus/missing-gpg: No such file or directory
+--- stdout
+N^@^@bb5f181f36e2907e1a4babc933765ebf23da5db3^@b76468dbcd40a24b8541d100035b61e1420a794b^@Corpus^@corpus@example.invalid^@2026-01-01T00:00:00Z^@signed
+^@
+=== signature-ssh-program-missing
+--- stderr
+error: cannot spawn C:/corpus/missing-keygen: No such file or directory
+error: cannot spawn C:/corpus/missing-keygen: No such file or directory
+--- stdout
+B^@^@90959a8267a52a478d31c0876a547e51a42a8309^@b76468dbcd40a24b8541d100035b61e1420a794b^@Corpus^@corpus@example.invalid^@2026-01-01T00:00:00Z^@signed
+^@
+=== signature-ssh-no-allowed-signers
+--- stderr
+error: gpg.ssh.allowedSignersFile needs to be configured and exist for ssh signature verification
+--- stdout
+N^@^@90959a8267a52a478d31c0876a547e51a42a8309^@b76468dbcd40a24b8541d100035b61e1420a794b^@Corpus^@corpus@example.invalid^@2026-01-01T00:00:00Z^@signed
+^@
+=== revert-nothing-to-commit
+--- stderr
+--- stdout
+On branch main
+nothing to commit, working tree clean
+=== open-dubious-ownership
+--- stderr
+fatal: detected dubious ownership in repository at 'C:/corpus/pick'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/corpus/pick
+--- stdout
+=== probe-dubious-ownership
+--- stderr
+fatal: detected dubious ownership in repository at 'C:/corpus/pick'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/corpus/pick
+--- stdout

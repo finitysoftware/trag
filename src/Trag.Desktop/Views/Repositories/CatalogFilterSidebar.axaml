@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:repositories="using:Trag.ViewModels.Repositories"
+             xmlns:controls="using:Trag.Desktop.Controls"
+             x:Class="Trag.Desktop.Views.Repositories.CatalogFilterSidebar" x:DataType="repositories:RepositoryCatalogViewModel" x:CompileBindings="True">
+  <!-- The left column of the repository list page: the all/local filters, one entry per account, and the way to add an account. -->
+  <Border Background="{DynamicResource ChromeBrush}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12,18" Spacing="4">
+      <TextBlock Classes="caption" Text="REPOSITORIES" Margin="8,0,0,10" />
+      <Button Classes="nav" Classes.active="{Binding Filter.IsAllFilter}" Name="AllRepositoriesButton" Command="{Binding Filter.ShowAllRepositoriesCommand}" AutomationProperties.Name="All repositories" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" FontSize="12">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"><controls:LineIcon Kind="folder" Width="18" Height="18" Foreground="{DynamicResource AccentBrush}" /><TextBlock Grid.Column="1" Text="All repositories" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Text="{Binding AllCountText}" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+      </Button>
+      <Button Classes="nav" Classes.active="{Binding Filter.IsLocalFilter}" Name="LocalRepositoriesButton" Command="{Binding Filter.ShowLocalRepositoriesCommand}" AutomationProperties.Name="Local repositories" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" FontSize="12">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"><controls:LineIcon Kind="monitor" Width="18" Height="18" Foreground="{DynamicResource AccentBrush}" /><TextBlock Grid.Column="1" Text="Local repositories" VerticalAlignment="Center" /><TextBlock Grid.Column="2" Text="{Binding Local.LocalCountText}" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+      </Button>
+      <Separator Margin="6,14" />
+      <TextBlock Classes="caption" Text="ACCOUNTS" Margin="8,0,0,10" />
+      <ItemsControl ItemsSource="{Binding AccountGroups}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="repositories:AccountGroup">
+        <Button Classes="nav" Classes.active="{Binding IsFiltered}" Command="{Binding $parent[UserControl].((repositories:RepositoryCatalogViewModel)DataContext).Filter.ShowAccountCommand}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding Title}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" FontSize="12">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"><controls:LineIcon Kind="{Binding IconKind}" Width="18" Height="18" Foreground="{DynamicResource TextBrush}" /><TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" /><TextBlock Grid.Column="2" Text="{Binding CountText}" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" /></Grid>
+        </Button>
+      </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+      <Button Classes="nav" Name="AddAccountButton" Command="{Binding RequestSettingsCommand}" AutomationProperties.Name="Add account" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" FontSize="12">
+        <StackPanel Orientation="Horizontal" Spacing="12"><controls:LineIcon Kind="plus" Width="18" Height="18" Foreground="{DynamicResource AccentBrush}" /><TextBlock Text="Add account" VerticalAlignment="Center" /></StackPanel>
+      </Button>
+    </StackPanel></ScrollViewer>
+  </Border>
+</UserControl>

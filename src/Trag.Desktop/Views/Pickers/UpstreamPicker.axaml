@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sync="using:Trag.ViewModels.Sync"
+             xmlns:controls="using:Trag.Desktop.Controls" xmlns:behaviors="using:Trag.Desktop.Behaviors"
+             x:Class="Trag.Desktop.Views.Pickers.UpstreamPicker" x:DataType="sync:SyncViewModel" x:CompileBindings="True" Width="292"
+             behaviors:FocusOnOpen.Target="{Binding #UpstreamSearchBox}">
+  <!-- The remote branch Pull and Push use, the chosen one checked; choosing closes the picker. The rows have no actions of
+       their own, so the whole row is the choice. -->
+  <StackPanel Spacing="8" Margin="16,15,16,12">
+    <TextBlock Text="Choose the upstream branch" FontWeight="SemiBold" FontSize="13" />
+    <TextBox Name="UpstreamSearchBox" Text="{Binding Selection.Search}" PlaceholderText="Find a branch…" FontSize="12" MaxLength="255" AutomationProperties.Name="Find an upstream branch">
+      <TextBox.KeyBindings><KeyBinding Gesture="Enter" Command="{Binding ChooseFirstBranchCommand}" /></TextBox.KeyBindings>
+    </TextBox>
+    <!-- The scroll bar is drawn over the content, so the list scrolls across the picker's right margin and keeps it free. -->
+    <ScrollViewer MaxHeight="380" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-16,0">
+      <ItemsControl Name="UpstreamBranchList" ItemsSource="{Binding Selection.Visible}" Margin="0,0,16,0"><ItemsControl.ItemTemplate><DataTemplate x:DataType="sync:SyncBranchRow">
+        <Button Classes="branch plain" Classes.current="{Binding IsChosen}" Command="{Binding $parent[UserControl].((sync:SyncViewModel)DataContext).ChooseBranchCommand}" CommandParameter="{Binding}">
+          <Grid ColumnDefinitions="14,Auto,*" ColumnSpacing="10">
+            <controls:LineIcon Kind="check" Width="14" Height="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" IsVisible="{Binding IsChosen}" />
+            <controls:LineIcon Grid.Column="1" Kind="branch" Width="15" Height="15" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          </Grid>
+        </Button>
+      </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+    </ScrollViewer>
+  </StackPanel>
+</UserControl>

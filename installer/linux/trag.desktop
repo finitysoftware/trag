@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Trag
+GenericName=Git Client
+Comment=A fast, native Git client
+Exec=Trag
+Icon=trag
+Categories=Development;RevisionControl;
+Terminal=false

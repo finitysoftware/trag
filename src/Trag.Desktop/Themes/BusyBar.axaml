@@ -1,0 +1,43 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Trag.Desktop.Controls">
+  <!-- BusyBar: the Fluent indeterminate bar (two indicators, same easing and offsets) with a 1 s sweep instead of 2 s,
+       so the "at least one full cycle" minimum stays short without cutting the animation. PART_Indicator is required by ProgressBar. -->
+  <ControlTheme x:Key="{x:Type controls:BusyBar}" TargetType="controls:BusyBar">
+    <Setter Property="Foreground" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
+    <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="MinHeight" Value="2" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:BusyBar">
+        <Border Name="ProgressBarRoot" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <Panel>
+            <Border Name="PART_Indicator" IsVisible="False" />
+            <Border Name="IndeterminateProgressBarIndicator" Background="{TemplateBinding Foreground}" CornerRadius="{TemplateBinding CornerRadius}"
+                    Width="{Binding $parent[controls:BusyBar].TemplateSettings.ContainerWidth}" />
+            <Border Name="IndeterminateProgressBarIndicator2" Background="{TemplateBinding Foreground}" CornerRadius="{TemplateBinding CornerRadius}"
+                    Width="{Binding $parent[controls:BusyBar].TemplateSettings.Container2Width}" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:indeterminate /template/ Border#IndeterminateProgressBarIndicator">
+      <Style.Animations>
+        <Animation IterationCount="Infinite" Duration="0:0:1">
+          <KeyFrame KeySpline="0.4,0,0.6,1" KeyTime="0:0:0"><Setter Property="TranslateTransform.X" Value="{Binding $parent[controls:BusyBar].TemplateSettings.ContainerAnimationStartPosition}" /></KeyFrame>
+          <KeyFrame KeySpline="0.4,0,0.6,1" KeyTime="0:0:0.75"><Setter Property="TranslateTransform.X" Value="{Binding $parent[controls:BusyBar].TemplateSettings.ContainerAnimationEndPosition}" /></KeyFrame>
+          <KeyFrame KeySpline="0.4,0,0.6,1" KeyTime="0:0:1"><Setter Property="TranslateTransform.X" Value="{Binding $parent[controls:BusyBar].TemplateSettings.ContainerAnimationEndPosition}" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="^:indeterminate /template/ Border#IndeterminateProgressBarIndicator2">
+      <Style.Animations>
+        <Animation IterationCount="Infinite" Duration="0:0:1">
+          <KeyFrame KeySpline="0.4,0,0.6,1" KeyTime="0:0:0"><Setter Property="TranslateTransform.X" Value="{Binding $parent[controls:BusyBar].TemplateSettings.Container2AnimationStartPosition}" /></KeyFrame>
+          <KeyFrame KeySpline="0.4,0,0.6,1" KeyTime="0:0:0.375"><Setter Property="TranslateTransform.X" Value="{Binding $parent[controls:BusyBar].TemplateSettings.Container2AnimationStartPosition}" /></KeyFrame>
+          <KeyFrame KeySpline="0.4,0,0.6,1" KeyTime="0:0:1"><Setter Property="TranslateTransform.X" Value="{Binding $parent[controls:BusyBar].TemplateSettings.Container2AnimationEndPosition}" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

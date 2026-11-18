@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:preview="using:Trag.Desktop.Diagnostics.Preview"
+             x:Class="Trag.Desktop.Diagnostics.Preview.PreviewView" x:DataType="preview:SyntheticPreview" x:CompileBindings="True">
+  <!-- The synthetic file list and diff of the virtualization fixture; probe-only, never shown on a normal launch. -->
+  <Grid ColumnDefinitions="350,5,*">
+    <ListBox Name="FilesList" Classes="virtualized" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile}" BorderThickness="0"><ListBox.ItemTemplate><DataTemplate x:DataType="preview:PreviewRow"><TextBlock Text="{Binding Text}" FontSize="12" TextTrimming="CharacterEllipsis" /></DataTemplate></ListBox.ItemTemplate></ListBox>
+    <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Stretch" />
+    <ListBox Grid.Column="2" Name="DiffList" Classes="virtualized" ItemsSource="{Binding DiffLines}" BorderThickness="0" FontFamily="Cascadia Mono,Consolas,DejaVu Sans Mono,monospace" FontSize="12"><ListBox.ItemTemplate><DataTemplate x:DataType="preview:PreviewRow"><Grid ColumnDefinitions="55,*"><TextBlock Text="{Binding Number}" Opacity="0.4" /><TextBlock Grid.Column="1" Text="{Binding Text}" Foreground="{DynamicResource PreviewAddedBrush}" /></Grid></DataTemplate></ListBox.ItemTemplate></ListBox>
+  </Grid>
+</UserControl>
