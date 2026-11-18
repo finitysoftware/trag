@@ -21,6 +21,7 @@
 <p align="center">
   <a href="https://trag.sh">Website</a> |
   <a href="https://downloads.finitysoftware.io/trag">Download</a> |
+  <a href="docs/manual/README.md">User manual</a> |
   <a href="#-building-from-source">Build from source</a>
 </p>
 
@@ -53,6 +54,11 @@ such as committing, branching, merging and syncing takes less effort. It is deve
 | **Sync** | Fetch, pull and push, or publish a new repository to GitHub or GitLab in one step |
 | **Advanced** | Submodules, Git LFS and signed commits |
 | **Terminal** | A terminal in the repository folder, one click away |
+
+## 📖 User manual
+
+The [user manual](docs/manual/README.md) walks through every part of Trag with screenshots: adding repositories,
+committing, history, branches, merging and rebasing, resolving conflicts, stashes, syncing, and accounts and settings.
 
 ## 📥 Download
 
